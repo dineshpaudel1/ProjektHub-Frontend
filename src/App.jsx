@@ -1,71 +1,48 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/admin/AdminLogin";
 import Dashboard from "./pages/admin/Dashboard";
+import Profile from "./pages/admin/Profile";
 import AdminLayout from "./layouts/AdminLayout";
 import UserLayout from "./layouts/UserLayout";
-import Home from "./pages/user/Home";
 import Projects from "./pages/user/Projects";
 import Services from "./pages/user/Services";
 import About from "./pages/user/About";
 import PrivateRoute from "./utils/PrivateRoute";
+import UserLogin from "./pages/user/UserLogin";
+import AdminProjects from "./pages/admin/AdminProjects";
+import MasterPage from "./pages/user/MasterPage";
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Default Route: User Home (no auth check) */}
-        <Route path="/" element={<Navigate to="/home" replace />} />
+        {/* User routes */}
+        <Route path="/" element={<UserLayout />}>
+          <Route index element={<MasterPage />} />
+          <Route path="projects" element={<Projects />} />
+          <Route path="services" element={<Services />} />
+          <Route path="about" element={<About />} />
+          <Route path="login" element={<UserLogin />} />
+        </Route>
 
-        {/* Login Page */}
-        <Route path="/login" element={<Login />} />
-
-        {/* Admin Protected Route */}
+        {/* Admin routes */}
+        <Route path="/admin/login" element={<Login />} />
         <Route
           path="/admin"
           element={
-            <PrivateRoute role="admin">
-              <AdminLayout>
-                <Dashboard />
-              </AdminLayout>
+            <PrivateRoute>
+              <AdminLayout />
             </PrivateRoute>
           }
-        />
-
-        {/* User Panel - Public Routes (no auth check) */}
-        <Route
-          path="/home"
-          element={
-            <UserLayout>
-              <Home />
-            </UserLayout>
-          }
-        />
-        <Route
-          path="/projects"
-          element={
-            <UserLayout>
-              <Projects />
-            </UserLayout>
-          }
-        />
-        <Route
-          path="/services"
-          element={
-            <UserLayout>
-              <Services />
-            </UserLayout>
-          }
-        />
-        <Route
-          path="/about"
-          element={
-            <UserLayout>
-              <About />
-            </UserLayout>
-          }
-        />
+        >
+          <Route index element={<Dashboard />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="projects" element={<AdminProjects />} />
+        </Route>
       </Routes>
     </Router>
+
   );
 }
 

@@ -1,5 +1,6 @@
-@import "tailwindcss";  
+@import "tailwindcss";
 
+/* ====== Fonts ====== */
 @font-face {
   font-family: Doto;
   src: url(./assets/fonts/Doto-Regular.ttf);
@@ -9,8 +10,48 @@
   font-family: Nunito;
   src: url(./assets/fonts/Nunito-Regular.ttf);
 }
+@font-face {
+  font-family: Poppins;
+  src: url(./assets/fonts/Poppins-Regular.ttf);
+}
 
-@theme {
-  --font-primary: Nunito, sans-serif;
-  --font-doto: Doto, sans-serif;
+/* ====== Theme Variables ====== */
+:root {
+  /* Fonts */
+  --font-primary: Poppins-Regular, sans-serif;
+  /* Light Theme Colors */
+  --bg-color: #ffffff;
+  --text-color: #0a0a0a;
+  --text-secondary: #4b5563;
+  --navbar-bg: #ffffff;
+  --menu-bg: #ffffff;
+  --hover-bg: #f3f4f6;
+  --border-color: #e5e7eb;
+  --button-primary: #5454D4;
+  --button-primary-hover: #4444c0;
+}
+
+/* Dark Theme Overrides */
+[data-theme="dark"] {
+  --bg-color: #19191B;
+  --text-color: #ffffff;
+  --text-secondary: #d1d5db;
+  --menu-bg: rgba(25, 25, 27, 0.7);     /* semi-transparent */
+  --navbar-bg: rgba(25, 25, 27, 0.6);   /* semi-transparent for glassmorphism */
+  --hover-bg: rgba(55, 65, 81, 0.4);    /* also semi-transparent for hover */
+  --border-color: rgba(255, 255, 255, 0.1); /* subtle border */
+  --button-primary: #6b6bff;
+  --button-primary-hover: #5454d4;
+}
+
+/* ====== Base Styles ====== */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-primary);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s;
 }
