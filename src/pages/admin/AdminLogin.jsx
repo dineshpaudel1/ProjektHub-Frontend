@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from "../../utils/axiosInstance";
 
 const AdminLogin = () => {
     const navigate = useNavigate();
@@ -20,19 +20,34 @@ const AdminLogin = () => {
                 password,
             });
 
-            const { accessToken, refreshToken } = response.data.data;
+            const { accessToken, refreshToken } = response?.data?.data || {};
+
+            if (!accessToken || !refreshToken) {
+                localStorage.clear(); // ❌ Clear all tokens
+                navigate("/admin/login");
+                return;
+            }
+
             localStorage.setItem("token", accessToken);
             localStorage.setItem("refreshToken", refreshToken);
             localStorage.setItem("isAuthenticated", "true");
 
             navigate("/admin");
         } catch (err) {
-            console.error(err);
-            setError("Invalid credentials or server error.");
+            console.error("Auth error:", err?.response || err.message);
+
+            // ❌ Clear all localStorage tokens if login fails or backend is down
+            localStorage.removeItem("token");
+            localStorage.removeItem("refreshToken");
+            localStorage.removeItem("isAuthenticated");
+
+            navigate("/admin/login");
         } finally {
             setLoading(false);
         }
     };
+
+
 
     return (
         <div

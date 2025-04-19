@@ -1,6 +1,7 @@
 import React from "react";
 import { Home, Briefcase, Menu } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
+import { FaFolderOpen } from 'react-icons/fa';
 
 const Sidebar = ({ isCollapsed, toggleSidebar }) => {
     const location = useLocation();
@@ -35,7 +36,7 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
 
                 {/* Projects Link */}
                 <Link
-                    to="projects"
+                    to="adminproject"
                     className={`flex items-center justify-center ${isCollapsed
                         ? "w-12 h-12 rounded-full"
                         : "w-full justify-start px-4 py-2.5 rounded-full"
@@ -45,8 +46,23 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
                         }`}
                 >
                     <div className="flex items-center gap-3">
-                        <Briefcase size={20} />
-                        {!isCollapsed && <span>Projects</span>}
+                        <FaFolderOpen size={20} />
+                        {!isCollapsed && <span>All Projects</span>}
+                    </div>
+                </Link>
+                <Link
+                    to="adminproject"
+                    className={`flex items-center justify-center ${isCollapsed
+                        ? "w-12 h-12 rounded-full"
+                        : "w-full justify-start px-4 py-2.5 rounded-full"
+                        } font-medium transition-all ${isActive("projects")
+                            ? "bg-[#e5e5e5] text-black"
+                            : "text-black hover:bg-gray-100"
+                        }`}
+                >
+                    <div className="flex items-center gap-3">
+                        <FaFolderOpen size={20} />
+                        {!isCollapsed && <span>Our Projects</span>}
                     </div>
                 </Link>
             </nav>
