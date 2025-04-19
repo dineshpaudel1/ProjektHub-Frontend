@@ -4,7 +4,6 @@ import { FaFolderOpen } from 'react-icons/fa';
 import thumbnail from '../../assets/images/thumbnailone.png';
 import ProjectCard from './ProjectCard';
 import AddCategoryModal from '../../modals/AddCategoryModal';
-import AddProjectModal from '../../modals/AddProjectModal';
 import axios from "../../utils/axiosInstance";
 
 
@@ -12,14 +11,8 @@ const AdminProjects = () => {
     const navigate = useNavigate();
 
     const [showCategoryModal, setShowCategoryModal] = useState(false);
-    const [showProjectModal, setShowProjectModal] = useState(false);
     const [categoryName, setCategoryName] = useState('');
     const [categories, setCategories] = useState([]);
-    const [projectForm, setProjectForm] = useState({
-        title: '',
-        description: '',
-        categoryId: '',
-    });
 
     // Fetch categories
     useEffect(() => {
@@ -74,18 +67,6 @@ const AdminProjects = () => {
         }
     };
 
-    const handleCreateProject = () => {
-        const { title, description, categoryId } = projectForm;
-        if (title && description && categoryId) {
-            console.log('Created project:', {
-                title,
-                description,
-                categoryId: Number(categoryId),
-            });
-            setShowProjectModal(false);
-            setProjectForm({ title: '', description: '', categoryId: '' });
-        }
-    };
 
     const projects = [
         {
@@ -122,7 +103,7 @@ const AdminProjects = () => {
                     <div className="bg-orange-500 text-white p-2 rounded mr-2">
                         <FaFolderOpen />
                     </div>
-                    <h1 className="text-2xl font-bold text-gray-800">Projects</h1>
+                    <h1 className="text-2xl font-bold text-gray-800">All Projects</h1>
                 </div>
 
                 <div className="flex gap-3">
@@ -131,12 +112,6 @@ const AdminProjects = () => {
                         className="px-5 py-1.5 text-blue-500 border border-blue-500 rounded-full hover:bg-blue-50 transition text-sm"
                     >
                         Add Category
-                    </button>
-                    <button
-                        onClick={() => setShowProjectModal(true)}
-                        className="px-5 py-1.5 text-blue-500 border border-blue-500 rounded-full hover:bg-blue-50 transition text-sm"
-                    >
-                        Add Projects
                     </button>
                 </div>
             </div>
@@ -167,15 +142,6 @@ const AdminProjects = () => {
                 onCreate={handleCreateCategory}
                 categoryName={categoryName}
                 setCategoryName={setCategoryName}
-            />
-
-            {/* Project Modal */}
-            <AddProjectModal
-                isOpen={showProjectModal}
-                onClose={() => setShowProjectModal(false)}
-                onCreate={handleCreateProject}
-                formData={projectForm}
-                setFormData={setProjectForm}
             />
         </div>
     );

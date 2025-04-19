@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ProjectCard = ({ category, title, subtitle, description, image, bg }) => {
+const ProjectCard = ({ category, title, subtitle, price, description, image, bg }) => {
     return (
         <div className="bg-white shadow-md overflow-hidden max-w-sm w-full relative">
             {/* Top section */}
@@ -23,9 +23,13 @@ const ProjectCard = ({ category, title, subtitle, description, image, bg }) => {
             </div>
 
             {/* Bottom white content section */}
-            <div className="pt-20 px-4 pb-4 text-sm text-gray-700">
-                {description}
+            <div className="pt-20 px-4 pb-2 text-sm text-gray-700">
+                {price}
             </div>
+            <div className=" px-4 pb-5 text-sm text-gray-700">
+                This is project details which is good
+            </div>
+
         </div>
     );
 };

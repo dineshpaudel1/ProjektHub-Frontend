@@ -11,7 +11,7 @@ instance.interceptors.response.use(
     (error) => {
         const status = error?.response?.status;
 
-        if (!navigator.onLine || status === 401 || status === 403 || !error.response) {
+        if (!navigator.onLine || status === 401 || !error.response) {
             // Clear localStorage if unauthorized or server offline
             localStorage.removeItem("token");
             localStorage.removeItem("refreshToken");

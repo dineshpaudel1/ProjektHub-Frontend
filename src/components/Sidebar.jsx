@@ -40,7 +40,7 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
                     className={`flex items-center justify-center ${isCollapsed
                         ? "w-12 h-12 rounded-full"
                         : "w-full justify-start px-4 py-2.5 rounded-full"
-                        } font-medium transition-all ${isActive("projects")
+                        } font-medium transition-all ${isActive("adminproject")
                             ? "bg-[#e5e5e5] text-black"
                             : "text-black hover:bg-gray-100"
                         }`}
@@ -51,18 +51,18 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
                     </div>
                 </Link>
                 <Link
-                    to="adminproject"
+                    to="sellerproject"
                     className={`flex items-center justify-center ${isCollapsed
                         ? "w-12 h-12 rounded-full"
                         : "w-full justify-start px-4 py-2.5 rounded-full"
-                        } font-medium transition-all ${isActive("projects")
+                        } font-medium transition-all ${isActive("sellerproject")
                             ? "bg-[#e5e5e5] text-black"
                             : "text-black hover:bg-gray-100"
                         }`}
                 >
                     <div className="flex items-center gap-3">
                         <FaFolderOpen size={20} />
-                        {!isCollapsed && <span>Our Projects</span>}
+                        {!isCollapsed && <span>Seller Projects</span>}
                     </div>
                 </Link>
             </nav>
