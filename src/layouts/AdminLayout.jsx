@@ -9,17 +9,19 @@ const AdminLayout = () => {
     const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
     return (
-        <div className="flex min-h-screen">
-            {/* Sidebar controlled by isCollapsed */}
+        <div>
+            {/* Fixed Navbar */}
+            <Navbar toggleSidebar={toggleSidebar} />
+
+            {/* Fixed Sidebar */}
             <Sidebar isCollapsed={isCollapsed} toggleSidebar={toggleSidebar} />
 
-            <div className="flex-1 flex flex-col">
-                {/* Pass toggleSidebar to Navbar so toggle button works */}
-                <Navbar toggleSidebar={toggleSidebar} />
-
-                <main className="flex-1 p-6 bg-gray-50 mt-[60px]">
-                    <Outlet />
-                </main>
+            {/* Main Content */}
+            <div
+                className={`transition-all duration-300 ease-in-out ${isCollapsed ? "ml-20" : "ml-64"
+                    } pt-[60px] h-[calc(100vh-60px)] overflow-y-auto bg-gray-50 p-6`}
+            >
+                <Outlet />
             </div>
         </div>
     );

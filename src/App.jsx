@@ -42,7 +42,7 @@ function App() {
           <Route path="profile" element={<Profile />} />
           <Route path="adminproject" element={<AdminProjects />} />
           <Route path="sellerproject" element={<SellerProjects />} />
-          <Route path="seller/projects/:id" element={<ProjectDetail />} />
+          <Route path="seller/projects/:id" element={<ProjectDetail />} />  
         </Route>
       </Routes>
     </Router>
