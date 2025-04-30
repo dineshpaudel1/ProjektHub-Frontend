@@ -1,9 +1,9 @@
 import React from "react";
-import { Home, Briefcase, Menu, Settings, Users, HelpCircle, LogOut } from 'lucide-react';
+import { Home, HelpCircle, LogOut } from 'lucide-react';
 import { useLocation, Link } from "react-router-dom";
 import { FaFolderOpen, FaRegFolder } from 'react-icons/fa';
 
-const Sidebar = ({ isCollapsed, toggleSidebar }) => {
+const Sidebar = ({ isCollapsed }) => {
     const location = useLocation();
 
     const isActive = (path) => location.pathname.includes(path);
@@ -75,23 +75,6 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
                                 {!isCollapsed && <span>Seller Projects</span>}
                             </div>
                             {!isCollapsed && isActive("sellerproject") && (
-                                <div className="ml-auto w-1.5 h-5 bg-blue-600 rounded-full"></div>
-                            )}
-                        </Link>
-                        <Link
-                            to="users"
-                            className={`flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 ${isActive("users")
-                                ? "bg-gray-100 text-gray-900 font-medium"
-                                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                                }`}
-                        >
-                            <div className="flex items-center gap-3">
-                                <div className={isActive("users") ? "text-blue-600" : ""}>
-                                    <Users size={18} strokeWidth={isActive("users") ? 2.5 : 2} />
-                                </div>
-                                {!isCollapsed && <span>Users</span>}
-                            </div>
-                            {isActive("users") && (
                                 <div className="ml-auto w-1.5 h-5 bg-blue-600 rounded-full"></div>
                             )}
                         </Link>

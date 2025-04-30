@@ -4,15 +4,13 @@ import {
   FaFolderOpen,
   FaUser,
   FaMedal,
-  FaChartLine,
   FaEllipsisH,
   FaArrowUp,
   FaArrowDown,
   FaCalendarAlt,
-  FaBell,
   FaCheckCircle
 } from 'react-icons/fa';
-import { HomeIcon, TrendingUp, Clock, ChevronRight, Search, BarChart3, PieChart, Users, Calendar } from 'lucide-react';
+import { Clock, ChevronRight } from 'lucide-react';
 
 // Enhanced Card Component
 const StatCard = ({ title, value, icon, iconBg, change, changeType, navigateTo }) => {
@@ -199,6 +197,15 @@ const Dashboard = () => {
             iconBg="bg-amber-500"
             change="5% ↓"
             changeType="decrease"
+            navigateTo="/admin/sold-projects"
+          />
+          <StatCard
+            title="Total Users"
+            value="500"
+            icon={<FaUser size={20} />}
+            iconBg="bg-green-500"
+            change="8% ↑"
+            changeType="increase"
             navigateTo="/admin/sold-projects"
           />
         </div>
