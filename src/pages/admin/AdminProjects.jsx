@@ -30,8 +30,6 @@ const AdminProjects = () => {
     const [showSortMenu, setShowSortMenu] = useState(false);
     const [showFilterMenu, setShowFilterMenu] = useState(false);
     const [priceRange, setPriceRange] = useState([0, 10000]);
-    const [notification, setNotification] = useState(null);
-    const [refreshing, setRefreshing] = useState(false);
 
     // Fetch categories
     useEffect(() => {
@@ -114,37 +112,6 @@ const AdminProjects = () => {
         }
     };
 
-    const handleRefresh = async () => {
-        setRefreshing(true);
-
-        try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                setError("Authentication required");
-                return;
-            }
-
-            // Fetch categories
-            const categoriesResponse = await axios.get('http://localhost:8080/api/users/category', {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            setCategories(categoriesResponse.data.data || []);
-
-            // Fetch projects
-            const projectsData = await getSellerProjects();
-            setProjects(projectsData?.data || []);
-
-            setNotification({ type: 'success', message: 'Data refreshed successfully!' });
-            setTimeout(() => setNotification(null), 3000);
-        } catch (error) {
-            console.error("❌ Failed to refresh data:", error);
-            setNotification({ type: 'error', message: 'Failed to refresh data' });
-            setTimeout(() => setNotification(null), 3000);
-        } finally {
-            setRefreshing(false);
-        }
-    };
-
     // Filter projects based on search, category, and price range
     const filteredProjects = projects.filter(project => {
         const matchesSearch = searchQuery === '' ||
@@ -202,27 +169,6 @@ const AdminProjects = () => {
 
     return (
         <div className="p-6 bg-gray-50 min-h-screen relative">
-            {/* Notification */}
-            {notification && (
-                <div className={`fixed top-6 right-6 z-50 p-4 rounded-lg shadow-lg flex items-center justify-between max-w-md animate-fade-in ${notification.type === 'success' ? 'bg-green-50 text-green-800 border-l-4 border-green-500' :
-                    notification.type === 'error' ? 'bg-red-50 text-red-800 border-l-4 border-red-500' :
-                        'bg-blue-50 text-blue-800 border-l-4 border-blue-500'
-                    }`}>
-                    <div className="flex items-center">
-                        {notification.type === 'success' && <Check className="w-5 h-5 mr-3" />}
-                        {notification.type === 'error' && <AlertCircle className="w-5 h-5 mr-3" />}
-                        {notification.type === 'info' && <Loader className="w-5 h-5 mr-3 animate-spin" />}
-                        <p>{notification.message}</p>
-                    </div>
-                    <button
-                        onClick={() => setNotification(null)}
-                        className="ml-4 text-gray-500 hover:text-gray-700"
-                    >
-                        <X className="w-4 h-4" />
-                    </button>
-                </div>
-            )}
-
             {/* Header Section */}
             <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
                 <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
@@ -244,14 +190,7 @@ const AdminProjects = () => {
                             <FaPlus size={14} />
                             Add Category
                         </button>
-                        <button
-                            onClick={handleRefresh}
-                            className={`p-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 transition ${refreshing ? 'animate-spin' : ''}`}
-                            disabled={refreshing}
-                            aria-label="Refresh"
-                        >
-                            <RefreshCw size={18} />
-                        </button>
+
                     </div>
                 </div>
             </div>
@@ -455,13 +394,7 @@ const AdminProjects = () => {
                         <AlertCircle className="w-6 h-6 text-red-500 mr-3" />
                         <p className="text-red-800">{error}</p>
                     </div>
-                    <button
-                        onClick={handleRefresh}
-                        className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center gap-2"
-                    >
-                        <RefreshCw size={16} />
-                        Try Again
-                    </button>
+
                 </div>
             )}
 
