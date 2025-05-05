@@ -9,7 +9,7 @@ const ProjectCard = ({
     description,
     image,
     bg,
-    status = "active",
+    status = '',
     date = "Apr 15, 2023",
     rating = 4.8,
     reviewCount = 24,
@@ -33,9 +33,6 @@ const ProjectCard = ({
     const getStatusColor = (status) => {
         switch (status.toLowerCase()) {
             case 'active': return 'bg-green-100 text-green-800';
-            case 'pending': return 'bg-yellow-100 text-yellow-800';
-            case 'completed': return 'bg-blue-100 text-blue-800';
-            case 'archived': return 'bg-gray-100 text-gray-800';
             default: return 'bg-gray-100 text-gray-800';
         }
     };
@@ -48,7 +45,7 @@ const ProjectCard = ({
             {/* Status Badge */}
             <div className="absolute top-4 left-4 z-10">
                 <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${getStatusColor(status)} capitalize`}>
-                    {status}
+                    visible
                 </span>
             </div>
 

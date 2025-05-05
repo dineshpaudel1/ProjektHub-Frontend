@@ -154,7 +154,6 @@ const ProjectDetail = () => {
                 </div>
             ) : (
                 <div className="max-w-3xl mx-auto">
-                    {/* Back Button */}
                     <button
                         className="group mb-8 flex items-center text-gray-600 hover:text-gray-900 transition-colors duration-300"
                         onClick={() => navigate(-1)}
@@ -278,6 +277,59 @@ const ProjectDetail = () => {
                                 >
                                     {isUploading ? 'Uploading...' : 'Update Thumbnail'}
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Additional Project Info */}
+                    <div className="mt-8 bg-white shadow-sm rounded-xl overflow-hidden">
+                        <div className="px-6 py-5 border-b border-gray-100">
+                            <h3 className="text-xl font-semibold text-gray-800">Project Details</h3>
+                        </div>
+                        <div className="p-6 space-y-4 text-gray-700">
+                            {project.category && (
+                                <div>
+                                    <h4 className="text-sm font-medium text-gray-500">Category</h4>
+                                    <p className="text-base">{project.category.name}</p>
+                                </div>
+                            )}
+
+                            {project.tags && project.tags.length > 0 && (
+                                <div>
+                                    <h4 className="text-sm font-medium text-gray-500">Tags</h4>
+                                    <div className="flex flex-wrap gap-2 mt-1">
+                                        {project.tags.map(tag => (
+                                            <span key={tag.id} className="px-2 py-1 text-sm bg-gray-100 border border-gray-300 rounded-full">
+                                                {tag.tag}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {project.photos && project.photos.length > 0 && (
+                                <div>
+                                    <h4 className="text-sm font-medium text-gray-500">Project Photos</h4>
+                                    <div className="flex flex-wrap gap-4 mt-2">
+                                        {project.photos.map(photo => (
+                                            <div key={photo.id} className="w-32">
+                                                <img
+                                                    src={`http://localhost:8080/api/media/photo?file=${photo.path}`}
+                                                    alt={photo.caption}
+                                                    className="rounded-lg border border-gray-200 object-cover w-full h-24"
+                                                />
+                                                <p className="mt-1 text-xs text-center">{photo.caption}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            <div>
+                                <h4 className="text-sm font-medium text-gray-500">Visibility</h4>
+                                <p className={`inline-block mt-1 px-2 py-1 rounded-md text-sm font-semibold ${project.visible ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                    {project.visible ? 'Public' : 'Private'}
+                                </p>
                             </div>
                         </div>
                     </div>

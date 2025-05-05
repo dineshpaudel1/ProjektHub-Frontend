@@ -58,8 +58,8 @@ const AdminProjects = () => {
         const fetchProjects = async () => {
             try {
                 setLoading(true);
-                const data = await getSellerProjects();
-                setProjects(data?.data || []);
+                const response = await axios.get('http://localhost:8080/api/public/projects');
+                setProjects(response.data.data || []);
                 setLoading(false);
             } catch (error) {
                 console.error("❌ Failed to fetch projects:", error);
@@ -67,8 +67,10 @@ const AdminProjects = () => {
                 setLoading(false);
             }
         };
+
         fetchProjects();
     }, []);
+
 
     const handleCreateCategory = async () => {
         const token = localStorage.getItem("token");

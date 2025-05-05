@@ -13,6 +13,7 @@ import AdminProjects from "./pages/admin/AdminProjects";
 import MasterPage from "./pages/user/MasterPage";
 import SellerProjects from "./pages/admin/SellerProjects";
 import ProjectDetail from "./pages/admin/ProjectDetail";
+import AllProjectDetail from "./pages/admin/AllProjectDetail";
 
 function App() {
   return (
@@ -42,7 +43,8 @@ function App() {
           <Route path="profile" element={<Profile />} />
           <Route path="adminproject" element={<AdminProjects />} />
           <Route path="sellerproject" element={<SellerProjects />} />
-          <Route path="seller/projects/:id" element={<ProjectDetail />} />  
+          <Route path="seller/projects/:id" element={<ProjectDetail />} />
+          <Route path="/admin/project/:id" element={<AllProjectDetail />} />
         </Route>
       </Routes>
     </Router>
