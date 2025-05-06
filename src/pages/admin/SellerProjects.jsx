@@ -234,6 +234,34 @@ const SellerProjects = () => {
                     ))}
                 </div>
             </div>
+            {error && !loading && (
+                <div className="bg-red-50 border-l-4 border-red-500 p-6 rounded-lg mb-6">
+                    <div className="flex items-center">
+                        <AlertCircle className="w-6 h-6 text-red-500 mr-3" />
+                        <p className="text-red-800">{error}</p>
+                    </div>
+                </div>
+            )}
+
+            {/* Empty State */}
+            {!loading && !error && sortedProjects.length === 0 && (
+                <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+                    <div className="bg-gray-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
+                        <FaFolderOpen size={32} className="text-gray-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2">No projects found</h3>
+                    <div className="flex justify-center gap-4">
+
+                        <button
+                            onClick={() => navigate('/admin/create-project')}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+                        >
+                            <FaPlus size={14} />
+                            Create Project
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* Project List */}
             {!loading && !error && sortedProjects.length > 0 && (
