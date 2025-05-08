@@ -142,10 +142,15 @@ const ProjectDetail = () => {
         setIsPhotoUploading(true);
         const token = localStorage.getItem('token');
         const formData = new FormData();
-        formData.append('file', photoFile);
-        formData.append('caption', photoCaption);
+
+        formData.append('files', photoFile); // key name must be `files`
+        formData.append(
+            'data',
+            JSON.stringify({ captions: [photoCaption] }) // JSON string for `data`
+        );
+
         try {
-            await axios.post(`http://localhost:8080/api/seller/project/addphotocaption/${id}`, formData, {
+            await axios.post(`http://localhost:8080/api/seller/project/${id}/photos/upload`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data'
@@ -164,6 +169,7 @@ const ProjectDetail = () => {
             setTimeout(() => setNotification(null), 3000);
         }
     };
+
 
     return (
         <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

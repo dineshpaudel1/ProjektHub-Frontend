@@ -1,6 +1,30 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from '../utils/axiosInstance';
 
 const AddProjectModal = ({ isOpen, onClose, onCreate, formData, setFormData }) => {
+    const [categories, setCategories] = useState([]);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await axios.get('/users/category', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    }
+                });
+
+                setCategories(response.data.data);
+            } catch (error) {
+                console.error('❌ Error fetching categories:', error);
+            }
+        };
+
+        if (isOpen) {
+            fetchCategories();
+        }
+    }, [isOpen]);
+
     if (!isOpen) return null;
 
     return (
@@ -14,19 +38,30 @@ const AddProjectModal = ({ isOpen, onClose, onCreate, formData, setFormData }) =
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+
             <textarea
                 placeholder="Project Description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <input
-                type="number"
-                placeholder="Category ID"
+
+            <select
                 value={formData.categoryId}
                 onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            >
+                <option value="">Select Category</option>
+                {categories.length > 0 ? (
+                    categories.map((cat) => (
+                        <option key={cat.id} value={cat.id}>
+                            {cat.name}
+                        </option>
+                    ))
+                ) : (
+                    <option disabled>No categories found</option>
+                )}
+            </select>
 
             <div className="flex justify-end gap-2">
                 <button

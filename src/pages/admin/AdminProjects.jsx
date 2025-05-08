@@ -9,7 +9,6 @@ import { Loader, AlertCircle, X } from 'lucide-react';
 import ProjectCard from './ProjectCard';
 import AddCategoryModal from '../../modals/AddCategoryModal';
 import axios from "../../utils/axiosInstance";
-import { getSellerProjects } from "../../apis/ProjectApi";
 
 const AdminProjects = () => {
     const navigate = useNavigate();

@@ -32,6 +32,14 @@ const Footer = () => {
                         <li><a href="#" className="hover:underline">For Students</a></li>
                     </ul>
                 </div>
+                <div>
+                    <h3 className="text-xl font-semibold mb-4">Communities</h3>
+                    <ul className="space-y-2 text-[var(--text-secondary)]">
+                        <li><a href="#" className="hover:underline">For Developers</a></li>
+                        <li><a href="#" className="hover:underline">For Clients</a></li>
+                        <li><a href="#" className="hover:underline">For Students</a></li>
+                    </ul>
+                </div>
 
                 {/* Company */}
                 <div>

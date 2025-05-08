@@ -14,6 +14,7 @@ import MasterPage from "./pages/user/MasterPage";
 import SellerProjects from "./pages/admin/SellerProjects";
 import ProjectDetail from "./pages/admin/ProjectDetail";
 import AllProjectDetail from "./pages/admin/AllProjectDetail";
+import UserProjectDetail from "./pages/user/UserProjectDetail";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="services" element={<Services />} />
           <Route path="about" element={<About />} />
           <Route path="login" element={<UserLogin />} />
+          <Route path="/project/:id" element={<UserProjectDetail />} />
         </Route>
 
         {/* Admin routes */}

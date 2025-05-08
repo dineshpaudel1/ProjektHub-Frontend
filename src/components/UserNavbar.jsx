@@ -11,6 +11,8 @@ const UserNavbar = () => {
 
     const [isOpen, setIsOpen] = useState(false);
     const [theme, setTheme] = useState(getInitialTheme);
+    const [username, setUsername] = useState(null);
+    const [profilePicture, setProfilePicture] = useState(null); // 👈 new state
 
     useEffect(() => {
         document.documentElement.setAttribute("data-theme", theme);
@@ -25,6 +27,22 @@ const UserNavbar = () => {
         const handleScrollClose = () => setIsOpen(false);
         window.addEventListener("scroll", handleScrollClose);
         return () => window.removeEventListener("scroll", handleScrollClose);
+    }, []);
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem("user");
+
+        if (storedUser && storedUser !== "undefined") {
+            try {
+                const user = JSON.parse(storedUser);
+                if (user?.username) setUsername(user.username);
+                if (user?.profilePicture) setProfilePicture(user.profilePicture);
+            } catch (err) {
+                console.error("Failed to parse user from localStorage", err);
+            }
+        } else {
+            localStorage.removeItem("user");
+        }
     }, []);
 
     return (
@@ -75,12 +93,21 @@ const UserNavbar = () => {
                     >
                         {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
                     </button>
-                    <button
-                        onClick={() => navigate("login")}
-                        className="bg-indigo-600 text-white font-medium rounded-full px-5 py-2 hover:bg-indigo-700 transition"
-                    >
-                        Login
-                    </button>
+
+                    {username ? (
+                        <img
+                            src={profilePicture || "/default-avatar.png"}
+                            alt="User"
+                            className="w-9 h-9 rounded-full object-cover border border-gray-300"
+                        />
+                    ) : (
+                        <button
+                            onClick={() => navigate("login")}
+                            className="bg-indigo-600 text-white font-medium rounded-full px-5 py-2 hover:bg-indigo-700 transition"
+                        >
+                            Login
+                        </button>
+                    )}
                 </div>
 
                 <div className="md:hidden z-30">
@@ -114,15 +141,25 @@ const UserNavbar = () => {
                         About Us
                     </a>
 
-                    <button
-                        onClick={() => {
-                            setIsOpen(false);
-                            navigate("login");
-                        }}
-                        className="w-full bg-indigo-600 text-white py-2 rounded-full font-semibold"
-                    >
-                        Login
-                    </button>
+                    {username ? (
+                        <div className="flex justify-center">
+                            <img
+                                src={profilePicture || "/default-avatar.png"}
+                                alt="User"
+                                className="w-10 h-10 rounded-full object-cover border"
+                            />
+                        </div>
+                    ) : (
+                        <button
+                            onClick={() => {
+                                setIsOpen(false);
+                                navigate("login");
+                            }}
+                            className="w-full bg-indigo-600 text-white py-2 rounded-full font-semibold"
+                        >
+                            Login
+                        </button>
+                    )}
 
                     <button
                         onClick={toggleDarkMode}

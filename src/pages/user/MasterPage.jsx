@@ -3,7 +3,6 @@ import Home from './Home'
 import Projects from './Projects'
 import Services from './Services'
 import About from './About'
-import Footer from '../../components/Footer'
 
 const MasterPage = () => {
     return (
