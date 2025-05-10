@@ -34,7 +34,7 @@ const Projects = () => {
     }, []);
 
     return (
-        <section className="py-16 px-4 sm:px-6 lg:px-12" style={{ backgroundColor: "var(--bg-color)" }}>
+        <section id="projects" className="py-16 px-4 sm:px-6 lg:px-12" style={{ backgroundColor: "var(--bg-color)" }}>
             <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12" style={{ color: "var(--text-color)" }}>
                 Projects
                 <div className="h-1 w-24 mx-auto mt-2 bg-[#5454D4] rounded-full"></div>

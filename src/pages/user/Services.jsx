@@ -22,7 +22,7 @@ const ServicesSection = () => {
     }, []);
 
     return (
-        <section
+        <section id="services"
             className="py-20 px-4 sm:px-6 lg:px-16"
             style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
         >

@@ -12,7 +12,7 @@ const About = () => {
     ];
 
     return (
-        <section
+        <section id='about'
             className="w-full px-6 py-16"
             style={{ backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
         >

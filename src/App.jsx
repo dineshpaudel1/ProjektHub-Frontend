@@ -15,6 +15,7 @@ import SellerProjects from "./pages/admin/SellerProjects";
 import ProjectDetail from "./pages/admin/ProjectDetail";
 import AllProjectDetail from "./pages/admin/AllProjectDetail";
 import UserProjectDetail from "./pages/user/UserProjectDetail";
+import ForgotPassword from "./pages/user/ForgetPassword";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path="about" element={<About />} />
           <Route path="login" element={<UserLogin />} />
           <Route path="/project/:id" element={<UserProjectDetail />} />
+          <Route path="forgot-password" element={<ForgotPassword />} />
         </Route>
 
         {/* Admin routes */}

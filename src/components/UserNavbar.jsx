@@ -12,7 +12,8 @@ const UserNavbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [theme, setTheme] = useState(getInitialTheme);
     const [username, setUsername] = useState(null);
-    const [profilePicture, setProfilePicture] = useState(null); // 👈 new state
+    const [profilePicture, setProfilePicture] = useState(null);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
 
     useEffect(() => {
         document.documentElement.setAttribute("data-theme", theme);
@@ -30,20 +31,51 @@ const UserNavbar = () => {
     }, []);
 
     useEffect(() => {
-        const storedUser = localStorage.getItem("user");
+        const loadUser = () => {
+            const storedUser = localStorage.getItem("user");
 
-        if (storedUser && storedUser !== "undefined") {
             try {
-                const user = JSON.parse(storedUser);
+                let user = storedUser && storedUser.trim().startsWith("{")
+                    ? JSON.parse(storedUser)
+                    : { username: storedUser };
+
                 if (user?.username) setUsername(user.username);
                 if (user?.profilePicture) setProfilePicture(user.profilePicture);
             } catch (err) {
                 console.error("Failed to parse user from localStorage", err);
+                localStorage.removeItem("user");
             }
-        } else {
-            localStorage.removeItem("user");
-        }
+        };
+
+        loadUser();
+
+        const handleStorageChange = () => {
+            loadUser();
+        };
+
+        window.addEventListener("storage", handleStorageChange);
+        return () => window.removeEventListener("storage", handleStorageChange);
     }, []);
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (!e.target.closest(".profile-dropdown")) {
+                setDropdownOpen(false);
+            }
+        };
+        document.addEventListener("click", handleClickOutside);
+        return () => document.removeEventListener("click", handleClickOutside);
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("user");
+        setUsername(null);
+        setProfilePicture(null);
+        setDropdownOpen(false);
+        navigate("/login");
+    };
 
     return (
         <div className="fixed top-0 left-0 w-full z-50">
@@ -95,11 +127,40 @@ const UserNavbar = () => {
                     </button>
 
                     {username ? (
-                        <img
-                            src={profilePicture || "/default-avatar.png"}
-                            alt="User"
-                            className="w-9 h-9 rounded-full object-cover border border-gray-300"
-                        />
+                        <div className="relative profile-dropdown">
+                            <div
+                                onClick={() => setDropdownOpen(!dropdownOpen)}
+                                className="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center font-semibold cursor-pointer border border-gray-300"
+                            >
+                                {username?.charAt(0).toUpperCase()}
+                            </div>
+                            {dropdownOpen && (
+                                <div
+                                    className={`absolute right-0 mt-2 w-40 rounded-md shadow-lg py-2 z-50 border ${theme === "dark"
+                                        ? "bg-gray-900 text-white border-gray-700"
+                                        : "bg-white text-gray-800 border-gray-200"
+                                        }`}
+                                >
+                                    <button
+                                        onClick={() => {
+                                            setDropdownOpen(false);
+                                            navigate("/profile");
+                                        }}
+                                        className={`w-full px-4 py-2 text-sm text-left transition ${theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-100"
+                                            }`}
+                                    >
+                                        Profile
+                                    </button>
+                                    <button
+                                        onClick={handleLogout}
+                                        className={`w-full px-4 py-2 text-sm text-left transition text-red-600 ${theme === "dark" ? "hover:bg-red-700" : "hover:bg-red-100"
+                                            }`}
+                                    >
+                                        Logout
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     ) : (
                         <button
                             onClick={() => navigate("login")}
@@ -110,6 +171,7 @@ const UserNavbar = () => {
                     )}
                 </div>
 
+                {/* Hamburger icon */}
                 <div className="md:hidden z-30">
                     <button onClick={() => setIsOpen(!isOpen)} style={{ color: "var(--text-color)" }}>
                         {isOpen ? <X /> : <Menu />}
@@ -117,12 +179,13 @@ const UserNavbar = () => {
                 </div>
             </nav>
 
+            {/* ✅ Mobile Dropdown */}
             {isOpen && (
                 <div
                     className="md:hidden absolute top-full left-0 w-full px-6 py-4 space-y-4 z-20 shadow-lg"
                     style={{
-                        backgroundColor: "var(--menu-bg)",
-                        color: "var(--text-color)",
+                        backgroundColor: theme === "dark" ? "#1f2937" : "#fff",
+                        color: theme === "dark" ? "#fff" : "#111827",
                         borderTop: "1px solid var(--border-color)",
                         backdropFilter: "blur(8px)",
                         WebkitBackdropFilter: "blur(8px)"
@@ -142,12 +205,18 @@ const UserNavbar = () => {
                     </a>
 
                     {username ? (
-                        <div className="flex justify-center">
-                            <img
-                                src={profilePicture || "/default-avatar.png"}
-                                alt="User"
-                                className="w-10 h-10 rounded-full object-cover border"
-                            />
+                        <div className="flex justify-start items-center gap-3">
+                            <div
+                                className="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center font-semibold border"
+                            >
+                                {username?.charAt(0).toUpperCase()}
+                            </div>
+                            <button
+                                onClick={handleLogout}
+                                className="text-sm text-red-600 font-medium hover:underline"
+                            >
+                                Logout
+                            </button>
                         </div>
                     ) : (
                         <button
