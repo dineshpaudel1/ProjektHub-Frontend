@@ -232,16 +232,7 @@ const UserProjectDetail = () => {
                                             <p className="text-xs text-center mt-3 text-[var(--text-secondary)]">24/7 support available</p>
                                         </div>
 
-                                        <div className="pt-4 border-t border-[var(--border-color)]">
-                                            <div className="flex justify-between text-sm py-2">
-                                                <span className="text-[var(--text-secondary)]">License:</span>
-                                                <span className="font-medium">Standard</span>
-                                            </div>
-                                            <div className="flex justify-between text-sm py-2">
-                                                <span className="text-[var(--text-secondary)]">Updates:</span>
-                                                <span className="font-medium">6 months</span>
-                                            </div>
-                                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -274,6 +265,8 @@ const UserProjectDetail = () => {
                                     <MessageCircle className="h-5 w-5 mr-2" />
                                     Ask a Question
                                 </h2>
+
+                                {/* Ask Form */}
                                 <form onSubmit={handleAskQuestion} className="mb-6">
                                     <textarea
                                         value={questionText}
@@ -288,22 +281,50 @@ const UserProjectDetail = () => {
                                         Submit Question
                                     </button>
                                 </form>
+
+                                {/* Questions List */}
                                 {questions.length > 0 && (
                                     <div className="mt-6">
                                         <h3 className="text-lg font-semibold mb-4">Previous Questions</h3>
                                         <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                            {questions.map((q, idx) => (
-                                                <li
-                                                    key={idx}
-                                                    className="bg-[var(--hover-bg)] border border-[var(--border-color)] p-4 rounded-lg text-sm shadow-md"
-                                                >
-                                                    <p className="text-[var(--text-color)]">{q.questionText}</p>
-                                                </li>
-                                            ))}
+                                            {questions.map((q, idx) => {
+                                                const askedDate = new Date(q.createdAt).toLocaleString("en-US", {
+                                                    day: "numeric",
+                                                    month: "short",
+                                                    year: "numeric",
+                                                    hour: "2-digit",
+                                                    minute: "2-digit",
+                                                });
+
+                                                return (
+                                                    <li
+                                                        key={idx}
+                                                        className="bg-[var(--hover-bg)] border border-[var(--border-color)] p-4 rounded-lg text-sm shadow-md space-y-2"
+                                                    >
+                                                        <div>
+                                                            <p className="font-medium text-[var(--text-color)]">Q: {q.questionText}</p>
+                                                            <p className="text-xs text-gray-500">
+                                                                Asked by: {q.askedBy} on {askedDate}
+                                                            </p>
+
+                                                        </div>
+                                                        {q.answerText ? (
+                                                            <div className="mt-2 border-t pt-2 border-gray-300 dark:border-gray-600">
+                                                                <p className="font-medium text-[var(--button-primary-hover)]">A: {q.answerText}</p>
+                                                                <p className="text-xs text-gray-500">Answered by: {q.answeredBy}</p>
+                                                            </div>
+                                                        ) : (
+                                                            <p className="italic text-yellow-500 text-xs">Answer pending...</p>
+                                                        )}
+                                                    </li>
+                                                );
+                                            })}
                                         </ul>
                                     </div>
                                 )}
                             </div>
+
+
                         </div>
                     </div>
                 </div>

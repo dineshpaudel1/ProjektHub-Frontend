@@ -3,6 +3,7 @@ import Home from './Home'
 import Projects from './Projects'
 import Services from './Services'
 import About from './About'
+import ChatbotWidget from './ChatbotWidget'
 
 const MasterPage = () => {
     return (
@@ -11,6 +12,7 @@ const MasterPage = () => {
             <Projects />
             <Services />
             <About />
+            <ChatbotWidget />
 
         </div>
     )
