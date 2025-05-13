@@ -213,6 +213,15 @@ const UserProjectDetail = () => {
                                 </div>
 
                                 <div className="rounded-xl shadow-lg p-6 w-full lg:w-80 bg-[var(--hover-bg)] border border-[var(--border-color)]">
+                                    {/* Thumbnail Image */}
+                                    <div className="mb-4">
+                                        <img
+                                            src={`http://localhost:8080/api/media/photo?file=${project.thumbnail}`}
+                                            alt={project.title}
+                                            className="w-full h-40 object-cover rounded-lg shadow-md"
+                                        />
+                                    </div>
+
                                     <div className="space-y-4">
                                         <div className="space-y-1">
                                             <div className="flex items-baseline justify-between">
@@ -231,14 +240,14 @@ const UserProjectDetail = () => {
                                             </button>
                                             <p className="text-xs text-center mt-3 text-[var(--text-secondary)]">24/7 support available</p>
                                         </div>
-
-
                                     </div>
                                 </div>
+
                             </div>
 
                             {project.photos?.length > 0 && (
-                                <div className="mt-12">
+                                <div className="mt-10 pt-8 border-t border-[var(--border-color)]">
+
                                     <h2 className="flex items-center text-xl font-semibold mb-4">
                                         <ImageIcon className="h-5 w-5 mr-2" />
                                         Gallery
@@ -260,7 +269,8 @@ const UserProjectDetail = () => {
                                 </div>
                             )}
 
-                            <div className="mt-12">
+                            <div className="mt-10 pt-8 border-t border-[var(--border-color)]">
+
                                 <h2 className="flex items-center text-xl font-semibold mb-4">
                                     <MessageCircle className="h-5 w-5 mr-2" />
                                     Ask a Question
@@ -284,7 +294,7 @@ const UserProjectDetail = () => {
 
                                 {/* Questions List */}
                                 {questions.length > 0 && (
-                                    <div className="mt-6">
+                                    <div className="mt-8">
                                         <h3 className="text-lg font-semibold mb-4">Previous Questions</h3>
                                         <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                             {questions.map((q, idx) => {

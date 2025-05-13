@@ -1,4 +1,4 @@
-// src/pages/Admin/AllProjectDetail.jsx
+// src/pages/Admin/EditProject.jsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -26,7 +26,7 @@ const getEmbedUrl = (url) => {
     }
 };
 
-const AllProjectDetail = () => {
+const EditProject = () => {
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -280,4 +280,4 @@ const AllProjectDetail = () => {
     );
 };
 
-export default AllProjectDetail;
+export default EditProject;

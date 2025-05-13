@@ -16,6 +16,7 @@ import ProjectDetail from "./pages/admin/ProjectDetail";
 import AllProjectDetail from "./pages/admin/AllProjectDetail";
 import UserProjectDetail from "./pages/user/UserProjectDetail";
 import ForgotPassword from "./pages/user/ForgetPassword";
+import EditProject from "./pages/admin/EditProject";
 
 function App() {
   return (
@@ -47,7 +48,8 @@ function App() {
           <Route path="profile" element={<Profile />} />
           <Route path="adminproject" element={<AdminProjects />} />
           <Route path="sellerproject" element={<SellerProjects />} />
-          <Route path="seller/projects/:id" element={<ProjectDetail />} />
+          {/* <Route path="seller/projects/:id" element={<ProjectDetail />} /> */}
+          <Route path="seller/projects/:id" element={<EditProject />} />
           <Route path="/admin/project/:id" element={<AllProjectDetail />} />
         </Route>
       </Routes>
