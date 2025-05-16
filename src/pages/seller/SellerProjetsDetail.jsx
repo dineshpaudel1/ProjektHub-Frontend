@@ -1,4 +1,4 @@
-// src/pages/Admin/EditProject.jsx
+// src/pages/Admin/SellerProjectDetail.jsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -26,7 +26,7 @@ const getEmbedUrl = (url) => {
     }
 };
 
-const EditProject = () => {
+const SellerProjectDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -38,9 +38,19 @@ const EditProject = () => {
 
     useEffect(() => {
         const fetchProjectDetails = async () => {
+            const token = localStorage.getItem("token"); // ✅ get JWT token
+            if (!token) {
+                setError("Unauthorized. Please login.");
+                return;
+            }
+
             try {
                 setLoading(true);
-                const res = await axios.get(`/public/project/${id}`);
+                const res = await axios.get(`/seller/project/details/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`, // ✅ add this
+                    },
+                });
                 setProject(res.data.data);
             } catch (err) {
                 setError("Failed to load project details.");
@@ -49,6 +59,7 @@ const EditProject = () => {
                 setLoading(false);
             }
         };
+
 
         const fetchQuestions = async () => {
             try {
@@ -88,7 +99,7 @@ const EditProject = () => {
     return (
         <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-[var(--bg-color)] text-[var(--text-color)] transition-all duration-300">
             <div className="max-w-6xl mx-auto">
-                <div className="mb-8">
+                <div className="flex justify-between items-center mb-8">
                     <button
                         onClick={() => navigate(-1)}
                         className="flex items-center text-[var(--text-secondary)] hover:text-[var(--button-primary)] transition-colors duration-200 font-medium"
@@ -96,7 +107,16 @@ const EditProject = () => {
                         <ArrowLeft className="mr-2 h-5 w-5" />
                         <span>Back to Projects</span>
                     </button>
+
+                    <button
+                        onClick={() => navigate(`/seller/editprojects/${id}`)}
+                        className="px-4 py-2 bg-[var(--button-primary)] text-white rounded-md hover:bg-[var(--button-primary-hover)] transition-colors duration-200"
+                    >
+                        Edit Project
+                    </button>
+
                 </div>
+
 
                 <div className="rounded-2xl shadow-lg overflow-hidden bg-[var(--menu-bg)] border border-[var(--border-color)]">
                     {/* Video */}
@@ -280,4 +300,4 @@ const EditProject = () => {
     );
 };
 
-export default EditProject;
+export default SellerProjectDetail;

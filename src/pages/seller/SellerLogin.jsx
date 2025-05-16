@@ -20,10 +20,18 @@ const SellerLogin = () => {
                 password,
             });
 
-            const { accessToken, refreshToken } = response?.data?.data || {};
+            const { accessToken, refreshToken, roles } = response?.data?.data || {};
+
+            // ❌ Check if SELLER is in the roles
+            if (!roles || !roles.includes("SELLER")) {
+                setError("You are not authorized to access the seller panel.");
+                localStorage.clear();
+                setLoading(false);
+                return;
+            }
 
             if (!accessToken || !refreshToken) {
-                localStorage.clear(); // ❌ Clear all tokens
+                localStorage.clear();
                 navigate("/seller/login");
                 return;
             }
@@ -36,18 +44,16 @@ const SellerLogin = () => {
         } catch (err) {
             console.error("Auth error:", err?.response || err.message);
 
-            // ❌ Clear all localStorage tokens if login fails or backend is down
             localStorage.removeItem("token");
             localStorage.removeItem("refreshToken");
             localStorage.removeItem("isAuthenticated");
 
+            setError("Invalid credentials.");
             navigate("/seller/login");
         } finally {
             setLoading(false);
         }
     };
-
-
 
     return (
         <div
@@ -64,13 +70,10 @@ const SellerLogin = () => {
                     borderColor: "var(--border-color)",
                 }}
             >
-                {/* Title */}
                 <h2 className="text-2xl font-bold text-center mb-6">Seller Login</h2>
 
-                {/* Error */}
                 {error && <p className="text-sm text-red-500 mb-4">{error}</p>}
 
-                {/* Login Form */}
                 <form onSubmit={handleLogin} className="space-y-5">
                     <div>
                         <label htmlFor="email" className="block text-sm font-semibold mb-1">

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
-import Navbar from "../components/Navbar";
-import Sidebar from "../components/Sidebar";
+import Navbar from "../pages/admin/AdminNav";
+import Sidebar from "../pages/admin/AdminSidebar";
 
 const AdminLayout = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);

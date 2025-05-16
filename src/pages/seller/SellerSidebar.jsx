@@ -3,18 +3,18 @@ import { Home, HelpCircle, LogOut } from 'lucide-react';
 import { useLocation, Link } from "react-router-dom";
 import { FaFolderOpen, FaRegFolder } from 'react-icons/fa';
 
-const Sidebar = ({ isCollapsed }) => {
+const SellerSidebar = ({ isCollapsed }) => {
     const location = useLocation();
 
     const isActive = (path) => location.pathname.includes(path);
 
     return (
         <aside
-            // Make sidebar fixed from top (after navbar at 60px) to bottom, and set width based on collapse state.
+            // Make SellerSidebar fixed from top (after navbar at 60px) to bottom, and set width based on collapse state.
             className={`fixed top-[60px] left-0 bottom-0 transition-all duration-300 ease-in-out ${isCollapsed ? "w-20" : "w-64"
                 } bg-white shadow-sm overflow-y-auto`}
         >
-            {/* Sidebar Content */}
+            {/* SellerSidebar Content */}
             <div className="flex flex-col h-full py-6">
                 {/* Main Navigation */}
                 <div className="px-4 mb-6">
@@ -25,7 +25,7 @@ const Sidebar = ({ isCollapsed }) => {
                     )}
                     <nav className="flex flex-col gap-2">
                         <Link
-                            to="dashboard"
+                            to="sellerdashboard"
                             className={`flex items-center ${isCollapsed ? "justify-center px-2 py-3" : "px-3 py-2.5"
                                 } rounded-lg transition-all duration-200 ${isActive("dashboard")
                                     ? "bg-gray-100 text-gray-900 font-medium"
@@ -42,24 +42,7 @@ const Sidebar = ({ isCollapsed }) => {
                                 <div className="ml-auto w-1.5 h-5 bg-blue-600 rounded-full"></div>
                             )}
                         </Link>
-                        <Link
-                            to="adminproject"
-                            className={`flex items-center ${isCollapsed ? "justify-center px-2 py-3" : "px-3 py-2.5"
-                                } rounded-lg transition-all duration-200 ${isActive("adminproject")
-                                    ? "bg-gray-100 text-gray-900 font-medium"
-                                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                                }`}
-                        >
-                            <div className={`flex items-center ${isCollapsed ? "" : "gap-3"}`}>
-                                <div className={isActive("adminproject") ? "text-blue-600" : ""}>
-                                    <FaFolderOpen size={isCollapsed ? 22 : 18} />
-                                </div>
-                                {!isCollapsed && <span>All Projects</span>}
-                            </div>
-                            {!isCollapsed && isActive("adminproject") && (
-                                <div className="ml-auto w-1.5 h-5 bg-blue-600 rounded-full"></div>
-                            )}
-                        </Link>
+
                         <Link
                             to="sellerproject"
                             className={`flex items-center ${isCollapsed ? "justify-center px-2 py-3" : "px-3 py-2.5"
@@ -72,7 +55,7 @@ const Sidebar = ({ isCollapsed }) => {
                                 <div className={isActive("sellerproject") ? "text-blue-600" : ""}>
                                     <FaRegFolder size={isCollapsed ? 22 : 18} />
                                 </div>
-                                {!isCollapsed && <span>Seller Projects</span>}
+                                {!isCollapsed && <span>My Projects</span>}
                             </div>
                             {!isCollapsed && isActive("sellerproject") && (
                                 <div className="ml-auto w-1.5 h-5 bg-blue-600 rounded-full"></div>
@@ -127,4 +110,4 @@ const Sidebar = ({ isCollapsed }) => {
     );
 };
 
-export default Sidebar;
+export default SellerSidebar;

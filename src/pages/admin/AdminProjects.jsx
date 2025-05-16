@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, use } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     FaFolderOpen,
@@ -6,7 +6,7 @@ import {
     FaPlus,
 } from 'react-icons/fa';
 import { Loader, AlertCircle, X } from 'lucide-react';
-import ProjectCard from './ProjectCard';
+import ProjectCard from '../../components/ProjectCard';
 import AddCategoryModal from '../../modals/AddCategoryModal';
 import axios from "../../utils/axiosInstance";
 
@@ -25,6 +25,7 @@ const AdminProjects = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [sortBy, setSortBy] = useState('newest');
+    const [notification, setNotification] = useState(null);
 
     // Fetch categories
     useEffect(() => {

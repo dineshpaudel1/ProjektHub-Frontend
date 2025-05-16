@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from "react";
-import logowhite from "../assets/images/logowhite.png";
-import logoDark from "../assets/images/logoblack.png";
 import { useNavigate } from "react-router-dom";
 import { Menu, X, Moon, Sun } from "lucide-react";
+import logowhite from "../../assets/images/logowhite.png";
+import logoDark from "../../assets/images/logoblack.png";
+import { useUser } from "../../context/UserContext";
 
 const UserNavbar = () => {
     const navigate = useNavigate();
+    const { user, setUser } = useUser();
+
     const getInitialTheme = () =>
-        localStorage.getItem("theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        localStorage.getItem("theme") ||
+        (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
 
     const [isOpen, setIsOpen] = useState(false);
     const [theme, setTheme] = useState(getInitialTheme);
-    const [username, setUsername] = useState(null);
-    const [profilePicture, setProfilePicture] = useState(null);
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
     useEffect(() => {
@@ -31,33 +33,6 @@ const UserNavbar = () => {
     }, []);
 
     useEffect(() => {
-        const loadUser = () => {
-            const storedUser = localStorage.getItem("user");
-
-            try {
-                let user = storedUser && storedUser.trim().startsWith("{")
-                    ? JSON.parse(storedUser)
-                    : { username: storedUser };
-
-                if (user?.username) setUsername(user.username);
-                if (user?.profilePicture) setProfilePicture(user.profilePicture);
-            } catch (err) {
-                console.error("Failed to parse user from localStorage", err);
-                localStorage.removeItem("user");
-            }
-        };
-
-        loadUser();
-
-        const handleStorageChange = () => {
-            loadUser();
-        };
-
-        window.addEventListener("storage", handleStorageChange);
-        return () => window.removeEventListener("storage", handleStorageChange);
-    }, []);
-
-    useEffect(() => {
         const handleClickOutside = (e) => {
             if (!e.target.closest(".profile-dropdown")) {
                 setDropdownOpen(false);
@@ -70,9 +45,7 @@ const UserNavbar = () => {
     const handleLogout = () => {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
-        localStorage.removeItem("user");
-        setUsername(null);
-        setProfilePicture(null);
+        setUser(null);
         setDropdownOpen(false);
         navigate("/login");
     };
@@ -83,15 +56,15 @@ const UserNavbar = () => {
                 className="px-6 py-4 flex justify-between items-center font-sans backdrop-blur-md border-b"
                 style={{
                     color: "var(--text-color)",
-                    backgroundColor: theme === "dark"
-                        ? "rgba(25, 25, 27, 0.3)"
-                        : "rgba(255, 255, 255, 0.7)",
+                    backgroundColor:
+                        theme === "dark" ? "rgba(25, 25, 27, 0.3)" : "rgba(255, 255, 255, 0.7)",
                     backdropFilter: "blur(12px)",
                     WebkitBackdropFilter: "blur(12px)",
                     borderColor: "var(--border-color)",
-                    boxShadow: theme === "dark"
-                        ? "0 4px 30px rgba(0, 0, 0, 0.4)"
-                        : "0 4px 30px rgba(0, 0, 0, 0.05)",
+                    boxShadow:
+                        theme === "dark"
+                            ? "0 4px 30px rgba(0, 0, 0, 0.4)"
+                            : "0 4px 30px rgba(0, 0, 0, 0.05)",
                 }}
             >
                 <div className="flex items-center space-x-2 cursor-pointer" onClick={() => navigate("/")}>
@@ -126,13 +99,23 @@ const UserNavbar = () => {
                         {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
                     </button>
 
-                    {username ? (
+                    {user ? (
                         <div className="relative profile-dropdown">
                             <div
                                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                                className="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center font-semibold cursor-pointer border border-gray-300"
+                                className="w-9 h-9 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden cursor-pointer border border-gray-400"
                             >
-                                {username?.charAt(0).toUpperCase()}
+                                {user.profilePicture ? (
+                                    <img
+                                        src={user.profilePicture}
+                                        alt="Profile"
+                                        className="w-full h-full object-cover rounded-full"
+                                    />
+                                ) : (
+                                    <span className="text-sm font-semibold text-white bg-indigo-600 w-full h-full flex items-center justify-center rounded-full">
+                                        {user.username?.charAt(0).toUpperCase()}
+                                    </span>
+                                )}
                             </div>
                             {dropdownOpen && (
                                 <div
@@ -144,7 +127,7 @@ const UserNavbar = () => {
                                     <button
                                         onClick={() => {
                                             setDropdownOpen(false);
-                                            navigate("/profile");
+                                            navigate("/userprofile");
                                         }}
                                         className={`w-full px-4 py-2 text-sm text-left transition ${theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-100"
                                             }`}
@@ -163,7 +146,7 @@ const UserNavbar = () => {
                         </div>
                     ) : (
                         <button
-                            onClick={() => navigate("login")}
+                            onClick={() => navigate("/login")}
                             className="bg-indigo-600 text-white font-medium rounded-full px-5 py-2 hover:bg-indigo-700 transition"
                         >
                             Login
@@ -171,7 +154,6 @@ const UserNavbar = () => {
                     )}
                 </div>
 
-                {/* Hamburger icon */}
                 <div className="md:hidden z-30">
                     <button onClick={() => setIsOpen(!isOpen)} style={{ color: "var(--text-color)" }}>
                         {isOpen ? <X /> : <Menu />}
@@ -179,7 +161,7 @@ const UserNavbar = () => {
                 </div>
             </nav>
 
-            {/* ✅ Mobile Dropdown */}
+            {/* Mobile Dropdown */}
             {isOpen && (
                 <div
                     className="md:hidden absolute top-full left-0 w-full px-6 py-4 space-y-4 z-20 shadow-lg"
@@ -188,7 +170,7 @@ const UserNavbar = () => {
                         color: theme === "dark" ? "#fff" : "#111827",
                         borderTop: "1px solid var(--border-color)",
                         backdropFilter: "blur(8px)",
-                        WebkitBackdropFilter: "blur(8px)"
+                        WebkitBackdropFilter: "blur(8px)",
                     }}
                 >
                     <a onClick={() => setIsOpen(false)} className="block font-semibold hover:text-indigo-500" href="#home">
@@ -204,12 +186,20 @@ const UserNavbar = () => {
                         About Us
                     </a>
 
-                    {username ? (
+                    {user ? (
                         <div className="flex justify-start items-center gap-3">
-                            <div
-                                className="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center font-semibold border"
-                            >
-                                {username?.charAt(0).toUpperCase()}
+                            <div className="w-9 h-9 rounded-full bg-gray-300 overflow-hidden border border-gray-400">
+                                {user.profilePicture ? (
+                                    <img
+                                        src={user.profilePicture}
+                                        alt="Profile"
+                                        className="w-full h-full object-cover rounded-full"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-white bg-indigo-600 rounded-full font-semibold">
+                                        {user.username?.charAt(0).toUpperCase()}
+                                    </div>
+                                )}
                             </div>
                             <button
                                 onClick={handleLogout}
@@ -222,7 +212,7 @@ const UserNavbar = () => {
                         <button
                             onClick={() => {
                                 setIsOpen(false);
-                                navigate("login");
+                                navigate("/login");
                             }}
                             className="w-full bg-indigo-600 text-white py-2 rounded-full font-semibold"
                         >

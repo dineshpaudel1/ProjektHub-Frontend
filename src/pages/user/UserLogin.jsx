@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
 import NotificationToast from "../../porjectdetailhelper/NotificationToast";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../../context/UserContext"; // ✅ import context
 
 const UserLogin = () => {
     const [notification, setNotification] = useState(null);
     const [identifier, setIdentifier] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
+    const { setUser } = useUser(); // ✅ use context
 
     useEffect(() => {
-        /* global google */
         if (window.google) {
             window.google.accounts.id.initialize({
                 client_id: "12680654953-a51mcs6na6dqs46buci6et88bf8hjt2o.apps.googleusercontent.com",
@@ -28,9 +29,7 @@ const UserLogin = () => {
         try {
             const res = await fetch("http://localhost:8080/api/auth/login/google", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ token: idToken }),
             });
 
@@ -41,16 +40,15 @@ const UserLogin = () => {
                 localStorage.setItem("accessToken", data.data.accessToken);
                 localStorage.setItem("refreshToken", data.data.refreshToken);
 
-                const base64Url = data.data.accessToken.split('.')[1];
-                const decoded = JSON.parse(atob(base64Url));
-                const username = decoded.username || decoded.sub || "unknown_user";
+                // ✅ Fetch user data and update context
+                const userRes = await fetch("http://localhost:8080/api/user/me", {
+                    headers: {
+                        Authorization: `Bearer ${data.data.accessToken}`,
+                    },
+                });
+                const userData = await userRes.json();
+                setUser(userData);
 
-                localStorage.setItem("user", JSON.stringify({
-                    username: username,
-                    profilePicture: null,
-                }));
-
-                window.dispatchEvent(new Event("storage"));
                 setNotification({ type: "success", message: "Login successful!" });
 
                 const redirectPath = localStorage.getItem("redirectAfterLogin") || "/";
@@ -76,9 +74,7 @@ const UserLogin = () => {
         try {
             const res = await fetch("http://localhost:8080/api/auth/user/login", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ identifier, password }),
             });
 
@@ -88,16 +84,15 @@ const UserLogin = () => {
                 localStorage.setItem("accessToken", data.data.accessToken);
                 localStorage.setItem("refreshToken", data.data.refreshToken);
 
-                const base64Url = data.data.accessToken.split('.')[1];
-                const decoded = JSON.parse(atob(base64Url));
-                const username = decoded.username || decoded.sub || "unknown_user";
+                // ✅ Fetch user data and update context
+                const userRes = await fetch("http://localhost:8080/api/user/me", {
+                    headers: {
+                        Authorization: `Bearer ${data.data.accessToken}`,
+                    },
+                });
+                const userData = await userRes.json();
+                setUser(userData);
 
-                localStorage.setItem("user", JSON.stringify({
-                    username: username,
-                    profilePicture: null,
-                }));
-
-                window.dispatchEvent(new Event("storage"));
                 setNotification({ type: "success", message: "Login successful!" });
 
                 const redirectPath = localStorage.getItem("redirectAfterLogin") || "/";
