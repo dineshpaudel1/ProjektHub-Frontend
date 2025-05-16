@@ -201,8 +201,15 @@ const AllProjectDetail = () => {
                                         <p className="text-green-600 text-sm font-bold">33% OFF</p>
                                     </div>
                                     <p className="text-xs text-center text-[var(--text-secondary)]">
-                                        Listed by: <strong>{project.sellerName}</strong>
+                                        Listed by: <strong>{project.seller.name}</strong>
                                     </p>
+                                    <div className="">
+                                        <img
+                                            src={`http://localhost:8080/api/media/photo?file=${project.seller.photo}`}
+                                            alt={project.title}
+                                            className="w-10 h-10 object-cover rounded-lg shadow-md"
+                                        />
+                                    </div>
                                 </div>
                             </div>
 

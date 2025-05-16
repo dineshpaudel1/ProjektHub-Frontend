@@ -3,6 +3,7 @@ import { Bell, Menu, Search, Settings, User, LogOut, ChevronDown } from 'lucide-
 import { useNavigate } from "react-router-dom";
 import user from "../../assets/images/user.png";
 import logo from "../../assets/images/logoblack.png";
+import axios from "../../utils/axiosInstance";
 
 const SellerNav = ({ toggleSidebar }) => {
     const [showMenu, setShowMenu] = useState(false);
@@ -12,8 +13,29 @@ const SellerNav = ({ toggleSidebar }) => {
     const menuRef = useRef();
     const searchRef = useRef();
     const navigate = useNavigate();
+    const [showNotifications, setShowNotifications] = useState(false);
+    const notificationRef = useRef();
+    const [pendingQuestions, setPendingQuestions] = useState([]);
 
     const token = localStorage.getItem("token");
+    useEffect(() => {
+        const fetchNotifications = async () => {
+            try {
+                const questionRes = await axios.get("/seller/interactions/pending-questions", {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setPendingQuestions(questionRes.data?.data || []);
+
+            } catch (error) {
+                console.error("Error fetching notifications:", error);
+            }
+        };
+
+        if (token) {
+            fetchNotifications();
+        }
+    }, [token]);
+
 
     const getUserRoles = () => {
         try {
@@ -53,6 +75,9 @@ const SellerNav = ({ toggleSidebar }) => {
             if (searchRef.current && !searchRef.current.contains(e.target) && showSearch) {
                 setShowSearch(false);
             }
+            if (notificationRef.current && !notificationRef.current.contains(e.target)) {
+                setShowNotifications(false);
+            }
         };
         document.addEventListener("mousedown", handler);
         return () => document.removeEventListener("mousedown", handler);
@@ -77,6 +102,7 @@ const SellerNav = ({ toggleSidebar }) => {
         console.log("Searching for:", searchQuery);
         setShowSearch(false);
     };
+
 
     return (
         <header className="fixed top-0 left-0 w-full h-16 z-50 bg-white shadow-sm flex items-center justify-between px-4 md:px-6">
@@ -145,18 +171,44 @@ const SellerNav = ({ toggleSidebar }) => {
                     )}
                 </div>
 
-                {/* Notifications */}
-                <div className="relative">
+                <div className="relative" ref={notificationRef}>
                     <button
+                        onClick={() => setShowNotifications(prev => !prev)}
                         className="p-2 rounded-full hover:bg-gray-100 relative"
                         aria-label="Notifications"
                     >
                         <Bell size={20} className="text-gray-700" />
-                        {hasNotifications && (
-                            <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-                        )}
+                        <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white" />
                     </button>
+
+                    {showNotifications && (
+                        <div className="absolute right-0 mt-3 w-80 bg-white shadow-xl rounded-xl z-50 animate-fadeIn">
+                            <div className="flex justify-between px-4 py-3 border-b border-gray-100">
+                                <h3 className="text-sm font-semibold text-gray-700">Notifications</h3>
+                                <span className="text-xs text-white bg-blue-600 rounded-full px-2 py-0.5">
+                                    {pendingQuestions.length} New
+                                </span>
+                            </div>
+
+                            <div className="px-4 py-3 text-sm text-gray-600 space-y-3 max-h-96 overflow-y-auto">
+                                {pendingQuestions.length === 0 ? (
+                                    <p className="text-gray-500 text-center">No new questions</p>
+                                ) : (
+                                    pendingQuestions.map((q, idx) => (
+                                        <div key={q.id || idx} className="flex items-start gap-2">
+                                            <span className="text-blue-500">❓</span>
+                                            <div className="flex-1">
+                                                <p><strong>{q.user?.username || "Someone"}</strong> asked: {q.questionText}</p>
+                                                <p className="text-xs text-gray-400 mt-1">{new Date(q.createdAt).toLocaleString()}</p>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
+
 
                 {/* User Avatar and Dropdown */}
                 <div className="relative" ref={menuRef}>

@@ -37,7 +37,7 @@ const UserLogin = () => {
 
             if (res.ok && data?.status === "success") {
                 localStorage.removeItem("googleidtoken");
-                localStorage.setItem("accessToken", data.data.accessToken);
+                localStorage.setItem("token", data.data.accessToken);
                 localStorage.setItem("refreshToken", data.data.refreshToken);
 
                 // ✅ Fetch user data and update context

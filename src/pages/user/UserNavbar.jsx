@@ -4,6 +4,7 @@ import { Menu, X, Moon, Sun } from "lucide-react";
 import logowhite from "../../assets/images/logowhite.png";
 import logoDark from "../../assets/images/logoblack.png";
 import { useUser } from "../../context/UserContext";
+import SellerRegisterModal from "../../modals/SellerRegisterModal";
 
 const UserNavbar = () => {
     const navigate = useNavigate();
@@ -16,6 +17,7 @@ const UserNavbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [theme, setTheme] = useState(getInitialTheme);
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [showSellerModal, setShowSellerModal] = useState(false);
 
     useEffect(() => {
         document.documentElement.setAttribute("data-theme", theme);
@@ -49,6 +51,8 @@ const UserNavbar = () => {
         setDropdownOpen(false);
         navigate("/login");
     };
+
+    const isSeller = user?.roles?.includes("SELLER");
 
     return (
         <div className="fixed top-0 left-0 w-full z-50">
@@ -98,6 +102,12 @@ const UserNavbar = () => {
                     >
                         {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
                     </button>
+
+                    {user && !isSeller && (
+                        <a onClick={() => setShowSellerModal(true)} className="font-semibold hover:text-indigo-500 transition cursor-pointer">
+                            Become Seller
+                        </a>
+                    )}
 
                     {user ? (
                         <div className="relative profile-dropdown">
@@ -186,6 +196,18 @@ const UserNavbar = () => {
                         About Us
                     </a>
 
+                    {user && !isSeller && (
+                        <a
+                            onClick={() => {
+                                setIsOpen(false);
+                                setShowSellerModal(true);
+                            }}
+                            className="block font-semibold hover:text-indigo-500 cursor-pointer"
+                        >
+                            Become Seller
+                        </a>
+                    )}
+
                     {user ? (
                         <div className="flex justify-start items-center gap-3">
                             <div className="w-9 h-9 rounded-full bg-gray-300 overflow-hidden border border-gray-400">
@@ -229,6 +251,10 @@ const UserNavbar = () => {
                         {theme === "dark" ? "Light Mode" : "Dark Mode"}
                     </button>
                 </div>
+            )}
+
+            {showSellerModal && (
+                <SellerRegisterModal onClose={() => setShowSellerModal(false)} />
             )}
         </div>
     );

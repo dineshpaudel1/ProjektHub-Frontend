@@ -65,8 +65,8 @@ const UserProfile = () => {
 
     return (
         <div className="min-h-screen flex justify-center items-center px-4" style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}>
-            <div className="max-w-4xl w-full rounded-xl shadow-lg p-8 border" style={{ backgroundColor: "var(--menu-bg)", borderColor: "var(--border-color)" }}>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="w-full max-w-xl rounded-xl shadow-lg p-8 border" style={{ backgroundColor: "var(--menu-bg)", borderColor: "var(--border-color)" }}>
+                <div className="space-y-6">
                     <div className="flex flex-col items-center">
                         <img
                             src={user.profilePicture}
@@ -76,53 +76,52 @@ const UserProfile = () => {
                         <h2 className="text-xl font-semibold mt-3">{user.fullName}</h2>
                     </div>
 
-                    <div className="md:col-span-2 space-y-6">
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Username</label>
-                            <div className="flex items-center gap-2 px-4 py-2 border rounded-md" style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}>
-                                <User size={18} />
-                                <span>{user.username}</span>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Email</label>
-                            <div className="flex items-center gap-2 px-4 py-2 border rounded-md" style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}>
-                                <Mail size={18} />
-                                <span>{user.email}</span>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Set New Password</label>
-                            <div className="flex flex-col md:flex-row gap-4">
-                                <input
-                                    type="password"
-                                    value={newPassword}
-                                    onChange={(e) => setNewPassword(e.target.value)}
-                                    placeholder="Enter new password"
-                                    className="flex-1 px-4 py-2 border rounded-md focus:outline-none"
-                                    style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)", borderColor: "var(--border-color)" }}
-                                />
-                                <button
-                                    onClick={handleSetPassword}
-                                    className="px-6 py-2 rounded-md text-white transition"
-                                    style={{ backgroundColor: "var(--button-primary)" }}
-                                >
-                                    Save Password
-                                </button>
-                            </div>
-                            {notification && (
-                                <div className={`mt-3 px-4 py-2 rounded text-sm ${notification.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-                                    {notification.message}
-                                </div>
-                            )}
+                    <div>
+                        <label className="block text-sm font-medium mb-1">Username</label>
+                        <div className="flex items-center gap-2 px-4 py-2 border rounded-md" style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}>
+                            <User size={18} />
+                            <span>{user.username}</span>
                         </div>
                     </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-1">Email</label>
+                        <div className="flex items-center gap-2 px-4 py-2 border rounded-md" style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}>
+                            <Mail size={18} />
+                            <span>{user.email}</span>
+                        </div>
+                    </div>
+
+                    {/* <div>
+                        <label className="block text-sm font-medium mb-1">Set New Password</label>
+                        <div className="flex flex-col md:flex-row gap-4">
+                            <input
+                                type="password"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                placeholder="Enter new password"
+                                className="flex-1 px-4 py-2 border rounded-md focus:outline-none"
+                                style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)", borderColor: "var(--border-color)" }}
+                            />
+                            <button
+                                onClick={handleSetPassword}
+                                className="px-6 py-2 rounded-md text-white transition"
+                                style={{ backgroundColor: "var(--button-primary)" }}
+                            >
+                                Save Password
+                            </button>
+                        </div>
+                        {notification && (
+                            <div className={`mt-3 px-4 py-2 rounded text-sm ${notification.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                                {notification.message}
+                            </div>
+                        )}
+                    </div> */}
                 </div>
             </div>
         </div>
     );
+
 };
 
 export default UserProfile;

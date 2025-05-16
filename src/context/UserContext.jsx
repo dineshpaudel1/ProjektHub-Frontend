@@ -5,7 +5,7 @@ const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem("token");
 
     useEffect(() => {
         const fetchUser = async () => {
