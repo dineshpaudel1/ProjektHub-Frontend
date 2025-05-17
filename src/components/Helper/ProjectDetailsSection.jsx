@@ -1,83 +1,212 @@
-import React from "react";
-import { ShoppingBag, Star, Tag } from "lucide-react";
+import React, { useState } from "react";
+import { ShoppingBag, Star, Pencil, UploadCloud } from "lucide-react";
+import axios from "../../utils/axiosInstance";
+import NotificationToast from "../../porjectdetailhelper/NotificationToast";
 
-const ProjectDetailsSection = ({ project, isExpanded, setIsExpanded }) => {
+const ProjectDetailsSection = ({ project, isExpanded, setIsExpanded, refreshProject }) => {
+    const [editing, setEditing] = useState({ title: false, description: false, price: false, video: false });
+    const [form, setForm] = useState({
+        title: project.title,
+        description: project.description,
+        price: project.price,
+        previewVideoUrl: project.previewVideoUrl
+    });
+    const [notification, setNotification] = useState(null);
+    const token = localStorage.getItem("token");
+
+    const handleFieldChange = (field, value) => {
+        setForm(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleUpdate = async () => {
+        try {
+            await axios.patch(`/seller/project/update/${project.id}`, {
+                title: form.title,
+                description: form.description,
+                price: Number(form.price),
+                previewVideoUrl: form.previewVideoUrl
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            setNotification({ type: 'success', message: 'Project updated!' });
+            refreshProject();
+        } catch (err) {
+            console.error(err);
+            setNotification({ type: 'error', message: 'Update failed' });
+        } finally {
+            setTimeout(() => setNotification(null), 3000);
+        }
+    };
+
+    const handleThumbnailUpdate = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const formData = new FormData();
+        formData.append("file", file);
+        try {
+            await axios.patch(`/seller/project/${project.id}/thumbnail`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            setNotification({ type: 'success', message: 'Thumbnail updated!' });
+            refreshProject();
+        } catch (err) {
+            console.error(err);
+            setNotification({ type: 'error', message: 'Thumbnail update failed' });
+        } finally {
+            setTimeout(() => setNotification(null), 3000);
+        }
+    };
+
     return (
-        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
-            {/* Left Section */}
-            <div className="flex-1 space-y-6">
-                <div>
-                    <h1 className="text-4xl font-bold mb-3 text-[var(--text-color)]">{project.title}</h1>
-                    <div className="flex flex-wrap items-center gap-4 text-sm mb-4">
-                        <div className="flex items-center text-yellow-500">
-                            {[...Array(5)].map((_, i) => (
-                                <Star key={i} className="h-4 w-4 fill-current" />
-                            ))}
-                            <span className="ml-2 text-[var(--text-secondary)] font-medium">(128)</span>
-                        </div>
-                        <div className="flex items-center text-green-600 font-medium">
-                            <ShoppingBag className="h-4 w-4 mr-1" />
-                            1,234 purchases
-                        </div>
-                    </div>
-                    <p className="text-[var(--text-secondary)] mb-2">
-                        {isExpanded ? project.description : `${project.description?.slice(0, 80)}...`}
-                    </p>
-                    {project.description?.length > 80 && (
-                        <button
-                            className="text-[var(--button-primary)] font-medium hover:underline"
-                            onClick={() => setIsExpanded(!isExpanded)}
-                        >
-                            {isExpanded ? "Show less" : "Read more"}
-                        </button>
-                    )}
-                </div>
-
-                {project.tags?.length > 0 && (
+        <>
+            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
+                {/* Left Section */}
+                <div className="flex-1 space-y-6">
                     <div>
-                        <h2 className="flex items-center text-lg font-semibold mb-3">
-                            <Tag className="h-5 w-5 mr-2" />
-                            Tags
-                        </h2>
-                        <div className="flex flex-wrap gap-2">
-                            {project.tags.map((tag) => (
-                                <span
-                                    key={tag.id}
-                                    className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--button-primary)] bg-opacity-10 text-white"
-                                >
-                                    #{tag.tag}
-                                </span>
-                            ))}
+                        <div className="flex items-center gap-2">
+                            {editing.title ? (
+                                <input
+                                    value={form.title}
+                                    onChange={(e) => handleFieldChange("title", e.target.value)}
+                                    onBlur={() => {
+                                        setEditing(prev => ({ ...prev, title: false }));
+                                        handleUpdate();
+                                    }}
+                                    className="text-4xl font-bold bg-transparent border-b border-gray-400 text-[var(--text-color)]"
+                                    autoFocus
+                                />
+                            ) : (
+                                <h1 className="text-4xl font-bold text-[var(--text-color)]">
+                                    {project.title}
+                                </h1>
+                            )}
+                            <Pencil className="h-4 w-4 cursor-pointer text-gray-500" onClick={() => setEditing(prev => ({ ...prev, title: true }))} />
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-4 text-sm mb-4 mt-2">
+                            <div className="flex items-center text-yellow-500">
+                                {[...Array(5)].map((_, i) => <Star key={i} className="h-4 w-4 fill-current" />)}
+                                <span className="ml-2 text-[var(--text-secondary)] font-medium">(128)</span>
+                            </div>
+                            <div className="flex items-center text-green-600 font-medium">
+                                <ShoppingBag className="h-4 w-4 mr-1" />
+                                1,234 purchases
+                            </div>
+                        </div>
+
+                        <div className="flex gap-2 items-start">
+                            {editing.description ? (
+                                <textarea
+                                    value={form.description}
+                                    onChange={(e) => handleFieldChange("description", e.target.value)}
+                                    onBlur={() => {
+                                        setEditing(prev => ({ ...prev, description: false }));
+                                        handleUpdate();
+                                    }}
+                                    className="w-full bg-transparent border-b border-gray-400 text-[var(--text-secondary)]"
+                                    rows={3}
+                                    autoFocus
+                                />
+                            ) : (
+                                <p className="text-[var(--text-secondary)] mb-2">
+                                    {isExpanded ? project.description : `${project.description?.slice(0, 80)}...`}
+                                </p>
+                            )}
+                            <Pencil className="h-4 w-4 text-gray-500 mt-1 cursor-pointer" onClick={() => setEditing(prev => ({ ...prev, description: true }))} />
+                        </div>
+
+                        {project.description?.length > 80 && (
+                            <button
+                                className="text-[var(--button-primary)] font-medium hover:underline"
+                                onClick={() => setIsExpanded(!isExpanded)}
+                            >
+                                {isExpanded ? "Show less" : "Read more"}
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Editable Video URL */}
+                    <div className="flex gap-2 items-center">
+                        {editing.video ? (
+                            <input
+                                type="text"
+                                value={form.previewVideoUrl}
+                                onChange={(e) => handleFieldChange("previewVideoUrl", e.target.value)}
+                                onBlur={() => {
+                                    setEditing(prev => ({ ...prev, video: false }));
+                                    handleUpdate();
+                                }}
+                                className="text-sm font-mono bg-transparent border-b border-gray-400 w-full"
+                                autoFocus
+                            />
+                        ) : (
+                            <p className="text-sm font-mono text-[var(--text-secondary)] truncate max-w-xs">
+                                {project.previewVideoUrl}
+                            </p>
+                        )}
+                        <Pencil className="h-4 w-4 text-gray-500 cursor-pointer" onClick={() => setEditing(prev => ({ ...prev, video: true }))} />
+                    </div>
+
+                </div>
+
+                {/* Right Section */}
+                <div className="rounded-xl shadow-lg p-6 w-full lg:w-80 bg-[var(--hover-bg)] border border-[var(--border-color)]">
+                    <div className="mb-4 relative group">
+                        <img
+                            src={`http://localhost:8080/api/media/photo?file=${project.thumbnail}`}
+                            alt={project.title}
+                            className="w-full h-40 object-cover rounded-lg shadow-md"
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-50 text-white flex items-center justify-center opacity-0 group-hover:opacity-70 transition-opacity rounded-lg cursor-pointer">
+                            <UploadCloud className="h-8 w-8 mb-2" />
+                            {/* <label htmlFor="thumbnailUpload" className="cursor-pointer">Change Thumbnail</label> */}
+
+                            <input
+                                id="thumbnailUpload"
+                                type="file"
+                                className="hidden"
+                                accept="image/*"
+                                onChange={handleThumbnailUpdate}
+                            />
                         </div>
                     </div>
-                )}
 
-                <div>
-                    <p>Video URL: <span className="font-mono text-sm">{project.previewVideoUrl}</span></p>
+                    <div className="space-y-4">
+                        <div className="space-y-1">
+                            <div className="flex items-baseline justify-between gap-2">
+                                {editing.price ? (
+                                    <input
+                                        type="number"
+                                        value={form.price}
+                                        onChange={(e) => handleFieldChange("price", e.target.value)}
+                                        onBlur={() => {
+                                            setEditing(prev => ({ ...prev, price: false }));
+                                            handleUpdate();
+                                        }}
+                                        className="text-3xl font-bold text-[var(--button-primary)] bg-transparent border-b border-gray-400"
+                                        autoFocus
+                                    />
+                                ) : (
+                                    <p className="text-3xl font-bold text-[var(--button-primary)]">
+                                        NPR {project.price}
+                                    </p>
+                                )}
+                                <Pencil className="h-4 w-4 text-gray-500 cursor-pointer" onClick={() => setEditing(prev => ({ ...prev, price: true }))} />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            {/* Right Section */}
-            <div className="rounded-xl shadow-lg p-6 w-full lg:w-80 bg-[var(--hover-bg)] border border-[var(--border-color)]">
-                <div className="mb-4">
-                    <img
-                        src={`http://localhost:8080/api/media/photo?file=${project.thumbnail}`}
-                        alt={project.title}
-                        className="w-full h-40 object-cover rounded-lg shadow-md"
-                    />
-                </div>
-
-                <div className="space-y-4">
-                    <div className="space-y-1">
-                        <div className="flex items-baseline justify-between">
-                            <p className="text-3xl font-bold text-[var(--button-primary)]">NPR {project.price}.99</p>
-                            <p className="text-sm line-through text-gray-500">NPR 2999.99</p>
-                        </div>
-                        <p className="text-green-600 text-sm font-bold">33% OFF</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+            {/* Toast */}
+            <NotificationToast notification={notification} onClose={() => setNotification(null)} />
+        </>
     );
 };
 

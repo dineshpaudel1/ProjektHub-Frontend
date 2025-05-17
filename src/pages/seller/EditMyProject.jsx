@@ -5,8 +5,6 @@ import axios from '../../utils/axiosInstance';
 
 import NotificationToast from '../../porjectdetailhelper/NotificationToast';
 import ThumbnailUpload from '../../porjectdetailhelper/ThumbnailUpload';
-import PhotoGallery from '../../porjectdetailhelper/PhotoGallery';
-import PhotoUploadModal from '../../porjectdetailhelper/PhotoUploadModal';
 import TagSection from '../../porjectdetailhelper/TagSection';
 
 const EditMyProject = () => {
@@ -25,7 +23,6 @@ const EditMyProject = () => {
     const [newTag, setNewTag] = useState('');
     const [isTagSubmitting, setIsTagSubmitting] = useState(false);
 
-    const [showPhotoModal, setShowPhotoModal] = useState(false);
     const [photoFile, setPhotoFile] = useState(null);
     const [photoCaption, setPhotoCaption] = useState('');
     const [isPhotoUploading, setIsPhotoUploading] = useState(false);
@@ -230,26 +227,9 @@ const EditMyProject = () => {
                             isTagSubmitting={isTagSubmitting}
                             setNotification={setNotification}
                         />
-                        <PhotoGallery
-                            project={project}
-                            setProject={setProject}
-                            setShowPhotoModal={setShowPhotoModal}
-                            setNotification={setNotification}
-                        />
-
-                        <p><strong>Visibility:</strong> <span className={`px-2 py-1 rounded ${project.visible ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{project.visible ? 'Public' : 'Private'}</span></p>
                     </div>
 
-                    <PhotoUploadModal
-                        show={showPhotoModal}
-                        onClose={() => setShowPhotoModal(false)}
-                        onUpload={handlePhotoUpload}
-                        isUploading={isPhotoUploading}
-                        photoFile={photoFile}
-                        setPhotoFile={setPhotoFile}
-                        photoCaption={photoCaption}
-                        setPhotoCaption={setPhotoCaption}
-                    />
+                    
                 </div>
             )}
         </div>

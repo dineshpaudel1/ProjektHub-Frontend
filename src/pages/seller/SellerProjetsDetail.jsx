@@ -8,19 +8,8 @@ import {
 import QuestionAnswerList from "../../components/Helper/QuestionAnswerList";
 import ProjectDetailsSection from "../../components/Helper/ProjectDetailsSection";
 import GallerySection from "../../components/Helper/GallerySection";
-
-const getEmbedUrl = (url) => {
-    try {
-        const match = url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=)([^&]+)/);
-        if (match && match[1]) {
-            return `https://www.youtube.com/embed/${match[1]}`;
-        }
-        return null;
-    } catch {
-        return null;
-    }
-};
-
+import NotificationToast from "../../porjectdetailhelper/NotificationToast";
+import TagDisplaySection from "../../components/Helper/TagDisplaySection";
 
 const SellerProjectDetail = () => {
     const { id } = useParams();
@@ -31,8 +20,9 @@ const SellerProjectDetail = () => {
     const [error, setError] = useState(null);
     const [questions, setQuestions] = useState([]);
     const [isExpanded, setIsExpanded] = useState(false);
+    const [notification, setNotification] = useState(null);
 
-    // ✅ Move outside
+
     const fetchQuestions = async () => {
         try {
             const res = await axios.get(`/public/project/${id}/interactions`);
@@ -42,33 +32,115 @@ const SellerProjectDetail = () => {
         }
     };
 
-    useEffect(() => {
-        const fetchProjectDetails = async () => {
-            const token = localStorage.getItem("token");
-            if (!token) {
-                setError("Unauthorized. Please login.");
-                return;
-            }
+    const fetchProjectDetails = async () => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            setError("Unauthorized. Please login.");
+            return;
+        }
 
-            try {
-                setLoading(true);
-                const res = await axios.get(`/seller/project/details/${id}`, {
+        try {
+            setLoading(true);
+            const res = await axios.get(`/seller/project/details/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setProject(res.data.data);
+        } catch (err) {
+            setError("Failed to load project details.");
+            console.error("❌ Error fetching project:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleToggleVisibility = async () => {
+        const token = localStorage.getItem("token");
+        if (!token || !project) return;
+
+        try {
+            await axios.patch(
+                `http://localhost:8080/api/seller/project/${project.id}/visibility`,
+                {},
+                {
                     headers: {
                         Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
                     },
-                });
-                setProject(res.data.data);
-            } catch (err) {
-                setError("Failed to load project details.");
-                console.error("❌ Error fetching project:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
+                }
+            );
 
+            setProject((prev) => ({
+                ...prev,
+                visible: !prev.visible,
+            }));
+
+            setNotification({
+                type: "success",
+                message: `Project marked as ${!project.visible ? "Public" : "Private"}`,
+            });
+
+            setTimeout(() => setNotification(null), 3000);
+        } catch (error) {
+            console.error("Visibility toggle failed:", error);
+            setNotification({
+                type: "error",
+                message: "Failed to change project visibility.",
+            });
+
+            setTimeout(() => setNotification(null), 3000);
+        }
+    };
+
+    const getEmbedUrl = (url) => {
+        try {
+            const match = url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=)([^&]+)/);
+            if (match && match[1]) {
+                return `https://www.youtube.com/embed/${match[1]}`;
+            }
+            return null;
+        } catch {
+            return null;
+        }
+    };
+
+    useEffect(() => {
         fetchProjectDetails();
         fetchQuestions();
     }, [id]);
+    const [newTag, setNewTag] = useState("");
+    const [isTagSubmitting, setIsTagSubmitting] = useState(false);
+
+    const handleAddTag = async () => {
+        if (!newTag.trim()) return;
+        const token = localStorage.getItem("token");
+        try {
+            setIsTagSubmitting(true);
+            await axios.post(`/seller/project/addTags/${project.id}`, {
+                tag: [newTag]
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                }
+            });
+
+            setProject(prev => ({
+                ...prev,
+                tags: [...prev.tags, { id: Date.now(), tag: newTag }]
+            }));
+
+            setNewTag("");
+            setNotification({ type: "success", message: "Tag added successfully!" });
+        } catch (err) {
+            console.error("Failed to add tag:", err);
+            setNotification({ type: "error", message: "Failed to add tag." });
+        } finally {
+            setIsTagSubmitting(false);
+            setTimeout(() => setNotification(null), 3000);
+        }
+    };
 
 
     if (loading) {
@@ -95,6 +167,12 @@ const SellerProjectDetail = () => {
 
     return (
         <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-[var(--bg-color)] text-[var(--text-color)] transition-all duration-300">
+            {/* ✅ Notification Toast */}
+            <NotificationToast
+                notification={notification}
+                onClose={() => setNotification(null)}
+            />
+
             <div className="max-w-6xl mx-auto">
                 <div className="flex justify-between items-center mb-8">
                     <button
@@ -105,15 +183,27 @@ const SellerProjectDetail = () => {
                         <span>Back to Projects</span>
                     </button>
 
-                    <button
+                    {/* <button
                         onClick={() => navigate(`/seller/editprojects/${id}`)}
                         className="px-4 py-2 bg-[var(--button-primary)] text-white rounded-md hover:bg-[var(--button-primary-hover)] transition-colors duration-200"
                     >
                         Edit Project
-                    </button>
+                    </button> */}
 
+                    <div className="flex items-center gap-2">
+
+                        <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={project.visible}
+                                onChange={handleToggleVisibility}
+                                className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-blue-600 transition-all"></div>
+                            <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
+                        </label>
+                    </div>
                 </div>
-
 
                 <div className="rounded-2xl shadow-lg overflow-hidden bg-[var(--menu-bg)] border border-[var(--border-color)]">
                     {/* Video */}
@@ -145,14 +235,30 @@ const SellerProjectDetail = () => {
                             project={project}
                             isExpanded={isExpanded}
                             setIsExpanded={setIsExpanded}
+                            refreshProject={fetchProjectDetails}
                         />
-                        <GallerySection photos={project.photos} />
-                        {/* Q&A Section */}
+
+                        <TagDisplaySection
+                            project={project}
+                            setProject={setProject}
+                            newTag={newTag}
+                            setNewTag={setNewTag}
+                            isTagSubmitting={isTagSubmitting}
+                            setIsTagSubmitting={setIsTagSubmitting}
+                            setNotification={setNotification}
+                        />
+
+                        <GallerySection
+                            photos={project.photos}
+                            id={project.id}
+                            refreshProject={fetchProjectDetails}
+                        />
+
+
                         <QuestionAnswerList
                             questions={questions}
                             refreshQuestions={fetchQuestions}
                         />
-
                     </div>
                 </div>
             </div>

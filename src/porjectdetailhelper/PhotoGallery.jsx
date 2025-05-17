@@ -43,13 +43,8 @@ const PhotoGallery = ({ project, setShowPhotoModal, setProject, setNotification 
     <div>
       <div className="flex items-center justify-between mb-2">
         <h4 className="text-sm font-medium text-gray-500">Project Photos</h4>
-        <button
-          onClick={handleToggleVisibility}
-          className={`text-sm px-3 py-1 rounded-md text-white ${project.visible ? 'bg-red-500 hover:bg-red-600' : 'bg-green-600 hover:bg-green-700'
-            }`}
-        >
-          {project.visible ? 'Make Private' : 'Make Public'}
-        </button>
+
+
       </div>
 
       <div className="flex flex-wrap gap-4 mt-2">
