@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import NotificationToast from "../../components/NotificationToast";
 import { useNavigate } from "react-router-dom";
-import { useUser } from "../../context/UserContext"; // ✅ import context
+import { useUser } from "../../context/UserContext";
 
 const UserLogin = () => {
     const [notification, setNotification] = useState(null);
     const [identifier, setIdentifier] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
-    const { setUser } = useUser(); // ✅ use context
+    const { setUser, setRoles } = useUser();
 
     useEffect(() => {
         if (window.google) {
@@ -34,23 +34,21 @@ const UserLogin = () => {
             });
 
             const data = await res.json();
-
             if (res.ok && data?.status === "success") {
-                localStorage.removeItem("googleidtoken");
                 localStorage.setItem("token", data.data.accessToken);
                 localStorage.setItem("refreshToken", data.data.refreshToken);
+                setRoles(data.data.roles);
 
-                // ✅ Fetch user data and update context
                 const userRes = await fetch("http://localhost:8080/api/user/me", {
                     headers: {
                         Authorization: `Bearer ${data.data.accessToken}`,
                     },
                 });
                 const userData = await userRes.json();
+                console.log(userData)
                 setUser(userData);
 
                 setNotification({ type: "success", message: "Login successful!" });
-
                 const redirectPath = localStorage.getItem("redirectAfterLogin") || "/";
                 localStorage.removeItem("redirectAfterLogin");
                 navigate(redirectPath);
@@ -79,12 +77,12 @@ const UserLogin = () => {
             });
 
             const data = await res.json();
+            console.log(data)
 
             if (res.ok && data?.status === "success") {
-                localStorage.setItem("accessToken", data.data.accessToken);
+                localStorage.setItem("token", data.data.accessToken);
                 localStorage.setItem("refreshToken", data.data.refreshToken);
 
-                // ✅ Fetch user data and update context
                 const userRes = await fetch("http://localhost:8080/api/user/me", {
                     headers: {
                         Authorization: `Bearer ${data.data.accessToken}`,
@@ -92,9 +90,9 @@ const UserLogin = () => {
                 });
                 const userData = await userRes.json();
                 setUser(userData);
+                console.log(userData)
 
                 setNotification({ type: "success", message: "Login successful!" });
-
                 const redirectPath = localStorage.getItem("redirectAfterLogin") || "/";
                 localStorage.removeItem("redirectAfterLogin");
                 navigate(redirectPath);

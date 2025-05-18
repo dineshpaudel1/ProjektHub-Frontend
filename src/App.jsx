@@ -26,13 +26,22 @@ import SellerPrivateRoute from "./utils/SellerPrivateRoute";
 import EditMyProject from "./pages/seller/EditMyProject";
 import AdminProfile from "./pages/admin/AdminProfile";
 import UserProfile from "./pages/user/UserProfile";
+import ApproveSeller from "./pages/admin/ApproveSeller";
+import { UserProvider } from "./context/UserContext";
 
 function App() {
   return (
     <Router>
       <Routes>
         {/* ✅ User Routes */}
-        <Route path="/" element={<UserLayout />}>
+        <Route
+          path="/"
+          element={
+            <UserProvider>
+              <UserLayout />
+            </UserProvider>
+          }
+        >
           <Route index element={<MasterPage />} />
           <Route path="projects" element={<Projects />} />
           <Route path="services" element={<Services />} />
@@ -58,6 +67,7 @@ function App() {
           <Route path="adminproject" element={<AdminProjects />} />
           <Route path="project/:id" element={<AllProjectDetail />} />
           <Route path="profile" element={<AdminProfile />} />
+          <Route path="approve-seller/:sellerId" element={<ApproveSeller />} />
         </Route>
 
         {/* ✅ Seller Routes */}
@@ -77,6 +87,8 @@ function App() {
           <Route path="projects/:id" element={<EditProject />} />
           {/* <Route path="projects/:id" element={<SellerProjectDetail />} />  */}
           <Route path="editprojects/:id" element={<EditMyProject />} />
+
+
 
           {/* Add more seller-specific routes as needed */}
         </Route>

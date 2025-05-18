@@ -9,6 +9,8 @@ const AdminNav = ({ toggleSidebar }) => {
     const [showSearch, setShowSearch] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [unapprovedSellers, setUnapprovedSellers] = useState([]);
+
 
     const menuRef = useRef();
     const searchRef = useRef();
@@ -54,8 +56,28 @@ const AdminNav = ({ toggleSidebar }) => {
             if (notificationRef.current && !notificationRef.current.contains(e.target)) setShowNotifications(false);
         };
         document.addEventListener("mousedown", handler);
+
+        const fetchUnapprovedSellers = async () => {
+            try {
+                const res = await fetch("http://localhost:8080/api/admin/unapproved-sellers", {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                const json = await res.json();
+                console.log("Fetched sellers:", json);
+                setUnapprovedSellers(json.data || []);
+
+            } catch (err) {
+                console.error("Error fetching unapproved sellers", err);
+            }
+        };
+
+        fetchUnapprovedSellers();
+
         return () => document.removeEventListener("mousedown", handler);
     }, []);
+
 
     const handleLogout = () => {
         const roles = getUserRoles();
@@ -66,7 +88,7 @@ const AdminNav = ({ toggleSidebar }) => {
         if (roles.includes("ADMIN")) {
             navigate("/admin/login");
         } else {
-            navigate("/login");
+            navigate("/admin/login");
         }
     };
 
@@ -136,41 +158,47 @@ const AdminNav = ({ toggleSidebar }) => {
                         aria-label="Notifications"
                     >
                         <Bell size={20} className="text-gray-700" />
-                        <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white" />
+                        {unapprovedSellers.length > 0 && (
+                            <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white" />
+                        )}
                     </button>
 
                     {showNotifications && (
                         <div className="absolute right-0 mt-3 w-80 bg-white shadow-xl rounded-xl z-50 animate-fadeIn">
                             <div className="flex justify-between px-4 py-3 border-b border-gray-100">
                                 <h3 className="text-sm font-semibold text-gray-700">Notifications</h3>
-                                <span className="text-xs text-white bg-blue-600 rounded-full px-2 py-0.5">4 New</span>
+                                <span className="text-xs text-white bg-blue-600 rounded-full px-2 py-0.5">
+                                    {unapprovedSellers.length} New
+                                </span>
                             </div>
 
                             <div className="px-4 py-3 text-sm text-gray-600 space-y-3 max-h-96 overflow-y-auto">
-                                <div className="flex items-start gap-2">
-                                    <span className="text-blue-500">🔵</span>
-                                    <div className="flex-1">
-                                        <p>Your <strong>Elite</strong> author Graphic Optimization <span className="text-blue-600">reward</span> is ready!</p>
-                                        <p className="text-xs text-gray-400 mt-1">JUST 30 SEC AGO</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-start gap-2">
-                                    <img src="/user.png" alt="Angela" className="w-6 h-6 rounded-full mt-1" />
-                                    <div className="flex-1">
-                                        <p><strong>Angela Bernier</strong> answered your comment on the forecast's graph 🔔.</p>
-                                        <p className="text-xs text-gray-400 mt-1">48 MIN AGO</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-start gap-2">
-                                    <span className="text-red-500">📨</span>
-                                    <div className="flex-1">
-                                        <p>You have received <strong className="text-green-600">20</strong> new messages in the conversation</p>
-                                        <p className="text-xs text-gray-400 mt-1">1 HOUR AGO</p>
-                                    </div>
-                                </div>
+                                {unapprovedSellers.length === 0 ? (
+                                    <p className="text-sm text-gray-500 p-4">No new seller requests.</p>
+                                ) : (
+                                    unapprovedSellers.map((seller) => (
+                                        <div
+                                            key={seller.id}
+                                            className="flex items-start gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded"
+                                            onClick={() => navigate(`approve-seller/${seller.id}`)}
+                                        >
+                                            <img
+                                                src={`http://localhost:8080/api/media/photo?file=${seller.verificationPhotoPath}`}
+                                                alt={seller.sellerName}
+                                                className="w-8 h-8 rounded-full mt-1 object-cover border"
+                                            />
+                                            <div className="flex-1">
+                                                <p><strong>{seller.sellerName}</strong> has requested seller verification.</p>
+                                                <p className="text-xs text-gray-400 mt-1">Click to view details</p>
+                                            </div>
+                                        </div>
+                                    ))
+
+                                )}
                             </div>
                         </div>
                     )}
+
                 </div>
 
                 {/* User Dropdown */}

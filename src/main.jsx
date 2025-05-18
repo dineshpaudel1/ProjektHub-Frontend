@@ -5,8 +5,6 @@ import App from './App.jsx';
 import { UserProvider } from '../src/context/UserContext.jsx';
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <UserProvider>
-      <App />
-    </UserProvider>
+    <App />
   </StrictMode>
 );

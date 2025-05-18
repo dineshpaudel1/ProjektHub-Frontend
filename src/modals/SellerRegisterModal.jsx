@@ -6,7 +6,7 @@ const SellerRegisterModal = ({ onClose }) => {
         bio: "",
         professionalTitle: "",
         phone: "",
-        skills: [""],
+        skills: [],
         verificationPhoto: null,
     });
 
@@ -44,17 +44,23 @@ const SellerRegisterModal = ({ onClose }) => {
         formData.skills.forEach(skill => data.append("skills", skill));
         data.append("verificationPhoto", formData.verificationPhoto);
 
+        const token = localStorage.getItem("token"); // or "accessToken" if that's what you used
+
         try {
             await axios.post("http://localhost:8080/api/user/seller-register", data, {
-                headers: { "Content-Type": "multipart/form-data" },
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    Authorization: `Bearer ${token}`, // 🔥 this line is important
+                },
             });
             showToast("Seller registration submitted successfully!", "success");
-            setTimeout(() => onClose(), 1000); // Close after toast shows
+            setTimeout(() => onClose(), 1000);
         } catch (error) {
             console.error("Registration failed", error);
             showToast("Failed to register as seller.", "error");
         }
     };
+
 
     return (
         <>

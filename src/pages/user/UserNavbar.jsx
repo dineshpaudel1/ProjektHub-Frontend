@@ -8,7 +8,7 @@ import SellerRegisterModal from "../../modals/SellerRegisterModal";
 
 const UserNavbar = () => {
     const navigate = useNavigate();
-    const { user, setUser } = useUser();
+    const { user, setUser, roles } = useUser();
 
     const getInitialTheme = () =>
         localStorage.getItem("theme") ||
@@ -45,15 +45,14 @@ const UserNavbar = () => {
     }, []);
 
     const handleLogout = () => {
-        localStorage.removeItem("accessToken");
+        localStorage.removeItem("token");
         localStorage.removeItem("refreshToken");
         setUser(null);
         setDropdownOpen(false);
         navigate("/login");
     };
 
-    const isSeller = user?.roles?.includes("SELLER");
-
+    const isSeller = roles?.includes("SELLER");
     return (
         <div className="fixed top-0 left-0 w-full z-50">
             <nav
@@ -208,14 +207,21 @@ const UserNavbar = () => {
                         </a>
                     )}
 
-                    {user ? (
+                    {user === null ? (
+                        // Show nothing or loader while user is still being fetched
+                        <div className="w-9 h-9 rounded-full bg-gray-200 animate-pulse"></div>
+                    ) : user ? (
                         <div className="flex justify-start items-center gap-3">
-                            <div className="w-9 h-9 rounded-full bg-gray-300 overflow-hidden border border-gray-400">
+                            <div className="w-9 h-9 rounded-full overflow-hidden border border-gray-400 bg-gray-300">
                                 {user.profilePicture ? (
                                     <img
                                         src={user.profilePicture}
                                         alt="Profile"
                                         className="w-full h-full object-cover rounded-full"
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = "/default-user.png"; // Optional fallback image
+                                        }}
                                     />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-white bg-indigo-600 rounded-full font-semibold">
@@ -241,6 +247,7 @@ const UserNavbar = () => {
                             Login
                         </button>
                     )}
+
 
                     <button
                         onClick={toggleDarkMode}
