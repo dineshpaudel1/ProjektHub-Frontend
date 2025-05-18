@@ -5,11 +5,11 @@ import {
     Loader,
     ArrowLeft,
 } from "lucide-react";
-import QuestionAnswerList from "../../components/Helper/QuestionAnswerList";
-import ProjectDetailsSection from "../../components/Helper/ProjectDetailsSection";
-import GallerySection from "../../components/Helper/GallerySection";
-import NotificationToast from "../../porjectdetailhelper/NotificationToast";
-import TagDisplaySection from "../../components/Helper/TagDisplaySection";
+import QuestionAnswerList from "../../components/SellerHelper/QuestionAnswerList";
+import ProjectDetailsSection from "../../components/SellerHelper/ProjectDetailsSection";
+import GallerySection from "../../components/SellerHelper/GallerySection";
+import NotificationToast from "../../components/NotificationToast";
+import TagDisplaySection from "../../components/SellerHelper/TagDisplaySection";
 
 const SellerProjectDetail = () => {
     const { id } = useParams();
@@ -233,9 +233,11 @@ const SellerProjectDetail = () => {
                     <div className="p-8">
                         <ProjectDetailsSection
                             project={project}
+                            setProject={setProject}
                             isExpanded={isExpanded}
                             setIsExpanded={setIsExpanded}
-                            refreshProject={fetchProjectDetails}
+                            notification={notification}
+                            setNotification={setNotification}
                         />
 
                         <TagDisplaySection

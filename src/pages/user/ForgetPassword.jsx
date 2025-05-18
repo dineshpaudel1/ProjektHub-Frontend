@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import NotificationToast from "../../porjectdetailhelper/NotificationToast";
+import NotificationToast from "../../components/NotificationToast";
 import axios from "../../utils/axiosInstance";
 import { useNavigate } from "react-router-dom";
 

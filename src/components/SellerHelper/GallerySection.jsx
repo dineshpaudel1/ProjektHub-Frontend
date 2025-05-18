@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { UploadCloud, X, ImageIcon } from "lucide-react";
 import axios from "../../utils/axiosInstance";
 import PhotoUploadModal from "../../modals/PhotoUploadModal";
-import NotificationToast from "../../porjectdetailhelper/NotificationToast";
+import NotificationToast from "../NotificationToast";
 
 const GallerySection = ({ id, photos, refreshProject }) => {
     const [showModal, setShowModal] = useState(false);

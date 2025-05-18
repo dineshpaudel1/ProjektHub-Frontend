@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import axios from "../utils/axiosInstance";
-import NotificationToast from "../porjectdetailhelper/NotificationToast"; // adjust path as needed
-
+import NotificationToast from "../components/NotificationToast";
 const SellerRegisterModal = ({ onClose }) => {
     const [formData, setFormData] = useState({
         bio: "",

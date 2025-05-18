@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { MessageCircle } from "lucide-react";
 import axios from "../../utils/axiosInstance";
-import NotificationToast from "../../porjectdetailhelper/NotificationToast";
+import NotificationToast from "../NotificationToast";
 
 const QuestionAnswerList = ({ questions, refreshQuestions }) => {
     const [answerMap, setAnswerMap] = useState({});

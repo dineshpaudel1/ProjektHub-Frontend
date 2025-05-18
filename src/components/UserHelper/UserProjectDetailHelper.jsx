@@ -58,7 +58,7 @@ const UserProjectDetailHelper = ({ project, isExpanded, setIsExpanded, onRequest
             </div>
 
             {/* Right Section */}
-            <div className="rounded-xl shadow-lg p-6 w-full lg:w-80 bg-[var(--hover-bg)] border border-[var(--border-color)]">
+            <div className="rounded-xl shadow-lg p-2 w-full lg:w-70 bg-[var(--hover-bg)] border border-[var(--border-color)]">
                 <div className="mb-4">
                     <img
                         src={`http://localhost:8080/api/media/photo?file=${project.thumbnail}`}
@@ -70,7 +70,7 @@ const UserProjectDetailHelper = ({ project, isExpanded, setIsExpanded, onRequest
                 <div className="space-y-4">
                     <div className="space-y-1">
                         <div className="flex items-baseline justify-between">
-                            <p className="text-3xl font-bold text-[var(--button-primary)]">NPR {project.price}.99</p>
+                            <p className="text-3xl font-bold text-[var(--button-primary)]">NPR {project.price}</p>
                             <p className="text-sm line-through text-gray-500">NPR 2999.99</p>
                         </div>
                         <p className="text-green-600 text-sm font-bold">33% OFF</p>

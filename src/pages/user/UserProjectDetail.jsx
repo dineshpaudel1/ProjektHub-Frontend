@@ -5,7 +5,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "../../utils/axiosInstance";
 import { Loader, ArrowLeft, MessageCircle } from "lucide-react";
 import SocialModal from "../../modals/SocialModal";
-import NotificationToast from "../../porjectdetailhelper/NotificationToast";
+import NotificationToast from "../../components/NotificationToast";
 import UserQuestionAnswerList from "../../components/UserHelper/QuestionAnswerList";
 import UserProjectDetailHelper from "../../components/UserHelper/UserProjectDetailHelper";
 import UserGallerySection from "../../components/UserHelper/UserGallerySection";

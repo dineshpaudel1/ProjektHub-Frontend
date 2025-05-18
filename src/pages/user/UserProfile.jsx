@@ -13,6 +13,7 @@ const UserProfile = () => {
     );
 
     const token = localStorage.getItem("accessToken");
+    console.log(user)
 
     useEffect(() => {
         document.documentElement.setAttribute("data-theme", theme);
@@ -69,10 +70,11 @@ const UserProfile = () => {
                 <div className="space-y-6">
                     <div className="flex flex-col items-center">
                         <img
-                            src={user.profilePicture}
+                            src={user.profilePicture || "https://via.placeholder.com/150"}
                             alt="Profile"
-                            className="w-32 h-32 rounded-full border-4 border-white shadow-md object-cover"
+                            className="w-32 h-32 rounded-full border border-green-500 object-cover"
                         />
+
                         <h2 className="text-xl font-semibold mt-3">{user.fullName}</h2>
                     </div>
 

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from '../../utils/axiosInstance';
 
-import NotificationToast from '../../porjectdetailhelper/NotificationToast';
+import NotificationToast from '../../components/NotificationToast';
 import ThumbnailUpload from '../../porjectdetailhelper/ThumbnailUpload';
 import TagSection from '../../porjectdetailhelper/TagSection';
 

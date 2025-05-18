@@ -10,7 +10,7 @@ const UserGallerySection = ({ photos }) => {
                 <ImageIcon className="h-5 w-5 mr-2" />
                 Gallery
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
                 {photos.map((photo) => (
                     <div key={photo.id} className="group relative">
                         <div className="aspect-w-4 aspect-h-3 rounded-xl overflow-hidden shadow-md">

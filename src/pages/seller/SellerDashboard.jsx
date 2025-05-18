@@ -118,7 +118,7 @@ const SellerDashboard = () => {
                         iconBg="bg-blue-500"
                         change="12%"
                         changeType="increase"
-                        navigateTo="/admin/adminproject"
+                        navigateTo="/seller/sellerproject"
                     />
                     <StatCard
                         title="Pending Questions"
