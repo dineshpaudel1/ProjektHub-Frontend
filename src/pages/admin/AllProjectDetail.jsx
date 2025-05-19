@@ -3,7 +3,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "../../utils/axiosInstance";
 import {
     Loader,
     ArrowLeft,
@@ -13,6 +12,7 @@ import {
     ShoppingBag,
     Star,
 } from "lucide-react";
+import { useProjectContext } from "../../context/ProjectContext";
 
 const getEmbedUrl = (url) => {
     try {
@@ -30,40 +30,23 @@ const AllProjectDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    const [project, setProject] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [questions, setQuestions] = useState([]);
+    const {
+        projectDetail: project,
+        loadingDetail,
+        fetchProjectDetail,
+        fetchQuestions,
+        loadingQuestions,
+        questions,
+    } = useProjectContext();
+
     const [isExpanded, setIsExpanded] = useState(false);
 
     useEffect(() => {
-        const fetchProjectDetails = async () => {
-            try {
-                setLoading(true);
-                const res = await axios.get(`/public/project/${id}`);
-                setProject(res.data.data);
-            } catch (err) {
-                setError("Failed to load project details.");
-                console.error("❌ Error fetching project:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        const fetchQuestions = async () => {
-            try {
-                const res = await axios.get(`/public/project/${id}/interactions`);
-                setQuestions(res.data.data || []);
-            } catch (err) {
-                console.error("Error fetching questions:", err);
-            }
-        };
-
-        fetchProjectDetails();
-        fetchQuestions();
+        fetchProjectDetail(id);
+        fetchQuestions(id);
     }, [id]);
 
-    if (loading) {
+    if (loadingDetail) {
         return (
             <div className="flex items-center justify-center h-screen">
                 <Loader className="animate-spin h-12 w-12 text-[var(--button-primary)]" />
@@ -71,17 +54,15 @@ const AllProjectDetail = () => {
         );
     }
 
-    if (error) {
+    if (!project) {
         return (
             <div className="flex items-center justify-center h-screen">
                 <div className="p-6 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded-lg max-w-md text-center shadow-lg">
-                    {error}
+                    Failed to load project details.
                 </div>
             </div>
         );
     }
-
-    if (!project) return null;
 
     const embedUrl = getEmbedUrl(project.previewVideoUrl);
 
@@ -99,7 +80,7 @@ const AllProjectDetail = () => {
                 </div>
 
                 <div className="rounded-2xl shadow-lg overflow-hidden bg-[var(--menu-bg)] border border-[var(--border-color)]">
-                    {/* Video */}
+                    {/* Video Preview */}
                     <div className="relative h-96 w-full bg-black">
                         {embedUrl ? (
                             <iframe
@@ -181,9 +162,7 @@ const AllProjectDetail = () => {
                             </div>
 
                             {/* Right */}
-                            {/* Right */}
                             <div className="rounded-xl shadow-lg p-6 w-full lg:w-80 bg-[var(--hover-bg)] border border-[var(--border-color)]">
-                                {/* Thumbnail Image */}
                                 <div className="mb-4">
                                     <img
                                         src={`http://localhost:8080/api/media/photo?file=${project.thumbnail}`}
@@ -212,10 +191,8 @@ const AllProjectDetail = () => {
                                     </div>
                                 </div>
                             </div>
-
                         </div>
 
-                        {/* Gallery */}
                         {/* Gallery */}
                         {project.photos?.length > 0 && (
                             <div className="mt-12">
@@ -240,9 +217,10 @@ const AllProjectDetail = () => {
                             </div>
                         )}
 
-
                         {/* Q&A Section */}
-                        {questions.length > 0 && (
+                        {loadingQuestions ? (
+                            <p className="mt-12 text-sm text-gray-400">Loading questions...</p>
+                        ) : questions.length > 0 ? (
                             <div className="mt-12">
                                 <h2 className="flex items-center text-xl font-semibold mb-4">
                                     <MessageCircle className="h-5 w-5 mr-2" />
@@ -279,7 +257,7 @@ const AllProjectDetail = () => {
                                     })}
                                 </ul>
                             </div>
-                        )}
+                        ) : null}
                     </div>
                 </div>
             </div>

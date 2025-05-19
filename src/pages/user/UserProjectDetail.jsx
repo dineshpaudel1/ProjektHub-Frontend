@@ -9,6 +9,7 @@ import NotificationToast from "../../components/NotificationToast";
 import UserQuestionAnswerList from "../../components/UserHelper/QuestionAnswerList";
 import UserProjectDetailHelper from "../../components/UserHelper/UserProjectDetailHelper";
 import UserGallerySection from "../../components/UserHelper/UserGallerySection";
+import { useProjectContext } from "../../context/ProjectContext";
 
 const getEmbedUrl = (url) => {
     try {
@@ -26,24 +27,19 @@ const UserProjectDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    const [project, setProject] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const {
+        projectDetail: project,
+        loadingDetail: loading,
+        fetchProjectDetail,
+        fetchQuestions,
+        loadingQuestions,
+        questions,
+    } = useProjectContext();
 
     const [questionText, setQuestionText] = useState("");
-    const [questions, setQuestions] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [notification, setNotification] = useState(null);
-
-    const fetchQuestions = async () => {
-        try {
-            const res = await axios.get(`/public/project/${id}/interactions`);
-            setQuestions(res.data.data || []);
-        } catch (err) {
-            console.error("Error fetching questions:", err);
-        }
-    };
 
     const handleAskQuestion = async (e) => {
         e.preventDefault();
@@ -54,10 +50,7 @@ const UserProjectDetail = () => {
         if (!token) {
             setNotification({ type: "error", message: "Please login to ask a question." });
             localStorage.setItem("redirectAfterLogin", `/project/${id}`);
-
-            setTimeout(() => {
-                navigate("/login");
-            }, 1500);
+            setTimeout(() => navigate("/login"), 1500);
             return;
         }
 
@@ -68,28 +61,15 @@ const UserProjectDetail = () => {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setQuestionText("");
-            fetchQuestions();
+            fetchQuestions(id);
         } catch (err) {
             console.error("Error submitting question:", err);
         }
     };
 
     useEffect(() => {
-        const fetchProjectDetails = async () => {
-            try {
-                setLoading(true);
-                const response = await axios.get(`/public/project/${id}`);
-                setProject(response.data.data);
-            } catch (err) {
-                console.error("❌ Error fetching project details:", err);
-                setError("Failed to load project details.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchProjectDetails();
-        fetchQuestions();
+        fetchProjectDetail(id);
+        fetchQuestions(id);
     }, [id]);
 
     if (loading) {
@@ -100,17 +80,15 @@ const UserProjectDetail = () => {
         );
     }
 
-    if (error) {
+    if (!loading && !project) {
         return (
             <div className="flex items-center justify-center h-screen">
                 <div className="p-6 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded-lg max-w-md text-center shadow-lg">
-                    {error}
+                    Failed to load project details.
                 </div>
             </div>
         );
     }
-
-    if (!project) return null;
 
     const embedUrl = getEmbedUrl(project.previewVideoUrl);
 
@@ -158,7 +136,7 @@ const UserProjectDetail = () => {
                         </div>
 
                         <div className="p-8">
-                            {/* Project Info (Title, Rating, Price, Description, Tags, Sidebar) */}
+                            {/* Project Info */}
                             <UserProjectDetailHelper
                                 project={project}
                                 isExpanded={isExpanded}
@@ -176,7 +154,6 @@ const UserProjectDetail = () => {
                                     Ask a Question
                                 </h2>
 
-                                {/* Ask Form */}
                                 <form onSubmit={handleAskQuestion} className="mb-6">
                                     <textarea
                                         value={questionText}
@@ -192,8 +169,11 @@ const UserProjectDetail = () => {
                                     </button>
                                 </form>
 
-                                {/* Previous Questions */}
-                                <UserQuestionAnswerList questions={questions} />
+                                {loadingQuestions ? (
+                                    <p className="text-sm text-gray-500">Loading questions...</p>
+                                ) : (
+                                    <UserQuestionAnswerList questions={questions} />
+                                )}
                             </div>
                         </div>
                     </div>

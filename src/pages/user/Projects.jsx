@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye } from "lucide-react";
-import axios from "../../utils/axiosInstance";
+import { useProjectContext } from "../../context/ProjectContext";
 
 const SkeletonCard = () => (
     <div className="space-y-4 animate-pulse">
@@ -15,23 +15,8 @@ const SkeletonCard = () => (
 );
 
 const Projects = () => {
-    const [projects, setProjects] = useState([]);
-    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
-
-    useEffect(() => {
-        const fetchProjects = async () => {
-            try {
-                const response = await axios.get("/public/projects");
-                setProjects(response.data.data);
-            } catch (error) {
-                console.error("Error fetching projects:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchProjects();
-    }, []);
+    const { projects, loadingProjects } = useProjectContext();
 
     return (
         <section id="projects" className="py-16 px-4 sm:px-6 lg:px-12" style={{ backgroundColor: "var(--bg-color)" }}>
@@ -41,7 +26,7 @@ const Projects = () => {
             </h2>
 
             <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
-                {loading || projects.length === 0
+                {loadingProjects || projects.length === 0
                     ? [...Array(3)].map((_, idx) => <SkeletonCard key={idx} />)
                     : projects.map((project) => (
                         <div
