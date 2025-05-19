@@ -230,7 +230,7 @@ const AdminNav = ({ toggleSidebar }) => {
                                 <span>Profile</span>
                             </button>
 
-                            <button
+                            {/* <button
                                 className="flex items-center gap-3 w-full text-left px-4 py-2.5 text-gray-700 hover:bg-gray-50"
                                 onClick={() => {
                                     setShowMenu(false);
@@ -239,17 +239,17 @@ const AdminNav = ({ toggleSidebar }) => {
                             >
                                 <Settings size={16} className="text-gray-500" />
                                 <span>Settings</span>
-                            </button>
+                            </button> */}
 
                             <div className="border-t border-gray-100 my-1"></div>
 
-                            <button
+                            {/* <button
                                 className="flex items-center gap-3 w-full text-left px-4 py-2.5 text-red-600 hover:bg-red-50"
                                 onClick={handleLogout}
                             >
                                 <LogOut size={16} className="text-red-500" />
                                 <span>Logout</span>
-                            </button>
+                            </button> */}
                         </div>
                     )}
                 </div>

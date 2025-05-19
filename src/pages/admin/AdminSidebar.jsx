@@ -1,12 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Home, HelpCircle, LogOut } from 'lucide-react';
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import { FaFolderOpen, FaRegFolder } from 'react-icons/fa';
 
 const Sidebar = ({ isCollapsed }) => {
     const location = useLocation();
+    const navigate = useNavigate();
 
     const isActive = (path) => location.pathname.includes(path);
+
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        navigate("/admin/login")
+    }
+
 
     return (
         <aside
@@ -78,13 +85,15 @@ const Sidebar = ({ isCollapsed }) => {
                                 <HelpCircle size={18} />
                                 <span className="text-sm">Help & Support</span>
                             </Link>
-                            <Link
-                                to="/logout"
-                                className="flex items-center gap-3 text-gray-600 hover:text-gray-900 transition-colors duration-200 py-2"
+
+
+                            <button
+                                onClick={handleLogout}
+                                className="flex items-center gap-3 text-gray-600 hover:text-gray-900 transition-colors duration-200 py-2 w-full text-left"
                             >
                                 <LogOut size={18} />
                                 <span className="text-sm">Log Out</span>
-                            </Link>
+                            </button>
                         </div>
                     ) : (
                         <div className="border-t border-gray-200 pt-4 flex flex-col items-center gap-4">
@@ -95,13 +104,7 @@ const Sidebar = ({ isCollapsed }) => {
                             >
                                 <HelpCircle size={20} />
                             </Link>
-                            <Link
-                                to="/logout"
-                                className="text-gray-600 hover:text-gray-900 transition-colors duration-200 p-2"
-                                aria-label="Log Out"
-                            >
-                                <LogOut size={20} />
-                            </Link>
+
                         </div>
                     )}
                 </div>

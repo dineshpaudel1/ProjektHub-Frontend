@@ -8,6 +8,11 @@ const SellerSidebar = ({ isCollapsed }) => {
 
     const isActive = (path) => location.pathname.includes(path);
 
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        navigate("/seller/login")
+    }
+
     return (
         <aside
             // Make SellerSidebar fixed from top (after navbar at 60px) to bottom, and set width based on collapse state.
@@ -79,7 +84,8 @@ const SellerSidebar = ({ isCollapsed }) => {
                                 <span className="text-sm">Help & Support</span>
                             </Link>
                             <Link
-                                to="/logout"
+                                onClick={handleLogout}
+
                                 className="flex items-center gap-3 text-gray-600 hover:text-gray-900 transition-colors duration-200 py-2"
                             >
                                 <LogOut size={18} />
@@ -96,7 +102,7 @@ const SellerSidebar = ({ isCollapsed }) => {
                                 <HelpCircle size={20} />
                             </Link>
                             <Link
-                                to="/logout"
+                                onClick={handleLogout}
                                 className="text-gray-600 hover:text-gray-900 transition-colors duration-200 p-2"
                                 aria-label="Log Out"
                             >
