@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { Eye } from "lucide-react";
 import { useProjectContext } from "../../context/ProjectContext";
 
+
+
+
+
 const SkeletonCard = () => (
     <div className="space-y-4 animate-pulse">
         <div className="w-full h-52 bg-gray-300 rounded-xl"></div>
@@ -17,6 +21,11 @@ const SkeletonCard = () => (
 const Projects = () => {
     const navigate = useNavigate();
     const { projects, loadingProjects } = useProjectContext();
+
+
+    const handleNavigate = () => {
+        navigate("/seeallproject");
+    };
 
     return (
         <section id="projects" className="py-16 px-4 sm:px-6 lg:px-12" style={{ backgroundColor: "var(--bg-color)" }}>
@@ -57,7 +66,9 @@ const Projects = () => {
             </div>
 
             <div className="mt-12 flex justify-end">
+
                 <button
+                    onClick={handleNavigate}
                     className="px-6 py-3 font-semibold text-white transition"
                     style={{ backgroundColor: "var(--button-primary)" }}
                     onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "var(--button-primary-hover)")}

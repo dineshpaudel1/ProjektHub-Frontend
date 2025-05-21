@@ -4,8 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from '../../utils/axiosInstance';
 
 import NotificationToast from '../../components/NotificationToast';
-import ThumbnailUpload from '../../porjectdetailhelper/ThumbnailUpload';
-import TagSection from '../../porjectdetailhelper/TagSection';
+// import ThumbnailUpload from '../../porjectdetailhelper/ThumbnailUpload';
+// import TagSection from '../../porjectdetailhelper/TagSection';
 
 const EditMyProject = () => {
     const { id } = useParams();
@@ -229,7 +229,7 @@ const EditMyProject = () => {
                         />
                     </div>
 
-                    
+
                 </div>
             )}
         </div>

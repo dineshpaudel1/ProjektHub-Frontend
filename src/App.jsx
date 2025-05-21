@@ -28,6 +28,7 @@ import AdminProfile from "./pages/admin/AdminProfile";
 import UserProfile from "./pages/user/UserProfile";
 import ApproveSeller from "./pages/admin/ApproveSeller";
 import { UserProvider } from "./context/UserContext";
+import SeeAllProject from "./pages/user/SeeAllProject";
 
 function App() {
   return (
@@ -48,8 +49,9 @@ function App() {
           <Route path="about" element={<About />} />
           <Route path="login" element={<UserLogin />} />
           <Route path="userprofile" element={<UserProfile />} />
-          <Route path="forgot-password" element={<ForgotPassword />} />
-          <Route path="project/:id" element={<UserProjectDetail />} />
+          <Route path="userprofile" element={<UserProfile />} />
+          <Route path="/project/:id" element={<UserProjectDetail />} />
+          <Route path="seeallproject" element={<SeeAllProject />} />
         </Route>
 
         {/* ✅ Admin Routes */}
