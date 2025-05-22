@@ -70,10 +70,10 @@ const Projects = () => {
                         : projects.map((project) => (
                             <div
                                 key={project.id}
-                                className="space-y-4 min-w-[300px] cursor-pointer flex-shrink-0"
                                 onClick={() => navigate(`/project/${project.id}`)}
+                                className="w-[300px] flex-shrink-0 space-y-4 cursor-pointer"
                             >
-                                <div className="w-full h-52 overflow-hidden rounded-xl shadow-md">
+                                <div className="w-full h-[208px] overflow-hidden rounded-xl shadow-md">
                                     <img
                                         src={`http://localhost:8080/api/media/photo?file=${project.thumbnail}`}
                                         alt={project.title}
@@ -92,6 +92,7 @@ const Projects = () => {
                                     </div>
                                 </div>
                             </div>
+
                         ))}
                 </div>
             </div>

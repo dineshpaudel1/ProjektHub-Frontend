@@ -131,11 +131,11 @@ const SellerDashboard = () => {
                     />
                     <StatCard
                         title="Sold Projects"
-                        value="12"
+                        value="5"
                         icon={<FaMedal size={20} />}
                         iconBg="bg-amber-500"
                         change="5%"
-                        changeType="decrease"
+                        changeType="increase"
                         navigateTo="/admin/sold-projects"
                     />
                 </div>

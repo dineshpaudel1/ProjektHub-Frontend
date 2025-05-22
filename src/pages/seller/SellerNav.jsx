@@ -178,7 +178,12 @@ const SellerNav = ({ toggleSidebar }) => {
                         aria-label="Notifications"
                     >
                         <Bell size={20} className="text-gray-700" />
-                        <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white" />
+
+                        {pendingQuestions.length > 0 && (
+                            <span className="absolute -top-1 -right-1 bg-red-600 text-[10px] text-white font-bold px-1.5 py-0.5 rounded-full shadow-sm">
+                                {pendingQuestions.length}
+                            </span>
+                        )}
                     </button>
 
                     {showNotifications && (
@@ -208,6 +213,7 @@ const SellerNav = ({ toggleSidebar }) => {
                         </div>
                     )}
                 </div>
+
 
 
                 {/* User Avatar and Dropdown */}

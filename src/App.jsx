@@ -23,7 +23,6 @@ import SellerProfile from "./pages/seller/SellerProfile";
 import SellerLayout from "./layouts/SellerLayout";
 import AdminPrivateRoute from "./utils/AdminPrivateRoute";
 import SellerPrivateRoute from "./utils/SellerPrivateRoute";
-import EditMyProject from "./pages/seller/EditMyProject";
 import AdminProfile from "./pages/admin/AdminProfile";
 import UserProfile from "./pages/user/UserProfile";
 import ApproveSeller from "./pages/admin/ApproveSeller";
@@ -90,7 +89,7 @@ function App() {
           <Route path="sellerproject" element={<SellerProjects />} />
           <Route path="projects/:id" element={<EditProject />} />
           {/* <Route path="projects/:id" element={<SellerProjectDetail />} />  */}
-          <Route path="editprojects/:id" element={<EditMyProject />} />
+          {/* <Route path="editprojects/:id" element={<EditMyProject />} /> */}
 
 
 

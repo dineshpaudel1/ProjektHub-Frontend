@@ -1,18 +1,13 @@
-// src/pages/Admin/AllProjectDetail.jsx
 "use client";
 
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-    Loader,
-    ArrowLeft,
-    Tag,
-    ImageIcon,
-    MessageCircle,
-    ShoppingBag,
-    Star,
-} from "lucide-react";
+import { Loader, ArrowLeft, MessageCircle } from "lucide-react";
 import { useProjectContext } from "../../context/ProjectContext";
+
+import UserProjectDetailHelper from "../../components/UserHelper/UserProjectDetailHelper";
+import UserGallerySection from "../../components/UserHelper/UserGallerySection";
+import UserQuestionAnswerList from "../../components/UserHelper/QuestionAnswerList";
 
 const getEmbedUrl = (url) => {
     try {
@@ -69,6 +64,7 @@ const AllProjectDetail = () => {
     return (
         <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-[var(--bg-color)] text-[var(--text-color)] transition-all duration-300">
             <div className="max-w-6xl mx-auto">
+                {/* Back Button */}
                 <div className="mb-8">
                     <button
                         onClick={() => navigate(-1)}
@@ -79,6 +75,7 @@ const AllProjectDetail = () => {
                     </button>
                 </div>
 
+                {/* Main Card */}
                 <div className="rounded-2xl shadow-lg overflow-hidden bg-[var(--menu-bg)] border border-[var(--border-color)]">
                     {/* Video Preview */}
                     <div className="relative h-96 w-full bg-black">
@@ -103,161 +100,28 @@ const AllProjectDetail = () => {
                         </div>
                     </div>
 
-                    {/* Content */}
+                    {/* Content Section */}
                     <div className="p-8">
-                        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
-                            {/* Left */}
-                            <div className="flex-1 space-y-6">
-                                <div>
-                                    <h1 className="text-4xl font-bold mb-3 text-[var(--text-color)]">{project.title}</h1>
-                                    <div className="flex flex-wrap items-center gap-4 text-sm mb-4">
-                                        <div className="flex items-center text-yellow-500">
-                                            <Star className="h-4 w-4 fill-current" />
-                                            <Star className="h-4 w-4 fill-current" />
-                                            <Star className="h-4 w-4 fill-current" />
-                                            <Star className="h-4 w-4 fill-current" />
-                                            <Star className="h-4 w-4 fill-current" />
-                                            <span className="ml-2 text-[var(--text-secondary)] font-medium">(128)</span>
-                                        </div>
-                                        <div className="flex items-center text-green-600 font-medium">
-                                            <ShoppingBag className="h-4 w-4 mr-1" />
-                                            1,234 purchases
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <p className="text-[var(--text-secondary)] mb-2">
-                                            {isExpanded
-                                                ? project.description
-                                                : `${project.description?.slice(0, 80)}...`}
-                                        </p>
-                                        {project.description?.length > 80 && (
-                                            <button
-                                                className="text-[var(--button-primary)] font-medium hover:underline"
-                                                onClick={() => setIsExpanded(!isExpanded)}
-                                            >
-                                                {isExpanded ? "Show less" : "Read more"}
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {project.tags?.length > 0 && (
-                                    <div>
-                                        <h2 className="flex items-center text-lg font-semibold mb-3">
-                                            <Tag className="h-5 w-5 mr-2" />
-                                            Tags
-                                        </h2>
-                                        <div className="flex flex-wrap gap-2">
-                                            {project.tags.map((tag) => (
-                                                <span
-                                                    key={tag.id}
-                                                    className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--button-primary)] bg-opacity-10 text-white"
-                                                >
-                                                    #{tag.tag}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Right */}
-                            <div className="rounded-xl shadow-lg p-6 w-full lg:w-80 bg-[var(--hover-bg)] border border-[var(--border-color)]">
-                                <div className="mb-4">
-                                    <img
-                                        src={`http://localhost:8080/api/media/photo?file=${project.thumbnail}`}
-                                        alt={project.title}
-                                        className="w-full h-40 object-cover rounded-lg shadow-md"
-                                    />
-                                </div>
-
-                                <div className="space-y-4">
-                                    <div className="space-y-1">
-                                        <div className="flex items-baseline justify-between">
-                                            <p className="text-3xl font-bold text-[var(--button-primary)]">NPR {project.price}.99</p>
-                                            <p className="text-sm line-through text-gray-500">NPR 2999.99</p>
-                                        </div>
-                                        <p className="text-green-600 text-sm font-bold">33% OFF</p>
-                                    </div>
-                                    <p className="text-xs text-center text-[var(--text-secondary)]">
-                                        Listed by: <strong>{project.seller.name}</strong>
-                                    </p>
-                                    <div className="">
-                                        <img
-                                            src={`http://localhost:8080/api/media/photo?file=${project.seller.photo}`}
-                                            alt={project.title}
-                                            className="w-10 h-10 object-cover rounded-lg shadow-md"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <UserProjectDetailHelper
+                            project={project}
+                            isExpanded={isExpanded}
+                            setIsExpanded={setIsExpanded}
+                            onRequestBuy={null} // Admins don't need this, pass null or skip
+                        />
 
                         {/* Gallery */}
-                        {project.photos?.length > 0 && (
-                            <div className="mt-12">
-                                <h2 className="flex items-center text-xl font-semibold mb-4">
-                                    <ImageIcon className="h-5 w-5 mr-2" />
-                                    Gallery
-                                </h2>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {project.photos.map((photo) => (
-                                        <div key={photo.id} className="group relative">
-                                            <div className="aspect-w-4 aspect-h-3 rounded-xl overflow-hidden shadow-md">
-                                                <img
-                                                    src={`http://localhost:8080/api/media/photo?file=${photo.path}`}
-                                                    alt={photo.caption || "Project Photo"}
-                                                    className="w-full h-40 object-cover group-hover:opacity-90 transition-opacity duration-200"
-                                                />
-                                            </div>
-                                            {photo.caption && <p className="text-sm mt-2 px-1 font-medium">{photo.caption}</p>}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
+                        <UserGallerySection photos={project.photos} />
 
                         {/* Q&A Section */}
-                        {loadingQuestions ? (
-                            <p className="mt-12 text-sm text-gray-400">Loading questions...</p>
-                        ) : questions.length > 0 ? (
-                            <div className="mt-12">
-                                <h2 className="flex items-center text-xl font-semibold mb-4">
-                                    <MessageCircle className="h-5 w-5 mr-2" />
-                                    Questions & Answers
-                                </h2>
-                                <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    {questions.map((q, idx) => {
-                                        const askedDate = new Date(q.createdAt).toLocaleString("en-US", {
-                                            day: "numeric",
-                                            month: "short",
-                                            year: "numeric",
-                                            hour: "2-digit",
-                                            minute: "2-digit",
-                                        });
-                                        return (
-                                            <li
-                                                key={idx}
-                                                className="bg-[var(--hover-bg)] border border-[var(--border-color)] p-4 rounded-lg text-sm shadow-md space-y-2"
-                                            >
-                                                <div>
-                                                    <p className="font-medium text-[var(--text-color)]">Q: {q.questionText}</p>
-                                                    <p className="text-xs text-gray-500">Asked by: {q.askedBy} on {askedDate}</p>
-                                                </div>
-                                                {q.answerText ? (
-                                                    <div className="mt-2 border-t pt-2 border-gray-300 dark:border-gray-600">
-                                                        <p className="font-medium text-[var(--button-primary-hover)]">A: {q.answerText}</p>
-                                                        <p className="text-xs text-gray-500">Answered by: {q.answeredBy}</p>
-                                                    </div>
-                                                ) : (
-                                                    <p className="italic text-yellow-500 text-xs">Answer pending...</p>
-                                                )}
-                                            </li>
-                                        );
-                                    })}
-                                </ul>
-                            </div>
-                        ) : null}
+                        <div className="mt-10 pt-8 border-t border-[var(--border-color)]">
+
+
+                            {loadingQuestions ? (
+                                <p className="text-sm text-gray-400">Loading questions...</p>
+                            ) : (
+                                <UserQuestionAnswerList questions={questions} />
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

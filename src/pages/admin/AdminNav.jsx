@@ -65,7 +65,6 @@ const AdminNav = ({ toggleSidebar }) => {
                     },
                 });
                 const json = await res.json();
-                console.log("Fetched sellers:", json);
                 setUnapprovedSellers(json.data || []);
 
             } catch (err) {

@@ -146,6 +146,7 @@ const ProjectDetailsSection = ({ project, setProject, isExpanded, setIsExpanded,
 
                     {/* Video URL */}
                     <div className="flex gap-2 items-center">
+                        <span>Enter Video Url:</span>
                         {editing.video ? (
                             <div className="flex items-center gap-2 w-full">
                                 <input
