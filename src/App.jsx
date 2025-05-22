@@ -29,6 +29,7 @@ import UserProfile from "./pages/user/UserProfile";
 import ApproveSeller from "./pages/admin/ApproveSeller";
 import { UserProvider } from "./context/UserContext";
 import SeeAllProject from "./pages/user/SeeAllProject";
+import SeeSellerProfile from "./pages/user/SeeSellerProfile";
 
 function App() {
   return (
@@ -52,6 +53,7 @@ function App() {
           <Route path="userprofile" element={<UserProfile />} />
           <Route path="/project/:id" element={<UserProjectDetail />} />
           <Route path="seeallproject" element={<SeeAllProject />} />
+          <Route path="/seller/:id" element={<SeeSellerProfile />} />
         </Route>
 
         {/* ✅ Admin Routes */}

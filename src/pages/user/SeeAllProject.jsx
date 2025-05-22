@@ -4,7 +4,13 @@ import SocialModal from "../../modals/SocialModal";
 import { useNavigate } from "react-router-dom";
 
 const SkeletonCard = () => (
-    <div className="bg-white border border-blue-200 rounded-lg p-6 flex flex-col md:flex-row items-start gap-6 shadow-sm animate-pulse">
+    <div
+        className="rounded-lg p-6 flex flex-col md:flex-row items-start gap-6 shadow-sm animate-pulse"
+        style={{
+            backgroundColor: "var(--hover-bg)",
+            border: "1px solid var(--border-color)"
+        }}
+    >
         <div className="w-full md:w-[300px] md:h-[200px] bg-gray-300 rounded-md"></div>
         <div className="flex-1 space-y-4 mt-4 md:mt-0">
             <div className="h-6 bg-gray-300 rounded w-3/4"></div>
@@ -19,7 +25,7 @@ const SkeletonCard = () => (
 );
 
 const SeeAllProject = () => {
-    const { projects, loadingProjects } = useProjectContext(); // ⬅️ Make sure this exists in your context
+    const { projects, loadingProjects } = useProjectContext();
     const [showModal, setShowModal] = useState(false);
     const [selectedProjectId, setSelectedProjectId] = useState(null);
     const navigate = useNavigate();
@@ -38,19 +44,23 @@ const SeeAllProject = () => {
     };
 
     return (
-        <div className="bg-[#ffff] min-h-screen py-10 px-6 mt-10">
-            <h2 className="text-3xl font-semibold font-playfair mb-10 text-blue-800">All Projects</h2>
+        <div style={{ backgroundColor: "var(--bg-color)", minHeight: "100vh" }} className="py-10 px-6 mt-10">
+            <h2 className="text-3xl font-semibold font-playfair mb-10" style={{ color: "var(--text-color)" }}>
+                All Projects
+            </h2>
 
             <div className="space-y-8">
                 {(loadingProjects || projects.length === 0)
-                    ? [...Array(4)].map((_, index) => (
-                        <SkeletonCard key={index} />
-                    ))
+                    ? [...Array(4)].map((_, index) => <SkeletonCard key={index} />)
                     : projects.map((project) => (
                         <div
                             key={project.id}
-                            className="bg-white border border-blue-200 rounded-lg p-6 flex flex-col md:flex-row items-start gap-6 shadow-sm hover:shadow-md transition cursor-pointer"
                             onClick={() => goToProjectDetail(project.id)}
+                            className="rounded-lg p-6 flex flex-col md:flex-row items-start gap-6 shadow-sm hover:shadow-md transition cursor-pointer"
+                            style={{
+                                backgroundColor: "var(--hover-bg)",
+                                border: "1px solid var(--border-color)"
+                            }}
                         >
                             <img
                                 src={`http://localhost:8080/api/media/photo?file=${project.thumbnail}`}
@@ -58,10 +68,13 @@ const SeeAllProject = () => {
                                 className="w-full md:w-[300px] md:h-[200px] object-cover rounded-md"
                             />
                             <div className="flex-1">
-                                <h3 className="text-2xl font-semibold text-blue-600 mb-2 font-playfair">
+                                <h3
+                                    className="text-2xl font-semibold mb-2 font-playfair"
+                                    style={{ color: "var(--button-primary)" }}
+                                >
                                     {project.title}
                                 </h3>
-                                <p className="text-gray-700 text-sm mb-4">
+                                <p className="text-sm mb-4" style={{ color: "var(--text-secondary)" }}>
                                     {project.description || "Lorem ipsum dolor sit amet consectetur adipisicing elit. Similique, exercitationem..."}
                                 </p>
                                 <div className="flex gap-4 mt-4">
@@ -70,7 +83,12 @@ const SeeAllProject = () => {
                                             e.stopPropagation();
                                             handleLiveView();
                                         }}
-                                        className="bg-white border border-blue-300 text-blue-600 px-4 py-2 rounded-md hover:bg-blue-50 transition"
+                                        className="px-4 py-2 rounded-md border transition"
+                                        style={{
+                                            backgroundColor: "transparent",
+                                            border: "1px solid var(--border-color)",
+                                            color: "var(--button-primary)"
+                                        }}
                                     >
                                         Live View
                                     </button>
@@ -79,7 +97,11 @@ const SeeAllProject = () => {
                                             e.stopPropagation();
                                             openModal(project.id);
                                         }}
-                                        className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+                                        className="px-4 py-2 rounded-md transition"
+                                        style={{
+                                            backgroundColor: "var(--button-primary)",
+                                            color: "#fff"
+                                        }}
                                     >
                                         Buy Project
                                     </button>

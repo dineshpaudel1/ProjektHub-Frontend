@@ -1,9 +1,11 @@
 import React from "react";
 import { ShoppingBag, Star, Tag } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 
 
 const UserProjectDetailHelper = ({ project, isExpanded, setIsExpanded, onRequestBuy }) => {
+    const navigate = useNavigate();
     return (
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
             {/* Left Section */}
@@ -98,7 +100,7 @@ const UserProjectDetailHelper = ({ project, isExpanded, setIsExpanded, onRequest
                                 </p>
                                 <button
                                     className="text-sm text-[var(--button-primary)] hover:underline"
-                                    onClick={() => alert("Go to Seller Profile")} // Replace this with navigation if needed
+                                    onClick={() => navigate(`/seller/${project.seller.id}`)} // ⬅️ Navigate to seller profile
                                 >
                                     View Seller Profile
                                 </button>
