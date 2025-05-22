@@ -1,6 +1,8 @@
 import React from "react";
 import { ShoppingBag, Star, Tag } from "lucide-react";
 
+
+
 const UserProjectDetailHelper = ({ project, isExpanded, setIsExpanded, onRequestBuy }) => {
     return (
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
@@ -51,15 +53,15 @@ const UserProjectDetailHelper = ({ project, isExpanded, setIsExpanded, onRequest
                         </div>
                     </div>
                 )}
-
-                <div>
-                    <p>Video URL: <span className="font-mono text-sm">{project.previewVideoUrl}</span></p>
-                </div>
             </div>
 
             {/* Right Section */}
-            <div className="rounded-xl shadow-lg p-2 w-full lg:w-70 bg-[var(--hover-bg)] border border-[var(--border-color)]">
-                <div className="mb-4">
+            <div className="rounded-xl shadow-lg p-4 w-full lg:w-70 bg-[var(--hover-bg)] border border-[var(--border-color)] space-y-6">
+                {/* Seller Info */}
+
+
+                {/* Project Thumbnail */}
+                <div>
                     <img
                         src={`http://localhost:8080/api/media/photo?file=${project.thumbnail}`}
                         alt={project.title}
@@ -67,6 +69,7 @@ const UserProjectDetailHelper = ({ project, isExpanded, setIsExpanded, onRequest
                     />
                 </div>
 
+                {/* Price & Buy */}
                 <div className="space-y-4">
                     <div className="space-y-1">
                         <div className="flex items-baseline justify-between">
@@ -83,9 +86,24 @@ const UserProjectDetailHelper = ({ project, isExpanded, setIsExpanded, onRequest
                         >
                             Request to Buy
                         </button>
-                        <p className="text-xs text-center mt-3 text-[var(--text-secondary)]">
-                            24/7 support available
-                        </p>
+                        <div className="flex items-center gap-4 mt-5">
+                            <img
+                                src={`http://localhost:8080/api/media/photo?file=${project.seller.photo || "default.jpg"}`}
+                                alt="Seller"
+                                className="w-14 h-14 rounded-full object-cover border-2 border-[var(--button-primary)]"
+                            />
+                            <div>
+                                <p className="text-md font-semibold text-[var(--text-color)]">
+                                    {project.seller.name || "Seller Name"}
+                                </p>
+                                <button
+                                    className="text-sm text-[var(--button-primary)] hover:underline"
+                                    onClick={() => alert("Go to Seller Profile")} // Replace this with navigation if needed
+                                >
+                                    View Seller Profile
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

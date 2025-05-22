@@ -176,17 +176,23 @@ const ProjectDetailsSection = ({ project, setProject, isExpanded, setIsExpanded,
                             alt={project.title}
                             className="w-full h-40 object-cover rounded-lg shadow-md"
                         />
-                        <div className="absolute inset-0 bg-black bg-opacity-50 text-white flex items-center justify-center opacity-0 group-hover:opacity-70 transition-opacity rounded-lg cursor-pointer">
+
+                        {/* Fix: Wrap with label to open file dialog */}
+                        <label
+                            htmlFor="thumbnailUpload"
+                            className="absolute inset-0 bg-black bg-opacity-50 text-white flex items-center justify-center opacity-0 group-hover:opacity-70 transition-opacity rounded-lg cursor-pointer"
+                        >
                             <UploadCloud className="h-8 w-8 mb-2" />
-                            <input
-                                id="thumbnailUpload"
-                                type="file"
-                                className="hidden"
-                                accept="image/*"
-                                onChange={handleThumbnailUpdate}
-                            />
-                        </div>
+                        </label>
+                        <input
+                            id="thumbnailUpload"
+                            type="file"
+                            className="hidden"
+                            accept="image/*"
+                            onChange={handleThumbnailUpdate}
+                        />
                     </div>
+
 
                     {/* Price */}
                     <div className="space-y-4">
