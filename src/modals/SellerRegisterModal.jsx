@@ -50,7 +50,7 @@ const SellerRegisterModal = ({ onClose }) => {
             await axios.post("http://localhost:8080/api/user/seller-register", data, {
                 headers: {
                     "Content-Type": "multipart/form-data",
-                    Authorization: `Bearer ${token}`, // 🔥 this line is important
+                    Authorization: `Bearer ${token}`,
                 },
             });
             showToast("Seller registration submitted successfully!", "success");
@@ -66,8 +66,12 @@ const SellerRegisterModal = ({ onClose }) => {
         <>
             <NotificationToast notification={notification} onClose={() => setNotification(null)} />
 
+            {/* Backdrop Blur */}
+            <div className="fixed inset-0 z-[9998] bg-black/30 backdrop-blur-sm"></div>
+
+            {/* Modal */}
             <div
-                className="absolute top-20 left-1/2 -translate-x-1/2 z-[9999] w-[90%] max-w-md border rounded-lg shadow-lg"
+                className="fixed top-20 left-1/2 -translate-x-1/2 z-[9999] w-[90%] max-w-md border rounded-lg shadow-lg"
                 style={{
                     backgroundColor: "var(--bg-color)",
                     color: "var(--text-color)",
@@ -198,6 +202,7 @@ const SellerRegisterModal = ({ onClose }) => {
             </div>
         </>
     );
+
 };
 
 export default SellerRegisterModal;

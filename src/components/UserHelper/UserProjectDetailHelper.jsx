@@ -12,7 +12,9 @@ const UserProjectDetailHelper = ({ project, isExpanded, setIsExpanded, onRequest
             {/* Left Section */}
             <div className="flex-1 space-y-6">
                 <div>
-                    <h1 className="text-4xl font-bold mb-3 text-[var(--text-color)]">{project.title}</h1>
+                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 text-[var(--text-color)]">
+                        {project.title}
+                    </h1>
                     <div className="flex flex-wrap items-center gap-4 text-sm mb-4">
                         <div className="flex items-center text-yellow-500">
                             {[...Array(5)].map((_, i) => (
@@ -73,10 +75,10 @@ const UserProjectDetailHelper = ({ project, isExpanded, setIsExpanded, onRequest
                 </div>
 
                 {/* Price & Buy */}
-                <div className="space-y-4">
+                <div className="space-y-4 sm:space-y-5">
                     <div className="space-y-1">
                         <div className="flex items-baseline justify-between">
-                            <p className="text-3xl font-bold text-[var(--button-primary)]">NPR {project.price}</p>
+                            <p className="text-2xl sm:text-3xl font-bold text-[var(--button-primary)]">NPR {project.price}</p>
                             <p className="text-sm line-through text-gray-500">NPR 2999.99</p>
                         </div>
                         <p className="text-green-600 text-sm font-bold">33% OFF</p>
@@ -101,7 +103,7 @@ const UserProjectDetailHelper = ({ project, isExpanded, setIsExpanded, onRequest
                                 </p>
                                 <button
                                     className="text-sm text-[var(--button-primary)] hover:underline"
-                                    onClick={() => navigate(`/seller/${project.seller.id}`)} // ⬅️ Navigate to seller profile
+                                    onClick={() => navigate(`/seller/${project.seller.id}`)}
                                 >
                                     View Seller Profile
                                 </button>

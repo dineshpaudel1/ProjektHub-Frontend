@@ -49,9 +49,8 @@ const PhotoUploadModal = ({
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-auto">
+    <div className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm flex items-center justify-center pointer-events-auto">
       <div className="bg-white p-6 rounded-lg shadow-lg w-[600px] max-h-[90vh] overflow-y-auto relative">
-
         {/* Dropzone or Upload Preview */}
         {photos.length === 0 ? (
           <div
@@ -108,7 +107,7 @@ const PhotoUploadModal = ({
           ))
         )}
 
-        {/* Add more button if files already exist */}
+        {/* Add more button */}
         {photos.length > 0 && (
           <div className="mb-6">
             <label

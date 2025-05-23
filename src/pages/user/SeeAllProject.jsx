@@ -44,8 +44,14 @@ const SeeAllProject = () => {
     };
 
     return (
-        <div style={{ backgroundColor: "var(--bg-color)", minHeight: "100vh" }} className="py-10 px-6 mt-10">
-            <h2 className="text-3xl font-semibold font-playfair mb-10" style={{ color: "var(--text-color)" }}>
+        <div
+            style={{ backgroundColor: "var(--bg-color)", minHeight: "100vh" }}
+            className="py-10 px-4 sm:px-6 lg:px-12 mt-10"
+        >
+            <h2
+                className="text-2xl sm:text-3xl font-semibold font-playfair mb-10"
+                style={{ color: "var(--text-color)" }}
+            >
                 All Projects
             </h2>
 
@@ -69,21 +75,24 @@ const SeeAllProject = () => {
                             />
                             <div className="flex-1">
                                 <h3
-                                    className="text-2xl font-semibold mb-2 font-playfair"
+                                    className="text-xl sm:text-2xl font-semibold mb-2 font-playfair"
                                     style={{ color: "var(--button-primary)" }}
                                 >
                                     {project.title}
                                 </h3>
-                                <p className="text-sm mb-4" style={{ color: "var(--text-secondary)" }}>
+                                <p
+                                    className="text-sm sm:text-base mb-4"
+                                    style={{ color: "var(--text-secondary)" }}
+                                >
                                     {project.description || "Lorem ipsum dolor sit amet consectetur adipisicing elit. Similique, exercitationem..."}
                                 </p>
-                                <div className="flex gap-4 mt-4">
+                                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-4">
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             handleLiveView();
                                         }}
-                                        className="px-4 py-2 rounded-md border transition"
+                                        className="px-4 py-2 w-full sm:w-auto rounded-md border transition"
                                         style={{
                                             backgroundColor: "transparent",
                                             border: "1px solid var(--border-color)",
@@ -97,7 +106,7 @@ const SeeAllProject = () => {
                                             e.stopPropagation();
                                             openModal(project.id);
                                         }}
-                                        className="px-4 py-2 rounded-md transition"
+                                        className="px-4 py-2 w-full sm:w-auto rounded-md transition"
                                         style={{
                                             backgroundColor: "var(--button-primary)",
                                             color: "#fff"

@@ -45,7 +45,7 @@ const UserProjectDetail = () => {
         e.preventDefault();
         if (!questionText.trim()) return;
 
-        const token = localStorage.getItem("accessToken");
+        const token = localStorage.getItem("token");
 
         if (!token) {
             setNotification({ type: "error", message: "Please login to ask a question." });
@@ -98,8 +98,7 @@ const UserProjectDetail = () => {
                 notification={notification}
                 onClose={() => setNotification(null)}
             />
-
-            <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-[var(--bg-color)] text-[var(--text-color)] transition-all duration-300">
+            <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-[var(--bg-color)] text-[var(--text-color)] transition-all duration-300 ease-in-out">
                 <div className="max-w-6xl mx-auto">
                     <div className="mb-8">
                         <button
@@ -113,7 +112,7 @@ const UserProjectDetail = () => {
 
                     <div className="rounded-2xl shadow-lg overflow-hidden bg-[var(--menu-bg)] border border-[var(--border-color)]">
                         {/* Video Preview */}
-                        <div className="relative h-96 w-full bg-black">
+                        <div className="relative w-full h-[400px] bg-black">
                             {embedUrl ? (
                                 <iframe
                                     src={embedUrl}
@@ -135,7 +134,9 @@ const UserProjectDetail = () => {
                             </div>
                         </div>
 
-                        <div className="p-8">
+
+                        <div className="p-4 sm:p-6 lg:p-8">
+
                             {/* Project Info */}
                             <UserProjectDetailHelper
                                 project={project}
@@ -159,7 +160,7 @@ const UserProjectDetail = () => {
                                         value={questionText}
                                         onChange={(e) => setQuestionText(e.target.value)}
                                         placeholder="Type your question..."
-                                        className="w-full px-4 py-3 border border-[var(--border-color)] rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-[var(--button-primary)] bg-transparent resize-none min-h-[120px]"
+                                        className="px-3 py-2 sm:px-4 sm:py-3 w-full border border-[var(--border-color)] rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-[var(--button-primary)] bg-transparent resize-none min-h-[120px]"
                                     />
                                     <button
                                         type="submit"

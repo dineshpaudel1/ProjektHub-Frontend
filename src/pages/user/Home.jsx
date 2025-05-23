@@ -25,11 +25,11 @@ const Home = () => {
             </div>
 
             {/* Main content */}
-            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-16 grid grid-cols-1 md:grid-cols-2 gap-12 items-center text-center md:text-left">
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-16 flex flex-col-reverse md:grid md:grid-cols-2 gap-12 items-center text-center md:text-left">
                 {/* Text Content */}
                 <div>
                     <h1
-                        className=" text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-6"
+                        className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-6"
                         style={{ color: "var(--text-color)" }}
                     >
                         Get <span className="text-[#5454D4]">Awesome</span>
@@ -49,7 +49,11 @@ const Home = () => {
 
                 {/* Image */}
                 <div className="flex justify-center">
-                    <img src={person} alt="Illustration" className="w-[80%] sm:w-[70%] md:w-[90%] max-w-md" />
+                    <img
+                        src={person}
+                        alt="Illustration"
+                        className="w-[80%] sm:w-[70%] md:w-[90%] max-w-md"
+                    />
                 </div>
             </div>
         </section>

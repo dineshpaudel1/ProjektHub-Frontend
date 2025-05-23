@@ -53,6 +53,7 @@ function App() {
           <Route path="/project/:id" element={<UserProjectDetail />} />
           <Route path="seeallproject" element={<SeeAllProject />} />
           <Route path="/seller/:id" element={<SeeSellerProfile />} />
+          <Route path="forgot-password" element={<ForgotPassword />} />
         </Route>
 
         {/* ✅ Admin Routes */}

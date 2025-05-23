@@ -63,14 +63,9 @@ const ProjectCard = ({
 
     return (
         <div
-            className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden w-full max-w-sm border border-gray-100 relative group"
+            className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden w-[300px] h-[400px] border border-gray-100 relative group"
             onClick={onClick}
         >
-            <div className="absolute top-4 left-4 z-10">
-                <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${getStatusColor(status)} capitalize`}>
-                    visible
-                </span>
-            </div>
 
             <div className="relative h-48 overflow-hidden">
                 <img
@@ -123,18 +118,20 @@ const ProjectCard = ({
 
             <div className="p-5">
                 <div className="flex justify-between items-center mb-2">
-                    <span className={`text-sm font-medium ${bg.replace('bg-', 'text-').replace('-500', '-700')}`}>
+                    <span className={`text-sm font-medium truncate ${bg.replace('bg-', 'text-').replace('-500', '-700')}`}>
                         {category}
                     </span>
+
                     <div className="flex items-center text-gray-500 text-xs">
                         <Clock size={12} className="mr-1" />
                         {date}
                     </div>
                 </div>
 
-                <h3 className="font-bold text-gray-900 text-lg mb-1 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                <h3 className="font-bold text-gray-900 text-lg mb-1 truncate group-hover:text-blue-600 transition-colors">
                     {title}
                 </h3>
+
 
                 <div className="border-t border-gray-100 my-4"></div>
 

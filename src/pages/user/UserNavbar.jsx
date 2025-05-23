@@ -52,6 +52,11 @@ const UserNavbar = () => {
         navigate("/login");
     };
 
+    useEffect(() => {
+        document.body.style.overflow = showSellerModal ? 'hidden' : 'auto';
+    }, [showSellerModal]);
+
+
     const isSeller = roles?.includes("SELLER");
     return (
         <div className="fixed top-0 left-0 w-full z-50">

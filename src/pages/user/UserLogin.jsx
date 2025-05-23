@@ -12,6 +12,8 @@ const UserLogin = () => {
 
     useEffect(() => {
         if (window.google) {
+            const isDark = document.documentElement.classList.contains("dark");
+
             window.google.accounts.id.initialize({
                 client_id: "12680654953-a51mcs6na6dqs46buci6et88bf8hjt2o.apps.googleusercontent.com",
                 callback: handleGoogleCallback,
@@ -19,10 +21,15 @@ const UserLogin = () => {
 
             window.google.accounts.id.renderButton(
                 document.getElementById("google-signin-button"),
-                { theme: "outline", size: "large", width: "100%" }
+                {
+                    theme: isDark ? "filled_black" : "outline",
+                    size: "large",
+                    width: "100%",
+                }
             );
         }
     }, []);
+
 
     const handleGoogleCallback = async (response) => {
         const idToken = response.credential;
@@ -107,88 +114,90 @@ const UserLogin = () => {
 
     return (
         <div
-            className="min-h-screen flex items-center justify-center font-Doto pt-8"
+            className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 font-Doto pt-8"
             style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
         >
             <NotificationToast
                 notification={notification}
                 onClose={() => setNotification(null)}
             />
+            <div className="flex flex-col justify-center items-center w-full max-w-[480px]">
+                <form
+                    onSubmit={handleManualLogin}
+                    className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-md xl:max-w-sm 2xl:max-w-sm rounded-xl shadow-md px-6 sm:px-8 py-10 border"
 
-            <form
-                onSubmit={handleManualLogin}
-                className="w-full max-w-sm rounded-xl shadow-md px-6 py-10 border"
-                style={{
-                    backgroundColor: "var(--menu-bg)",
-                    borderColor: "var(--border-color)",
-                }}
-            >
-                <h2 className="text-2xl font-bold text-center mb-5">Login</h2>
-
-                <div className="mb-5">
-                    <label htmlFor="email" className="block text-base font-semibold mb-1">Email</label>
-                    <input
-                        id="email"
-                        type="email"
-                        placeholder="Email or Username"
-                        value={identifier}
-                        onChange={(e) => setIdentifier(e.target.value)}
-                        required
-                        className="w-full px-4 py-2.5 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        style={{
-                            backgroundColor: "var(--bg-color)",
-                            color: "var(--text-color)",
-                            borderColor: "var(--border-color)",
-                        }}
-                    />
-                </div>
-
-                <div className="mb-6">
-                    <div className="flex justify-between items-center mb-1">
-                        <label htmlFor="password" className="text-base font-semibold">Password</label>
-                        <span
-                            onClick={() => navigate("/forgot-password")}
-                            className="text-sm font-semibold hover:underline cursor-pointer"
-                        >
-                            Forgot password?
-                        </span>
-                    </div>
-                    <input
-                        id="password"
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        className="w-full px-4 py-2.5 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        style={{
-                            backgroundColor: "var(--bg-color)",
-                            color: "var(--text-color)",
-                            borderColor: "var(--border-color)",
-                        }}
-                    />
-                </div>
-
-                <button
-                    type="submit"
-                    className="w-full py-2.5 text-white bg-blue-600 rounded-full font-semibold hover:bg-blue-700 transition duration-200"
+                    style={{
+                        backgroundColor: "var(--menu-bg)",
+                        borderColor: "var(--border-color)",
+                    }}
                 >
-                    Login
-                </button>
+                    <h2 className="text-2xl font-bold text-center mb-5">Login</h2>
 
-                <div className="my-6 flex items-center text-sm" style={{ color: "var(--text-secondary)" }}>
-                    <hr className="flex-grow border-t" style={{ borderColor: "var(--border-color)" }} />
-                    <span className="mx-3">Or Signin with</span>
-                    <hr className="flex-grow border-t" style={{ borderColor: "var(--border-color)" }} />
-                </div>
+                    <div className="mb-5">
+                        <label htmlFor="email" className="block text-base font-semibold mb-1">Email</label>
+                        <input
+                            id="email"
+                            type="email"
+                            placeholder="Email or Username"
+                            value={identifier}
+                            onChange={(e) => setIdentifier(e.target.value)}
+                            required
+                            className="w-full px-4 py-2.5 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            style={{
+                                backgroundColor: "var(--bg-color)",
+                                color: "var(--text-color)",
+                                borderColor: "var(--border-color)",
+                            }}
+                        />
+                    </div>
 
-                <div id="google-signin-button" className="w-full flex justify-center" />
+                    <div className="mb-6">
+                        <div className="flex justify-between items-center mb-1">
+                            <label htmlFor="password" className="text-base font-semibold">Password</label>
+                            <span
+                                onClick={() => navigate("/forgot-password")}
+                                className="text-sm font-semibold hover:underline cursor-pointer"
+                            >
+                                Forgot password?
+                            </span>
+                        </div>
+                        <input
+                            id="password"
+                            type="password"
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            className="w-full px-4 py-2.5 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            style={{
+                                backgroundColor: "var(--bg-color)",
+                                color: "var(--text-color)",
+                                borderColor: "var(--border-color)",
+                            }}
+                        />
+                    </div>
 
-                <p className="text-center text-sm mt-6">
-                    Don't have an account?{" "}
-                    <a href="#" className="font-bold underline">Signup</a>
-                </p>
-            </form>
+                    <button
+                        type="submit"
+                        className="w-full py-2.5 text-white bg-blue-600 rounded-full font-semibold hover:bg-blue-700 transition duration-200"
+                    >
+                        Login
+                    </button>
+
+                    <div className="my-6 flex items-center text-sm" style={{ color: "var(--text-secondary)" }}>
+                        <hr className="flex-grow border-t" style={{ borderColor: "var(--border-color)" }} />
+                        <span className="mx-3">Or Signin with</span>
+                        <hr className="flex-grow border-t" style={{ borderColor: "var(--border-color)" }} />
+                    </div>
+
+                    <div id="google-signin-button" className="w-full flex justify-center" />
+
+                    <p className="text-center text-sm mt-6">
+                        Don't have an account?{" "}
+                        <a href="#" className="font-bold underline">Signup</a>
+                    </p>
+                </form>
+            </div>
         </div>
     );
 };

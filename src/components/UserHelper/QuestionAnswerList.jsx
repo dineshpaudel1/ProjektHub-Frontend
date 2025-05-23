@@ -1,8 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { MessageCircle } from "lucide-react";
 
 const UserQuestionAnswerList = ({ questions }) => {
+    const [visibleCount, setVisibleCount] = useState(5);
+
     if (!questions || questions.length === 0) return null;
+
+    const handleLoadMore = () => {
+        setVisibleCount((prev) => prev + 5);
+    };
+
+    const visibleQuestions = questions.slice(0, visibleCount);
 
     return (
         <div className="mt-12">
@@ -10,8 +18,8 @@ const UserQuestionAnswerList = ({ questions }) => {
                 <MessageCircle className="h-5 w-5 mr-2" />
                 Questions & Answers
             </h2>
-            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {questions.map((q, idx) => {
+            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                {visibleQuestions.map((q, idx) => {
                     const askedDate = new Date(q.createdAt).toLocaleString("en-US", {
                         day: "numeric",
                         month: "short",
@@ -45,6 +53,17 @@ const UserQuestionAnswerList = ({ questions }) => {
                     );
                 })}
             </ul>
+
+            {visibleCount < questions.length && (
+                <div className="mt-6 text-center">
+                    <button
+                        onClick={handleLoadMore}
+                        className="px-5 py-2 text-sm font-medium bg-[var(--button-primary)] text-white rounded-md hover:bg-[var(--button-primary-hover)] transition"
+                    >
+                        Load More
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

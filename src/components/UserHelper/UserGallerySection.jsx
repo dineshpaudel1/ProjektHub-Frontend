@@ -10,9 +10,14 @@ const UserGallerySection = ({ photos }) => {
                 <ImageIcon className="h-5 w-5 mr-2" />
                 Gallery
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+
+            {/* Scrollable row on mobile, grid on sm+ */}
+            <div className="flex gap-4 overflow-x-auto sm:grid sm:grid-cols-2 lg:grid-cols-5 sm:gap-6 hide-scrollbar">
                 {photos.map((photo) => (
-                    <div key={photo.id} className="group relative">
+                    <div
+                        key={photo.id}
+                        className="group relative shrink-0 w-[250px] sm:w-auto"
+                    >
                         <div className="aspect-w-4 aspect-h-3 rounded-xl overflow-hidden shadow-md">
                             <img
                                 src={`http://localhost:8080/api/media/photo?file=${photo.path}`}
