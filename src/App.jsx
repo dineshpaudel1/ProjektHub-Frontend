@@ -39,7 +39,7 @@ function App() {
 
         {/* ✅ User Routes */}
         <Route
-          path="ProjektHub-Frontend"
+          path="/"
           element={
             <UserProvider>
               <UserLayout />
