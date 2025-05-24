@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useRef } from "react";
 import axios from "../utils/axiosInstance";
 
 const ProjectContext = createContext();
@@ -6,6 +6,7 @@ const ProjectContext = createContext();
 export const ProjectProvider = ({ children }) => {
     const [projects, setProjects] = useState([]);
     const [loadingProjects, setLoadingProjects] = useState(true);
+    const hasFetchedProjects = useRef(false); // 🧠 Ref does NOT trigger re-renders
 
     const [projectDetail, setProjectDetail] = useState(null);
     const [loadingDetail, setLoadingDetail] = useState(false);
@@ -13,13 +14,15 @@ export const ProjectProvider = ({ children }) => {
     const [questions, setQuestions] = useState([]);
     const [loadingQuestions, setLoadingQuestions] = useState(false);
 
-    // Fetch all public projects
     const fetchProjects = async () => {
+        if (hasFetchedProjects.current) return; // ✅ Prevent re-fetching
+
         try {
             setLoadingProjects(true);
             const res = await axios.get("http://localhost:8080/api/public/projects");
             if (res.data.status === "success") {
                 setProjects(res.data.data);
+                hasFetchedProjects.current = true; // 🧠 set ref after fetch
             }
         } catch (err) {
             console.error("Error fetching projects:", err);
@@ -28,7 +31,6 @@ export const ProjectProvider = ({ children }) => {
         }
     };
 
-    // Fetch single project detail by ID
     const fetchProjectDetail = async (id) => {
         try {
             setLoadingDetail(true);
@@ -43,7 +45,6 @@ export const ProjectProvider = ({ children }) => {
         }
     };
 
-    // Fetch questions for a specific project
     const fetchQuestions = async (id) => {
         try {
             setLoadingQuestions(true);
@@ -56,7 +57,6 @@ export const ProjectProvider = ({ children }) => {
         }
     };
 
-    // Load projects on first mount
     useEffect(() => {
         fetchProjects();
     }, []);
@@ -80,5 +80,4 @@ export const ProjectProvider = ({ children }) => {
     );
 };
 
-// Custom hook for easy access
 export const useProjectContext = () => useContext(ProjectContext);

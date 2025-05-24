@@ -84,16 +84,16 @@ const UserNavbar = () => {
                 </div>
 
                 <div className="hidden md:flex space-x-10">
-                    <a href="#home" onClick={() => navigate("/")} className="font-semibold hover:text-indigo-500 transition">
+                    <a onClick={() => navigate("/")} className="font-semibold hover:text-indigo-500 transition">
                         Home
                     </a>
-                    <a href="#projects" className="font-semibold hover:text-indigo-500 transition">
+                    <a onClick={() => navigate("/projects")} className="font-semibold hover:text-indigo-500 transition">
                         Projects
                     </a>
-                    <a href="#services" className="font-semibold hover:text-indigo-500 transition">
+                    <a onClick={() => navigate("/services")} className="font-semibold hover:text-indigo-500 transition">
                         Our Services
                     </a>
-                    <a href="#about" className="font-semibold hover:text-indigo-500 transition">
+                    <a onClick={() => navigate("/about")} className="font-semibold hover:text-indigo-500 transition">
                         About Us
                     </a>
                 </div>
