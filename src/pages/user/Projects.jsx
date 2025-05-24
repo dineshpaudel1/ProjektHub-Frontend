@@ -4,7 +4,7 @@ import { Eye, ChevronLeft, ChevronRight } from "lucide-react";
 import { useProjectContext } from "../../context/ProjectContext";
 
 const SkeletonCard = () => (
-    <div className="space-y-4 animate-pulse min-w-[300px] snap-start">
+    <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-2 space-y-4 animate-pulse">
         <div className="w-full h-52 bg-gray-300 rounded-xl"></div>
         <div className="space-y-2">
             <div className="h-4 bg-gray-300 rounded w-3/4"></div>
@@ -23,11 +23,8 @@ const Projects = () => {
     const scroll = (direction) => {
         const container = scrollRef.current;
         const scrollAmount = 320;
-        if (direction === "left") {
-            container.scrollLeft -= scrollAmount;
-        } else {
-            container.scrollLeft += scrollAmount;
-        }
+        if (direction === "left") container.scrollLeft -= scrollAmount;
+        else container.scrollLeft += scrollAmount;
     };
 
     const handleNavigate = () => {
@@ -37,7 +34,7 @@ const Projects = () => {
     return (
         <section
             id="projects"
-            className="scroll-mt-24 py-16 px-4 sm:px-6 lg:px-12"
+            className="scroll-mt-10 py-16 px-4 sm:px-6 lg:px-12"
             style={{ backgroundColor: "var(--bg-color)" }}
         >
             <h2
@@ -53,13 +50,13 @@ const Projects = () => {
                     <>
                         <button
                             onClick={() => scroll("left")}
-                            className="hidden sm:flex absolute -left-6 top-1/2 transform -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-2 hover:scale-110 transition"
+                            className="hidden lg:flex absolute -left-6 top-1/2 transform -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-2 hover:scale-110 transition"
                         >
                             <ChevronLeft size={28} className="text-gray-700" />
                         </button>
                         <button
                             onClick={() => scroll("right")}
-                            className="hidden sm:flex absolute -right-6 top-1/2 transform -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-2 hover:scale-110 transition"
+                            className="hidden lg:flex absolute -right-6 top-1/2 transform -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-2 hover:scale-110 transition"
                         >
                             <ChevronRight size={28} className="text-gray-700" />
                         </button>
@@ -68,7 +65,7 @@ const Projects = () => {
 
                 <div
                     ref={scrollRef}
-                    className="flex gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth px-2"
+                    className="flex flex-wrap lg:flex-nowrap gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth"
                 >
                     {(loadingProjects || projects.length === 0)
                         ? [...Array(4)].map((_, idx) => <SkeletonCard key={idx} />)
@@ -76,7 +73,7 @@ const Projects = () => {
                             <div
                                 key={project.id}
                                 onClick={() => navigate(`/project/${project.id}`)}
-                                className="w-[300px] flex-shrink-0 space-y-4 cursor-pointer snap-start"
+                                className="w-full sm:w-1/2 md:w-1/3 lg:w-[22%] flex-shrink-0 px-2 cursor-pointer snap-start"
                             >
                                 <div className="w-full h-[208px] overflow-hidden rounded-xl shadow-md">
                                     <img
@@ -85,7 +82,7 @@ const Projects = () => {
                                         className="w-full h-full object-cover"
                                     />
                                 </div>
-                                <div>
+                                <div className="mt-3">
                                     <h3
                                         className="text-lg font-semibold truncate"
                                         style={{ color: "var(--text-color)" }}

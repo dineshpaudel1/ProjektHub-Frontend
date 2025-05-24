@@ -59,7 +59,7 @@ const UserNavbar = () => {
 
     const isSeller = roles?.includes("SELLER");
     return (
-        <div className="fixed top-0 left-0 w-full z-50">
+        <div className="fixed top-0 left-0 w-full z-50 ">
             <nav
                 className="px-6 py-4 flex justify-between items-center font-sans backdrop-blur-md border-b"
                 style={{
@@ -178,92 +178,136 @@ const UserNavbar = () => {
             {/* Mobile Dropdown */}
             {isOpen && (
                 <div
-                    className="md:hidden absolute top-full left-0 w-full px-6 py-4 space-y-4 z-20 shadow-lg"
+                    className="md:hidden fixed inset-0 z-40 overflow-y-auto"
                     style={{
-                        backgroundColor: theme === "dark" ? "#1f2937" : "#fff",
-                        color: theme === "dark" ? "#fff" : "#111827",
-                        borderTop: "1px solid var(--border-color)",
-                        backdropFilter: "blur(8px)",
-                        WebkitBackdropFilter: "blur(8px)",
+                        backgroundColor: theme === "dark" ? "#111827" : "#ffffff",
+                        color: theme === "dark" ? "#ffffff" : "#111827",
+                        transition: "all 0.3s ease",
                     }}
                 >
-                    <a onClick={() => setIsOpen(false)} className="block font-semibold hover:text-indigo-500" href="#home">
-                        Home
-                    </a>
-                    <a onClick={() => setIsOpen(false)} className="block font-semibold hover:text-indigo-500" href="#projects">
-                        Projects
-                    </a>
-                    <a onClick={() => setIsOpen(false)} className="block font-semibold hover:text-indigo-500" href="#services">
-                        Our Services
-                    </a>
-                    <a onClick={() => setIsOpen(false)} className="block font-semibold hover:text-indigo-500" href="#about">
-                        About Us
-                    </a>
+                    {/* Top bar with profile and close */}
+                    {/* TOP MOBILE NAV HEADER */}
+                    <div className="flex items-center justify-between px-6 py-4 border-b"
+                        style={{
+                            borderColor: theme === "dark" ? "#374151" : "#e5e7eb",
+                        }}
+                    >
+                        {/* Left: Logo */}
+                        <div className="flex items-center gap-3">
+                            <img
+                                src={theme === "dark" ? logowhite : logoDark}
+                                alt="Logo"
+                                className="h-6 sm:h-7"
+                            />
 
-                    {user && !isSeller && (
-                        <a
-                            onClick={() => {
-                                setIsOpen(false);
-                                setShowSellerModal(true);
-                            }}
-                            className="block font-semibold hover:text-indigo-500 cursor-pointer"
-                        >
-                            Become Seller
-                        </a>
-                    )}
+                            {/* Show only if user is logged in */}
 
-                    {user === null ? (
-                        // Show nothing or loader while user is still being fetched
-                        <div className="w-9 h-9 rounded-full bg-gray-200 animate-pulse"></div>
-                    ) : user ? (
-                        <div className="flex justify-start items-center gap-3">
-                            <div className="w-9 h-9 rounded-full overflow-hidden border border-gray-400 bg-gray-300">
-                                {user.profilePicture ? (
-                                    <img
-                                        src={user.profilePicture}
-                                        alt="Profile"
-                                        className="w-full h-full object-cover rounded-full"
-                                        onError={(e) => {
-                                            e.target.onerror = null;
-                                            e.target.src = "/default-user.png"; // Optional fallback image
-                                        }}
-                                    />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-white bg-indigo-600 rounded-full font-semibold">
-                                        {user.username?.charAt(0).toUpperCase()}
+                        </div>
+
+                        {/* Right: Close Button */}
+                        <button onClick={() => setIsOpen(false)} className="text-xl">
+                            <X size={24} />
+                        </button>
+                    </div>
+
+
+                    {/* Nav Items */}
+                    <ul className="px-6 py-6 space-y-6 text-lg font-medium">
+                        <li>
+                            {user && (
+                                <div className="flex items-center gap-2">
+                                    <div className="w-9 h-9 rounded-full overflow-hidden border border-gray-400 bg-gray-300">
+                                        {user.profilePicture ? (
+                                            <img
+                                                src={user.profilePicture}
+                                                alt="Profile"
+                                                className="w-full h-full object-cover rounded-full"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-white bg-indigo-600 rounded-full font-semibold">
+                                                {user.username?.charAt(0).toUpperCase() || "A"}
+                                            </div>
+                                        )}
                                     </div>
-                                )}
-                            </div>
+
+                                    <button
+                                        onClick={() => {
+                                            setIsOpen(false);
+                                            navigate("/userprofile");
+                                        }}
+                                        className="font-medium hover:underline text-[var(--primary-color)]"
+                                    >
+                                        {user.username}
+                                    </button>
+                                </div>
+                            )}
+                        </li>
+                        <li>
+                            <a
+                                href="#projects"
+                                onClick={() => setIsOpen(false)}
+                                className="block hover:text-indigo-500"
+                            >
+                                Projects
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="#services"
+                                onClick={() => setIsOpen(false)}
+                                className="block hover:text-indigo-500"
+                            >
+                                Our Services
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="#about"
+                                onClick={() => setIsOpen(false)}
+                                className="block hover:text-indigo-500"
+                            >
+                                About Us
+                            </a>
+                        </li>
+                    </ul>
+
+                    {/* Bottom: Theme + Login/Logout */}
+                    <div className="px-6 space-y-4 pb-8">
+                        <button
+                            onClick={toggleDarkMode}
+                            className="w-full flex items-center justify-center gap-2 border py-2 rounded-full font-medium"
+                            style={{
+                                borderColor: theme === "dark" ? "#4b5563" : "#d1d5db",
+                                backgroundColor: theme === "dark" ? "#1f2937" : "#f9fafb",
+                            }}
+                        >
+                            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+                            {theme === "dark" ? "Light Mode" : "Dark Mode"}
+                        </button>
+
+                        {user ? (
                             <button
                                 onClick={handleLogout}
-                                className="text-sm text-red-600 font-medium hover:underline"
+                                className="w-full bg-red-600 text-white py-2 rounded-full font-medium"
                             >
                                 Logout
                             </button>
-                        </div>
-                    ) : (
-                        <button
-                            onClick={() => {
-                                setIsOpen(false);
-                                navigate("/login");
-                            }}
-                            className="w-full bg-indigo-600 text-white py-2 rounded-full font-semibold"
-                        >
-                            Login
-                        </button>
-                    )}
-
-
-                    <button
-                        onClick={toggleDarkMode}
-                        className="w-full flex items-center justify-center gap-2 border py-2 rounded-full font-medium mt-2"
-                        style={{ borderColor: "var(--border-color)" }}
-                    >
-                        {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-                        {theme === "dark" ? "Light Mode" : "Dark Mode"}
-                    </button>
+                        ) : (
+                            <button
+                                onClick={() => {
+                                    setIsOpen(false);
+                                    navigate("/login");
+                                }}
+                                className="w-full bg-indigo-600 text-white py-2 rounded-full font-medium"
+                            >
+                                Login
+                            </button>
+                        )}
+                    </div>
                 </div>
             )}
+
+
 
             {showSellerModal && (
                 <SellerRegisterModal onClose={() => setShowSellerModal(false)} />

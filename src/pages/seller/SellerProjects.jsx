@@ -254,7 +254,7 @@ const SellerProjects = () => {
                     <div className="flex justify-center gap-4">
 
                         <button
-                            onClick={() => navigate('/admin/create-project')}
+                            onClick={() => setShowProjectModal(true)}
                             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
                         >
                             <FaPlus size={14} />

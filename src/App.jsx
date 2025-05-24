@@ -9,6 +9,7 @@ import About from "./pages/user/About";
 import UserLogin from "./pages/user/UserLogin";
 import AdminProjects from "./pages/admin/AdminProjects";
 import MasterPage from "./pages/user/MasterPage";
+import ScrollToTop from "./components/ScrollToTop";
 
 import SellerProjects from "./pages/seller/SellerProjects";
 import AllProjectDetail from "./pages/admin/AllProjectDetail";
@@ -33,10 +34,12 @@ import SeeSellerProfile from "./pages/user/SeeSellerProfile";
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
+
         {/* ✅ User Routes */}
         <Route
-          path="/"
+          path="ProjektHub-Frontend"
           element={
             <UserProvider>
               <UserLayout />
