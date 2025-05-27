@@ -1,73 +1,59 @@
-import React from 'react';
-import aboutPhoto from '../../assets/images/aboutphoto.png';
-import { FaGraduationCap } from 'react-icons/fa';
-import { BsWhatsapp } from 'react-icons/bs';
+import React from "react";
+import aboutPhoto from "../../assets/images/about.png";
 
 const About = () => {
-    const points = [
-        "We give you full optimized project Place the order",
-        "We give you full optimized project Place the order",
-        "We give you full optimized project Place the order",
-        "We give you full optimized project Place the order",
-    ];
-
     return (
         <section
-            id='about'
-            className="w-full px-4 sm:px-6 lg:px-16 py-20 sm:py-24 relative z-0"
-            style={{ backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
+            id="about"
+            className="w-full px-4 sm:px-6 lg:px-16 py-20 sm:py-24"
+            style={{
+                backgroundColor: "var(--bg-color)",
+                color: "var(--text-color)",
+                fontFamily: "var(--font-primary)",
+            }}
         >
-            {/* Section Title */}
-            <div className="text-center mb-16">
-                <h2 className="text-3xl sm:text-4xl font-extrabold inline-block relative pb-2">
-                    About Us
-                    <span className="absolute left-1/2 -bottom-1 w-24 h-1 bg-[#5454D4] rounded-full -translate-x-1/2"></span>
+            {/* Heading */}
+            <div className="max-w-7xl mx-auto text-center mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold">
+                    About <span className="text-[var(--button-primary)]">Us</span>
                 </h2>
+                <div className="h-1 w-24 mx-auto mt-2 bg-[#5454D4] rounded-full"></div>
             </div>
 
-            {/* Main Content */}
-            <div className="max-w-6xl mx-auto flex flex-col-reverse md:flex-row items-center gap-12">
-                {/* Text Column */}
-                <div className="flex-1 space-y-6 text-center md:text-left">
-                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold leading-snug">
-                        We Make Your Ideas <br className="hidden md:block" /> in Reality World
+            {/* Content Container */}
+            <div className="max-w-7xl mx-auto flex flex-col-reverse lg:flex-row items-center justify-between gap-12">
+                {/* Left: Text */}
+                <div className="flex-1 text-center lg:text-left">
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight mb-6">
+                        We Make <br />
+                        <span className="relative inline-block">
+                            <span className="z-10 relative">Your Ideas</span>
+                            <span className="absolute inset-0 -bottom-3 h-2 bg-blue-200 z-0 rounded-full w-[90%]"></span>
+                        </span>{" "}
+                        Into{" "}
+                        <span className="text-[var(--button-primary)]">Reality World</span>.
                     </h2>
-                    <p className="text-sm sm:text-base leading-relaxed max-w-lg mx-auto md:mx-0" style={{ color: 'var(--text-secondary)' }}>
-                        We will build project for your Major Project and secure your full potential with us and make sure to perfect and I love you.
+                    <p
+                        className="text-base sm:text-lg mb-8 max-w-xl mx-auto lg:mx-0"
+                        style={{ color: "var(--text-secondary)" }}
+                    >
+                        We use creativity and code to help students and businesses bring their ideas to life. From final year
+                        projects to scalable platforms, we tailor each solution with precision and care.
                     </p>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 justify-items-center md:justify-items-start">
-                        {points.map((point, index) => (
-                            <div key={index} className="flex items-center space-x-2">
-                                <FaGraduationCap className="text-blue-500 text-xl" />
-                                <span className="text-sm sm:text-base">{point}</span>
-                            </div>
-                        ))}
-                    </div>
+                    <button className="bg-[var(--button-primary)] hover:bg-[var(--button-primary-hover)] text-white px-6 py-3 rounded-full font-semibold text-sm transition">
+                        Let's Build With Us
+                    </button>
                 </div>
 
-                {/* Image Column */}
-                <div className="flex-1 flex justify-center items-center relative w-full pt-8 md:pt-0">
-                    {/* WhatsApp Badge */}
-                    <div
-                        className="absolute top-2 left-1/2 transform -translate-x-1/2 sm:top-4 sm:translate-x-0 shadow-xl rounded-full px-4 py-2 flex items-center gap-2 z-10"
-                        style={{
-                            backgroundColor: 'var(--hover-bg)',
-                            border: '1px solid var(--border-color)',
-                            backdropFilter: 'blur(10px)',
-                        }}
-                    >
-                        <BsWhatsapp className="text-green-500 text-xl" />
-                        <span className="text-sm font-semibold leading-tight text-center sm:text-left" style={{ color: 'var(--text-color)' }}>
-                            Contact us anytime<br />9847503434
-                        </span>
+                {/* Right: Image */}
+                <div className="flex-1 relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl mx-auto">
+                    <div className="absolute -top-10 -left-10 w-full h-full z-0">
+                        <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" className="w-full h-full"></svg>
                     </div>
-
-                    {/* Image */}
                     <img
                         src={aboutPhoto}
-                        alt="About us"
-                        className="w-full max-w-xs sm:max-w-sm md:max-w-md relative z-0"
+                        alt="Working on project"
+                        className="relative z-10 w-full rounded-xl object-cover"
                     />
                 </div>
             </div>

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Home, HelpCircle, LogOut } from 'lucide-react';
+import { Receipt, Home, HelpCircle, LogOut } from 'lucide-react';
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import { FaFolderOpen, FaRegFolder } from 'react-icons/fa';
 
@@ -64,6 +64,24 @@ const Sidebar = ({ isCollapsed }) => {
                                 {!isCollapsed && <span>All Projects</span>}
                             </div>
                             {!isCollapsed && isActive("adminproject") && (
+                                <div className="ml-auto w-1.5 h-5 bg-blue-600 rounded-full"></div>
+                            )}
+                        </Link>
+                        <Link
+                            to="ordersummary"
+                            className={`flex items-center ${isCollapsed ? "justify-center px-2 py-3" : "px-3 py-2.5"
+                                } rounded-lg transition-all duration-200 ${isActive("ordersummary")
+                                    ? "bg-gray-100 text-gray-900 font-medium"
+                                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                                }`}
+                        >
+                            <div className={`flex items-center ${isCollapsed ? "" : "gap-3"}`}>
+                                <div className={isActive("ordersummary") ? "text-blue-600" : ""}>
+                                    <Receipt size={isCollapsed ? 22 : 18} />
+                                </div>
+                                {!isCollapsed && <span>Order</span>}
+                            </div>
+                            {!isCollapsed && isActive("ordersummary") && (
                                 <div className="ml-auto w-1.5 h-5 bg-blue-600 rounded-full"></div>
                             )}
                         </Link>

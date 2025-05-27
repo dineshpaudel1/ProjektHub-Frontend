@@ -1,15 +1,13 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "../../utils/axiosInstance";
-import { Loader, ArrowLeft, MessageCircle } from "lucide-react";
-import NotificationToast from "../../components/NotificationToast";
+import { Loader, MessageCircle } from "lucide-react";
 import UserQuestionAnswerList from "../../components/UserHelper/QuestionAnswerList";
 import UserProjectDetailHelper from "../../components/UserHelper/UserProjectDetailHelper";
 import UserGallerySection from "../../components/UserHelper/UserGallerySection";
 import { useProjectContext } from "../../context/ProjectContext";
 import OrderModal from "../../modals/OrderModal";
+import { notifySuccess, notifyError } from '../../utils/toastNotify';
 
 const getEmbedUrl = (url) => {
     try {
@@ -39,7 +37,6 @@ const UserProjectDetail = () => {
 
     const [questionText, setQuestionText] = useState("");
     const [isExpanded, setIsExpanded] = useState(false);
-    const [notification, setNotification] = useState(null);
     const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
 
 
@@ -50,9 +47,9 @@ const UserProjectDetail = () => {
         const token = localStorage.getItem("token");
 
         if (!token) {
-            setNotification({ type: "error", message: "Please login to ask a question." });
+            notifyError("Please Login to Ask a Question");
             localStorage.setItem("redirectAfterLogin", `/project/${id}`);
-            setTimeout(() => navigate("/login"), 1500);
+            setTimeout(() => navigate("/login"));
             return;
         }
 
@@ -65,7 +62,7 @@ const UserProjectDetail = () => {
             setQuestionText("");
             fetchQuestions(id);
         } catch (err) {
-            console.error("Error submitting question:", err);
+            notifyError("Error Submitting question");
         }
     };
 
@@ -96,10 +93,6 @@ const UserProjectDetail = () => {
 
     return (
         <>
-            <NotificationToast
-                notification={notification}
-                onClose={() => setNotification(null)}
-            />
             <div className="min-h-screen py-[100px] px-4 sm:px-6 lg:px-8 bg-[var(--bg-color)] text-[var(--text-color)] transition-all duration-300 ease-in-out">
                 <div className="max-w-6xl mx-auto">
                     <div className="rounded-2xl shadow-lg overflow-hidden bg-[var(--menu-bg)] border border-[var(--border-color)]">
@@ -138,10 +131,7 @@ const UserProjectDetail = () => {
                                 onRequestBuy={() => {
                                     const token = localStorage.getItem("token");
                                     if (!token) {
-                                        setNotification({
-                                            type: "error",
-                                            message: "Please login to order the project."
-                                        });
+                                        notifyError("Before Placing Order Please login");;
                                         navigate("/login");
                                         return;
                                     }

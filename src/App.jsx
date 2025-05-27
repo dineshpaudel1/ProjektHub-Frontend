@@ -1,5 +1,7 @@
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
 // import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Login from "./pages/admin/AdminLogin";
 import Dashboard from "./pages/admin/Dashboard";
 import AdminLayout from "./layouts/AdminLayout";
@@ -32,12 +34,16 @@ import { UserProvider } from "./context/UserContext";
 import SeeAllProject from "./pages/user/SeeAllProject";
 import SeeSellerProfile from "./pages/user/SeeSellerProfile";
 import EditMyProject from "./pages/seller/EditMyProject";
+import MyOrder from "./pages/user/MyOrder";
+import OrderSummary from "./pages/admin/OrderSummary";
 
 function App() {
   return (
     <Router>
       <ScrollToTop />
+      <ToastContainer />
       <Routes>
+
 
         {/* ✅ User Routes */}
         <Route
@@ -59,6 +65,7 @@ function App() {
           <Route path="seeallproject" element={<SeeAllProject />} />
           <Route path="/seller/:id" element={<SeeSellerProfile />} />
           <Route path="forgot-password" element={<ForgotPassword />} />
+          <Route path="my-orders" element={<MyOrder />} />
         </Route>
 
         {/* ✅ Admin Routes */}
@@ -76,6 +83,7 @@ function App() {
           <Route path="adminproject" element={<AdminProjects />} />
           <Route path="project/:id" element={<AllProjectDetail />} />
           <Route path="profile" element={<AdminProfile />} />
+          <Route path="ordersummary" element={<OrderSummary />} />
           <Route path="approve-seller/:sellerId" element={<ApproveSeller />} />
         </Route>
 

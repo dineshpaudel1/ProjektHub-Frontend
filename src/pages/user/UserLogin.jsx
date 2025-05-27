@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import NotificationToast from "../../components/NotificationToast";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
+import { notifySuccess, notifyError } from '../../utils/toastNotify';
 
 const UserLogin = () => {
-    const [notification, setNotification] = useState(null);
     const [identifier, setIdentifier] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
@@ -30,7 +29,6 @@ const UserLogin = () => {
         }
     }, []);
 
-
     const handleGoogleCallback = async (response) => {
         const idToken = response.credential;
         try {
@@ -52,10 +50,9 @@ const UserLogin = () => {
                     },
                 });
                 const userData = await userRes.json();
-                console.log(userData)
                 setUser(userData);
 
-                setNotification({ type: "success", message: "Login successful!" });
+                notifySuccess("Login Succes");
                 const redirectPath = localStorage.getItem("redirectAfterLogin") || "/";
                 localStorage.removeItem("redirectAfterLogin");
                 navigate(redirectPath);
@@ -64,7 +61,7 @@ const UserLogin = () => {
             }
         } catch (err) {
             console.error("Login failed:", err);
-            setNotification({ type: "error", message: err.message || "Something went wrong" });
+            notifyError("Something went wrong");
         }
     };
 
@@ -72,7 +69,7 @@ const UserLogin = () => {
         e.preventDefault();
 
         if (!identifier || !password) {
-            setNotification({ type: "error", message: "Please enter both email and password." });
+            notifyError("Please enter both email and password.");
             return;
         }
 
@@ -84,7 +81,6 @@ const UserLogin = () => {
             });
 
             const data = await res.json();
-            console.log(data)
 
             if (res.ok && data?.status === "success") {
                 localStorage.setItem("token", data.data.accessToken);
@@ -97,9 +93,8 @@ const UserLogin = () => {
                 });
                 const userData = await userRes.json();
                 setUser(userData);
-                console.log(userData)
 
-                setNotification({ type: "success", message: "Login successful!" });
+                notifySuccess("Login successful!");
                 const redirectPath = localStorage.getItem("redirectAfterLogin") || "/";
                 localStorage.removeItem("redirectAfterLogin");
                 navigate(redirectPath);
@@ -108,7 +103,7 @@ const UserLogin = () => {
             }
         } catch (err) {
             console.error("Login error:", err);
-            setNotification({ type: "error", message: err.message || "Login failed" });
+            notifyError(err.message || "Login failed");
         }
     };
 
@@ -117,15 +112,10 @@ const UserLogin = () => {
             className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 font-Doto pt-8"
             style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
         >
-            <NotificationToast
-                notification={notification}
-                onClose={() => setNotification(null)}
-            />
             <div className="flex flex-col justify-center items-center w-full max-w-[480px]">
                 <form
                     onSubmit={handleManualLogin}
                     className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-md xl:max-w-sm 2xl:max-w-sm rounded-xl shadow-md px-6 sm:px-8 py-10 border"
-
                     style={{
                         backgroundColor: "var(--menu-bg)",
                         borderColor: "var(--border-color)",

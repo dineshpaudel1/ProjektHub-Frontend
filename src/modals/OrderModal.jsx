@@ -3,6 +3,8 @@ import { useProjectContext } from '../context/ProjectContext';
 import { useUser } from "../context/UserContext";
 import axios from "../utils/axiosInstance";
 import logo from '../assets/images/logoblack.png';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify'; // make sure react-toastify is installed and configured
 
 const OrderModal = ({ isOpen, onClose }) => {
     const [step, setStep] = useState(1);
@@ -11,6 +13,7 @@ const OrderModal = ({ isOpen, onClose }) => {
 
     const { selectedProject } = useProjectContext();
     const { user } = useUser();
+    const navigate = useNavigate();
 
     const handleProceed = () => {
         if (!phoneNumber.trim()) return;
@@ -21,7 +24,6 @@ const OrderModal = ({ isOpen, onClose }) => {
         if (!selectedProject?.id || !phoneNumber.trim()) return;
 
         const token = localStorage.getItem("token");
-        console.log(token);
         if (!token) {
             alert("Please login again.");
             return;
@@ -50,15 +52,16 @@ const OrderModal = ({ isOpen, onClose }) => {
             );
 
             if (response.data.statusCode === 200) {
-                alert("Order placed successfully!");
-                onClose(); // Close modal after success
+                toast.success("Your order placed successfully. Wait for response.");
+                onClose(); // Close modal
+                navigate("/my-orders"); // Redirect to MyOrder.jsx
             } else {
-                alert("Something went wrong.");
+                toast.error("Something went wrong. Try again.");
             }
 
         } catch (err) {
             console.error("Order failed:", err);
-            alert("Order failed. Try again.");
+            toast.error("Order failed. Try again.");
         } finally {
             setLoading(false);
         }
@@ -67,8 +70,8 @@ const OrderModal = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50 px-4 font-[var(--font-primary)]">
-            <div className="bg-[var(--bg-color)] rounded-lg w-full max-w-3xl shadow-xl relative px-8 py-6 text-[var(--text-color)]">
+        <div className="fixed inset-0 flex items-center justify-center z-50 px-4 backdrop-blur-sm bg-black/10 font-[var(--font-primary)]">
+            <div className="bg-[var(--bg-color)] rounded-lg w-full max-w-3xl shadow-xl relative px-8 py-6 text-[var(--text-color)] max-h-[90vh] overflow-y-auto">
                 <button
                     onClick={onClose}
                     className="absolute top-4 right-5 text-2xl font-bold text-[var(--text-color)]"
