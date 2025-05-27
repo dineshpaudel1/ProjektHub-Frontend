@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "../../utils/axiosInstance";
 import { Loader, ArrowLeft, MessageCircle } from "lucide-react";
-import SocialModal from "../../modals/SocialModal";
 import NotificationToast from "../../components/NotificationToast";
 import UserQuestionAnswerList from "../../components/UserHelper/QuestionAnswerList";
 import UserProjectDetailHelper from "../../components/UserHelper/UserProjectDetailHelper";
 import UserGallerySection from "../../components/UserHelper/UserGallerySection";
 import { useProjectContext } from "../../context/ProjectContext";
+import OrderModal from "../../modals/OrderModal";
 
 const getEmbedUrl = (url) => {
     try {
@@ -34,12 +34,14 @@ const UserProjectDetail = () => {
         fetchQuestions,
         loadingQuestions,
         questions,
+        setSelectedProject,
     } = useProjectContext();
 
     const [questionText, setQuestionText] = useState("");
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [notification, setNotification] = useState(null);
+    const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+
 
     const handleAskQuestion = async (e) => {
         e.preventDefault();
@@ -98,18 +100,8 @@ const UserProjectDetail = () => {
                 notification={notification}
                 onClose={() => setNotification(null)}
             />
-            <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-[var(--bg-color)] text-[var(--text-color)] transition-all duration-300 ease-in-out">
+            <div className="min-h-screen py-[100px] px-4 sm:px-6 lg:px-8 bg-[var(--bg-color)] text-[var(--text-color)] transition-all duration-300 ease-in-out">
                 <div className="max-w-6xl mx-auto">
-                    <div className="mb-8">
-                        <button
-                            onClick={() => navigate(-1)}
-                            className="flex items-center text-[var(--text-secondary)] hover:text-[var(--button-primary)] transition-colors duration-200 font-medium"
-                        >
-                            <ArrowLeft className="mr-2 h-5 w-5" />
-                            <span>Back to Projects</span>
-                        </button>
-                    </div>
-
                     <div className="rounded-2xl shadow-lg overflow-hidden bg-[var(--menu-bg)] border border-[var(--border-color)]">
                         {/* Video Preview */}
                         <div className="relative w-full h-[400px] bg-black">
@@ -142,8 +134,23 @@ const UserProjectDetail = () => {
                                 project={project}
                                 isExpanded={isExpanded}
                                 setIsExpanded={setIsExpanded}
-                                onRequestBuy={() => setIsModalOpen(true)}
+                                setSelectedProject={setSelectedProject}
+                                onRequestBuy={() => {
+                                    const token = localStorage.getItem("token");
+                                    if (!token) {
+                                        setNotification({
+                                            type: "error",
+                                            message: "Please login to order the project."
+                                        });
+                                        navigate("/login");
+                                        return;
+                                    }
+                                    setSelectedProject(project);
+                                    setIsOrderModalOpen(true);
+
+                                }}
                             />
+
 
                             {/* Gallery */}
                             <UserGallerySection photos={project.photos} />
@@ -181,7 +188,8 @@ const UserProjectDetail = () => {
                 </div>
             </div>
 
-            <SocialModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+            <OrderModal isOpen={isOrderModalOpen} onClose={() => setIsOrderModalOpen(false)} />
+
         </>
     );
 };

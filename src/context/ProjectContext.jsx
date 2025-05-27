@@ -13,6 +13,8 @@ export const ProjectProvider = ({ children }) => {
 
     const [questions, setQuestions] = useState([]);
     const [loadingQuestions, setLoadingQuestions] = useState(false);
+    const [selectedProject, setSelectedProject] = useState(null);
+
 
     const fetchProjects = async () => {
         if (hasFetchedProjects.current) return; // ✅ Prevent re-fetching
@@ -73,6 +75,8 @@ export const ProjectProvider = ({ children }) => {
                 questions,
                 loadingQuestions,
                 fetchQuestions,
+                selectedProject,
+                setSelectedProject, // ✅ Include both
             }}
         >
             {children}

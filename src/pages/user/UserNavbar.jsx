@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu, X, Moon, Sun } from "lucide-react";
+import { Menu, X, Moon, Sun, ShoppingCart } from "lucide-react";
 import logowhite from "../../assets/images/logowhite.png";
 import logoDark from "../../assets/images/logoblack.png";
 import { useUser } from "../../context/UserContext";
@@ -107,9 +107,15 @@ const UserNavbar = () => {
                         {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
                     </button>
 
-                    {user && !isSeller && (
+                    {/* {user && !isSeller && (
                         <a onClick={() => setShowSellerModal(true)} className="font-semibold hover:text-indigo-500 transition cursor-pointer">
                             Become Seller
+                        </a>
+                    )} */}
+                    
+                    {user && (
+                        <a onClick={() => setShowSellerModal(true)} className="font-semibold hover:text-indigo-500 transition cursor-pointer">
+                            <ShoppingCart />
                         </a>
                     )}
 

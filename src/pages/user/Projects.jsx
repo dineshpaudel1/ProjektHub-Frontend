@@ -34,9 +34,10 @@ const Projects = () => {
     return (
         <section
             id="projects"
-            className="scroll-mt-10 py-16 px-4 sm:px-6 lg:px-12"
+            className="scroll-mt-24 pt-24 sm:pt-28 px-4 sm:px-6 lg:px-12"
             style={{ backgroundColor: "var(--bg-color)" }}
         >
+
             <h2
                 className="text-3xl sm:text-4xl font-bold text-center mb-12"
                 style={{ color: "var(--text-color)" }}
@@ -65,7 +66,7 @@ const Projects = () => {
 
                 <div
                     ref={scrollRef}
-                    className="flex flex-wrap lg:flex-nowrap gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth"
+                    className="flex flex-wrap lg:flex-nowrap gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth"
                 >
                     {(loadingProjects || projects.length === 0)
                         ? [...Array(4)].map((_, idx) => <SkeletonCard key={idx} />)
@@ -73,9 +74,10 @@ const Projects = () => {
                             <div
                                 key={project.id}
                                 onClick={() => navigate(`/project/${project.id}`)}
-                                className="w-full sm:w-1/2 md:w-1/3 lg:w-[22%] flex-shrink-0 px-2 cursor-pointer snap-start"
+                                className="w-full sm:w-1/2 md:w-1/3 lg:w-[26%] flex-shrink-0 px-2 cursor-pointer snap-start"
                             >
-                                <div className="w-full h-[208px] overflow-hidden rounded-xl shadow-md">
+
+                                <div className="w-full h-[220px] overflow-hidden rounded-xl shadow-md">
                                     <img
                                         src={`http://localhost:8080/api/media/photo?file=${project.thumbnail}`}
                                         alt={project.title}

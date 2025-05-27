@@ -4,8 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 
 
-
-const UserProjectDetailHelper = ({ project, isExpanded, setIsExpanded, onRequestBuy }) => {
+const UserProjectDetailHelper = ({ project, isExpanded, setIsExpanded, onRequestBuy, setSelectedProject }) => {
     const navigate = useNavigate();
     return (
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
@@ -87,7 +86,10 @@ const UserProjectDetailHelper = ({ project, isExpanded, setIsExpanded, onRequest
                     <div className="pt-2">
                         <button
                             className="w-full bg-[var(--button-primary)] hover:bg-[var(--button-primary-hover)] text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 shadow-md"
-                            onClick={onRequestBuy}
+                            onClick={() => {
+                                setSelectedProject(project); // ✅ make sure this is set
+                                onRequestBuy(); // ✅ triggers `setIsOrderModalOpen(true)`
+                            }}
                         >
                             Request to Buy
                         </button>

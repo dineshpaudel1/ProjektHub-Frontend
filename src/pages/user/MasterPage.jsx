@@ -12,7 +12,7 @@ const MasterPage = () => {
             <Projects />
             <Services />
             <About />
-            <ChatbotWidget />
+            {/* <ChatbotWidget /> */}
 
         </div>
     )
