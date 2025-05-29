@@ -30,19 +30,8 @@ const AdminProjects = () => {
     // Fetch categories
     useEffect(() => {
         const fetchCategories = async () => {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                setError("Authentication required");
-                setLoading(false);
-                return;
-            }
-
             try {
-                const response = await axios.get('http://localhost:8080/api/users/category', {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+                const response = await axios.get('http://localhost:8080/api/public/category');
                 setCategories(response.data.data || []);
             } catch (error) {
                 console.error('❌ Failed to fetch categories:', error);

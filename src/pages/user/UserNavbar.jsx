@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, Moon, Sun, ShoppingCart } from "lucide-react";
 import logowhite from "../../assets/images/logowhite.png";
 import logoDark from "../../assets/images/logoblack.png";
@@ -112,12 +112,16 @@ const UserNavbar = () => {
                             Become Seller
                         </a>
                     )} */}
-                    
+
                     {user && (
-                        <a onClick={() => setShowSellerModal(true)} className="font-semibold hover:text-indigo-500 transition cursor-pointer">
+                        <Link
+                            to="/my-orders"
+                            className="font-semibold hover:text-indigo-500 transition cursor-pointer"
+                        >
                             <ShoppingCart />
-                        </a>
+                        </Link>
                     )}
+
 
                     {user ? (
                         <div className="relative profile-dropdown">
