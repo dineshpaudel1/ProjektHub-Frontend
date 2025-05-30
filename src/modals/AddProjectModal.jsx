@@ -7,12 +7,7 @@ const AddProjectModal = ({ isOpen, onClose, onCreate, formData, setFormData }) =
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const token = localStorage.getItem('token');
-                const response = await axios.get('/users/category', {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    }
-                });
+                const response = await axios.get('/public/category',);
                 setCategories(response.data.data);
             } catch (error) {
                 console.error('❌ Error fetching categories:', error);

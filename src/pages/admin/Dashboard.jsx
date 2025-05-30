@@ -75,27 +75,10 @@ const Dashboard = () => {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     };
-
-    fetch("http://localhost:8080/api/seller/profile", { headers })
-      .then(res => res.json())
-      .then(data => setSellerCount(data.length || 0))
-      .catch(console.error);
-
-    fetch("http://localhost:8080/api/user/profile", { headers })
-      .then(res => res.json())
-      .then(data => setUserCount(data.length || 0))
-      .catch(console.error);
-
-    fetch("http://localhost:8080/api/sold/project", { headers })
-      .then(res => res.json())
-      .then(data => setSoldCount(data.length || 0))
-      .catch(console.error);
-
     fetch("http://localhost:8080/api/admin/unapproved-sellers", { headers })
       .then(res => res.json())
       .then(data => setRecentActivities(data))
       .catch(console.error);
-
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 60000);
@@ -127,7 +110,9 @@ const Dashboard = () => {
 
       <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-6 mb-8 text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-full opacity-10">
-          <svg viewBox="0 0 200 200"><path fill="white" d="M39.9,-51.2C54.3,-39.9..." transform="translate(100 100)" /></svg>
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <path fill="white" d="M38.6,-60.5C51.5,-54.3,63.6,-43.2,69.3,-29.8C75,-16.4,74.2,-0.8,68.7,13.8C63.1,28.3,52.7,40.9,40.6,49.9C28.5,58.9,14.8,64.2,-0.9,65.4C-16.5,66.6,-33,63.7,-44.6,54.7C-56.1,45.6,-62.8,30.5,-65.4,15.3C-68,-0.1,-66.5,-15.3,-61.4,-29.2C-56.2,-43.1,-47.3,-55.7,-35.6,-61.9C-23.9,-68.2,-11.9,-68.1,1.2,-69.7C14.2,-71.3,28.5,-74.6,38.6,-60.5Z" transform="translate(100 100)" />
+          </svg>
         </div>
         <div className="relative z-10">
           <h2 className="text-2xl font-bold mb-2">Welcome back, Admin!</h2>

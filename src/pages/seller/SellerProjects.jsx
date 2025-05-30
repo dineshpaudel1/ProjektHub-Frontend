@@ -79,9 +79,7 @@ const SellerProjects = () => {
                 return;
             }
             try {
-                const catRes = await axios.get('http://localhost:8080/api/users/category', {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
+                const catRes = await axios.get('http://localhost:8080/api/public/category')
                 setCategories(catRes.data.data || []);
                 const projRes = await getSellerProjects();
                 setProjects(mapProjects(projRes.data));

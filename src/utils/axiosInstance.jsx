@@ -1,29 +1,31 @@
-
 import axios from 'axios';
 
 const instance = axios.create({
     baseURL: 'http://localhost:8080/api',
-
 });
 
-// Interceptor to handle auth failures globally
-// instance.interceptors.response.use(
-//     (response) => response,
-//     (error) => {
-//         const status = error?.response?.status;
+// ✅ Automatically attach token to every request
+instance.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token');
 
-//         if (!navigator.onLine || status === 401 || !error.response) {
-//             // Clear localStorage if unauthorized or server offline
-//             localStorage.removeItem("token");
-//             localStorage.removeItem("refreshToken");
-//             localStorage.removeItem("isAuthenticated");
+        // Define routes that should skip auth
+        const isPublicEndpoint =
+            config.url?.startsWith('/public') ||
+            config.url?.includes('/media/photo') ||
+            config.url?.includes('/auth') ||
+            config.url?.includes('/search') ||
+            config.url?.includes('/register') ||
+            config.method === 'get' && config.url?.includes('/projects');
 
-//             // Force reload to login page
-//             window.location.href = "/admin/login";
-//         }
+        if (token && !isPublicEndpoint) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
 
-//         return Promise.reject(error);
-//     }
-// );
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
+
 
 export default instance;

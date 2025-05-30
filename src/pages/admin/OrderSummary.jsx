@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react"
 import axios from "axios"
 import { ClipboardList, Package, Users, DollarSign, TrendingUp } from "lucide-react"
+import { useNavigate } from "react-router-dom";
+
 
 const OrderSummary = () => {
     const [orders, setOrders] = useState([])
     const [loading, setLoading] = useState(true)
+    const navigate = useNavigate();
+
 
     const fetchOrderSummary = async () => {
         try {
@@ -137,9 +141,10 @@ const OrderSummary = () => {
                                     {orders.map((order, index) => (
                                         <tr
                                             key={order.orderId}
-                                            className="hover:bg-gray-50 transition-colors"
-                                            style={{ animationDelay: `${index * 50}ms` }}
+                                            className="hover:bg-gray-50 transition-colors cursor-pointer"
+                                            onClick={() => navigate(`/admin/orders/${order.orderId}`)}
                                         >
+
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="text-sm font-medium text-gray-900">#{order.orderId}</div>
                                             </td>
@@ -177,9 +182,10 @@ const OrderSummary = () => {
                             {orders.map((order, index) => (
                                 <div
                                     key={order.orderId}
-                                    className="p-6 hover:bg-gray-50 transition-colors"
-                                    style={{ animationDelay: `${index * 50}ms` }}
+                                    className="p-6 hover:bg-gray-50 transition-colors cursor-pointer"
+                                    onClick={() => navigate(`/admin/orders/${order.orderId}`)}
                                 >
+
                                     <div className="flex items-center justify-between mb-3">
                                         <div className="text-sm font-medium text-gray-900">Order #{order.orderId}</div>
                                         <span

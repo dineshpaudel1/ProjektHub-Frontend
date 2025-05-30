@@ -36,6 +36,7 @@ import SeeSellerProfile from "./pages/user/SeeSellerProfile";
 import EditMyProject from "./pages/seller/EditMyProject";
 import MyOrder from "./pages/user/MyOrder";
 import OrderSummary from "./pages/admin/OrderSummary";
+import AdminOrderDetails from "./pages/admin/AdminOrderDetails";
 
 function App() {
   return (
@@ -85,6 +86,7 @@ function App() {
           <Route path="profile" element={<AdminProfile />} />
           <Route path="ordersummary" element={<OrderSummary />} />
           <Route path="approve-seller/:sellerId" element={<ApproveSeller />} />
+          <Route path="/admin/orders/:id" element={<AdminOrderDetails />} />
         </Route>
 
         {/* ✅ Seller Routes */}
