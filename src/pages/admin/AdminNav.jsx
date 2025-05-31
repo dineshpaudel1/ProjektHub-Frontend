@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Bell, Menu, Search, Settings, User, LogOut, ChevronDown } from 'lucide-react';
+import { Bell, Menu, Search, User, ChevronDown } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import user from "../../assets/images/user.png";
 import logo from "../../assets/images/logoblack.png";
+import axios from "../../utils/axiosInstance";
 
 const AdminNav = ({ toggleSidebar }) => {
     const [showMenu, setShowMenu] = useState(false);
@@ -10,6 +11,8 @@ const AdminNav = ({ toggleSidebar }) => {
     const [showNotifications, setShowNotifications] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [unapprovedSellers, setUnapprovedSellers] = useState([]);
+    const [notifications, setNotifications] = useState([]);
+    const unreadCount = notifications.filter(n => !n.read).length + unapprovedSellers.length;
 
 
     const menuRef = useRef();
@@ -18,6 +21,24 @@ const AdminNav = ({ toggleSidebar }) => {
     const navigate = useNavigate();
 
     const token = localStorage.getItem("token");
+
+    const fetchAdminNotifications = async () => {
+        try {
+            const res = await axios.get("/notifications?role=ADMIN");
+            setNotifications(res.data.data || []);
+        } catch (err) {
+            console.error("Error fetching admin notifications", err);
+        }
+    };
+
+    // const fetchUnapprovedSellers = async () => {
+    //     try {
+    //         const res = await axios.get("/admin/unapproved-sellers");
+    //         setUnapprovedSellers(res.data.data || []);
+    //     } catch (err) {
+    //         console.error("Error fetching unapproved sellers", err);
+    //     }
+    // };
 
     const getUserRoles = () => {
         try {
@@ -57,26 +78,11 @@ const AdminNav = ({ toggleSidebar }) => {
         };
         document.addEventListener("mousedown", handler);
 
-        const fetchUnapprovedSellers = async () => {
-            try {
-                const res = await fetch("http://localhost:8080/api/admin/unapproved-sellers", {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                const json = await res.json();
-                setUnapprovedSellers(json.data || []);
-
-            } catch (err) {
-                console.error("Error fetching unapproved sellers", err);
-            }
-        };
-
-        fetchUnapprovedSellers();
+        fetchAdminNotifications();
+        // fetchUnapprovedSellers();
 
         return () => document.removeEventListener("mousedown", handler);
     }, []);
-
 
     const handleLogout = () => {
         const roles = getUserRoles();
@@ -101,16 +107,13 @@ const AdminNav = ({ toggleSidebar }) => {
         <header className="fixed top-0 left-0 w-full h-16 z-50 bg-white shadow-sm flex items-center justify-between px-4 md:px-6">
             {/* Left: Logo + Toggle */}
             <div className="flex items-center gap-4">
-                <button
-                    onClick={toggleSidebar}
-                    className="p-2 rounded-full hover:bg-gray-100"
-                >
+                <button onClick={toggleSidebar} className="p-2 rounded-full hover:bg-gray-100">
                     <Menu size={20} className="text-gray-700" />
                 </button>
                 <img src={logo} alt="Logo" className="h-8 md:h-9 object-contain" />
             </div>
 
-            {/* Middle: Search (Desktop) */}
+            {/* Middle: Search */}
             <div className="hidden md:block flex-grow max-w-md mx-4">
                 <form onSubmit={handleSearch} className="relative">
                     <input
@@ -124,7 +127,7 @@ const AdminNav = ({ toggleSidebar }) => {
                 </form>
             </div>
 
-            {/* Right: Mobile Search + Notifications + Profile */}
+            {/* Right: Icons and Dropdown */}
             <div className="flex items-center gap-2 md:gap-4">
 
                 {/* Mobile Search */}
@@ -157,47 +160,68 @@ const AdminNav = ({ toggleSidebar }) => {
                         aria-label="Notifications"
                     >
                         <Bell size={20} className="text-gray-700" />
-                        {unapprovedSellers.length > 0 && (
-                            <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white" />
+                        {(notifications.length > 0 || unapprovedSellers.length > 0) && (
+                            <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                                {unreadCount > 9 ? "9+" : unreadCount}
+                            </span>
                         )}
                     </button>
 
                     {showNotifications && (
-                        <div className="absolute right-0 mt-3 w-80 bg-white shadow-xl rounded-xl z-50 animate-fadeIn">
+                        <div className="absolute right-0 mt-3 w-96 bg-white shadow-xl rounded-xl z-50 animate-fadeIn">
                             <div className="flex justify-between px-4 py-3 border-b border-gray-100">
                                 <h3 className="text-sm font-semibold text-gray-700">Notifications</h3>
                                 <span className="text-xs text-white bg-blue-600 rounded-full px-2 py-0.5">
-                                    {unapprovedSellers.length} New
+                                    {notifications.length + unapprovedSellers.length} New
                                 </span>
                             </div>
 
                             <div className="px-4 py-3 text-sm text-gray-600 space-y-3 max-h-96 overflow-y-auto">
-                                {unapprovedSellers.length === 0 ? (
-                                    <p className="text-sm text-gray-500 p-4">No new seller requests.</p>
-                                ) : (
-                                    unapprovedSellers.map((seller) => (
-                                        <div
-                                            key={seller.id}
-                                            className="flex items-start gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded"
-                                            onClick={() => navigate(`approve-seller/${seller.id}`)}
-                                        >
-                                            <img
-                                                src={`http://localhost:8080/api/media/photo?file=${seller.verificationPhotoPath}`}
-                                                alt={seller.sellerName}
-                                                className="w-8 h-8 rounded-full mt-1 object-cover border"
-                                            />
-                                            <div className="flex-1">
-                                                <p><strong>{seller.sellerName}</strong> has requested seller verification.</p>
-                                                <p className="text-xs text-gray-400 mt-1">Click to view details</p>
-                                            </div>
+                                {notifications.map((note) => (
+                                    <div
+                                        key={note.id}
+                                        className="flex items-start gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded"
+                                        onClick={() => {
+                                            if (note.targetType === "ORDER") {
+                                                navigate(`/admin/orders/${note.targetId}`);
+                                                setShowNotifications(false);
+                                            }
+                                        }}
+                                    >
+                                        <img
+                                            src={note.photoUrl}
+                                            alt={note.photoUrl}
+                                            className="w-9 h-9 rounded-full mt-1 object-cover border"
+                                        />
+                                        <div className="flex-1">
+                                            <p className="font-medium text-gray-800">{note.message}</p>
+                                            <p className="text-xs text-gray-400 mt-1">
+                                                {new Date(note.timeStamp).toLocaleString()}
+                                            </p>
                                         </div>
-                                    ))
+                                    </div>
+                                ))}
 
-                                )}
+                                {unapprovedSellers.map((seller) => (
+                                    <div
+                                        key={seller.id}
+                                        className="flex items-start gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded"
+                                        onClick={() => navigate(`approve-seller/${seller.id}`)}
+                                    >
+                                        <img
+                                            src={`http://localhost:8080/api/media/photo?file=${seller.verificationPhotoPath}`}
+                                            alt={seller.sellerName}
+                                            className="w-9 h-9 rounded-full mt-1 object-cover border"
+                                        />
+                                        <div className="flex-1">
+                                            <p><strong>{seller.sellerName}</strong> has requested seller verification.</p>
+                                            <p className="text-xs text-gray-400 mt-1">Click to view details</p>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     )}
-
                 </div>
 
                 {/* User Dropdown */}
@@ -228,27 +252,6 @@ const AdminNav = ({ toggleSidebar }) => {
                                 <User size={16} className="text-gray-500" />
                                 <span>Profile</span>
                             </button>
-
-                            {/* <button
-                                className="flex items-center gap-3 w-full text-left px-4 py-2.5 text-gray-700 hover:bg-gray-50"
-                                onClick={() => {
-                                    setShowMenu(false);
-                                    navigate("settings");
-                                }}
-                            >
-                                <Settings size={16} className="text-gray-500" />
-                                <span>Settings</span>
-                            </button> */}
-
-                            <div className="border-t border-gray-100 my-1"></div>
-
-                            {/* <button
-                                className="flex items-center gap-3 w-full text-left px-4 py-2.5 text-red-600 hover:bg-red-50"
-                                onClick={handleLogout}
-                            >
-                                <LogOut size={16} className="text-red-500" />
-                                <span>Logout</span>
-                            </button> */}
                         </div>
                     )}
                 </div>

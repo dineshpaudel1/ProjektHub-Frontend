@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import { MessageCircle } from "lucide-react";
 import axios from "../../utils/axiosInstance";
-import NotificationToast from "../NotificationToast";
+import { toast } from "react-toastify";
 
 const QuestionAnswerList = ({ questions, refreshQuestions }) => {
     const [answerMap, setAnswerMap] = useState({});
     const [submitting, setSubmitting] = useState({});
-    const [notification, setNotification] = useState(null);
 
     const handleAnswerChange = (questionId, value) => {
         setAnswerMap((prev) => ({ ...prev, [questionId]: value }));
@@ -17,6 +16,7 @@ const QuestionAnswerList = ({ questions, refreshQuestions }) => {
         if (!token || !answerMap[questionId]?.trim()) return;
 
         setSubmitting((prev) => ({ ...prev, [questionId]: true }));
+
         try {
             await axios.post(
                 "/seller/interactions/answer-question",
@@ -30,12 +30,13 @@ const QuestionAnswerList = ({ questions, refreshQuestions }) => {
                     },
                 }
             );
+
             setAnswerMap((prev) => ({ ...prev, [questionId]: "" }));
             refreshQuestions();
-            setNotification({ type: "success", message: "Answer submitted successfully." });
+            toast.success("Answer submitted successfully.");
         } catch (err) {
             console.error("❌ Error submitting answer:", err);
-            setNotification({ type: "error", message: "Failed to submit answer. Please try again." });
+            toast.error("Failed to submit answer. Please try again.");
         } finally {
             setSubmitting((prev) => ({ ...prev, [questionId]: false }));
         }
@@ -45,15 +46,11 @@ const QuestionAnswerList = ({ questions, refreshQuestions }) => {
 
     return (
         <div className="mt-12">
-            <NotificationToast
-                notification={notification}
-                onClose={() => setNotification(null)}
-            />
-
             <h2 className="flex items-center text-xl font-semibold mb-4">
                 <MessageCircle className="h-5 w-5 mr-2" />
                 Questions & Answers
             </h2>
+
             <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {questions.map((q) => {
                     const questionId = q.questionId;

@@ -1,5 +1,5 @@
-import { HashRouter as Router, Routes, Route } from "react-router-dom";
-// import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+// import { HashRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Login from "./pages/admin/AdminLogin";
@@ -33,7 +33,6 @@ import ApproveSeller from "./pages/admin/ApproveSeller";
 import { UserProvider } from "./context/UserContext";
 import SeeAllProject from "./pages/user/SeeAllProject";
 import SeeSellerProfile from "./pages/user/SeeSellerProfile";
-import EditMyProject from "./pages/seller/EditMyProject";
 import MyOrder from "./pages/user/MyOrder";
 import OrderSummary from "./pages/admin/OrderSummary";
 import AdminOrderDetails from "./pages/admin/AdminOrderDetails";
@@ -105,7 +104,7 @@ function App() {
           <Route path="sellerproject" element={<SellerProjects />} />
           <Route path="projects/:id" element={<EditProject />} />
           {/* <Route path="projects/:id" element={<SellerProjectDetail />} />  */}
-          <Route path="editprojects/:id" element={<EditMyProject />} />
+          {/* <Route path="editprojects/:id" element={<EditMyProject />} /> */}
 
 
 

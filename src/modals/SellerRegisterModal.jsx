@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "../utils/axiosInstance";
-import NotificationToast from "../components/NotificationToast";
+import { toast } from "react-toastify";
+
 const SellerRegisterModal = ({ onClose }) => {
     const [formData, setFormData] = useState({
         bio: "",
@@ -9,13 +10,6 @@ const SellerRegisterModal = ({ onClose }) => {
         skills: [],
         verificationPhoto: null,
     });
-
-    const [notification, setNotification] = useState(null);
-
-    const showToast = (message, type = "success") => {
-        setNotification({ message, type });
-        setTimeout(() => setNotification(null), 4000);
-    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -44,7 +38,7 @@ const SellerRegisterModal = ({ onClose }) => {
         formData.skills.forEach(skill => data.append("skills", skill));
         data.append("verificationPhoto", formData.verificationPhoto);
 
-        const token = localStorage.getItem("token"); // or "accessToken" if that's what you used
+        const token = localStorage.getItem("token");
 
         try {
             await axios.post("http://localhost:8080/api/user/seller-register", data, {
@@ -53,25 +47,21 @@ const SellerRegisterModal = ({ onClose }) => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            showToast("Seller registration submitted successfully!", "success");
-            setTimeout(() => onClose(), 1000);
+            toast.success("Seller registration submitted successfully!");
+            setTimeout(() => onClose(), 1500);
         } catch (error) {
             console.error("Registration failed", error);
-            showToast("Failed to register as seller.", "error");
+            toast.error("Failed to register as seller.");
         }
     };
 
-
     return (
         <>
-            <NotificationToast notification={notification} onClose={() => setNotification(null)} />
-
-            {/* Backdrop Blur */}
+            {/* Backdrop */}
             <div className="fixed inset-0 z-[9998] bg-black/30 backdrop-blur-sm"></div>
 
             {/* Modal */}
-            <div
-                className="fixed top-20 left-1/2 -translate-x-1/2 z-[9999] w-[90%] max-w-md border rounded-lg shadow-lg"
+            <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[9999] w-[90%] max-w-md border rounded-lg shadow-lg"
                 style={{
                     backgroundColor: "var(--bg-color)",
                     color: "var(--text-color)",
@@ -80,22 +70,13 @@ const SellerRegisterModal = ({ onClose }) => {
             >
                 <div className="flex justify-between items-center px-6 pt-6 pb-2">
                     <h2 className="text-xl font-semibold">Become a Seller</h2>
-                    <button
-                        onClick={onClose}
-                        style={{ color: "var(--text-color)" }}
-                        className="hover:text-red-600 text-lg"
-                    >
+                    <button onClick={onClose} style={{ color: "var(--text-color)" }} className="hover:text-red-600 text-lg">
                         ✕
                     </button>
                 </div>
 
                 <div className="px-6 pb-6">
-                    <input
-                        type="text"
-                        name="bio"
-                        value={formData.bio}
-                        onChange={handleChange}
-                        placeholder="Bio"
+                    <input type="text" name="bio" value={formData.bio} onChange={handleChange} placeholder="Bio"
                         className="mb-3 w-full px-3 py-2 border rounded-md"
                         style={{
                             backgroundColor: "var(--bg-color)",
@@ -103,12 +84,7 @@ const SellerRegisterModal = ({ onClose }) => {
                             borderColor: "var(--border-color)",
                         }}
                     />
-
-                    <input
-                        type="text"
-                        name="professionalTitle"
-                        value={formData.professionalTitle}
-                        onChange={handleChange}
+                    <input type="text" name="professionalTitle" value={formData.professionalTitle} onChange={handleChange}
                         placeholder="Professional Title"
                         className="mb-3 w-full px-3 py-2 border rounded-md"
                         style={{
@@ -117,13 +93,7 @@ const SellerRegisterModal = ({ onClose }) => {
                             borderColor: "var(--border-color)",
                         }}
                     />
-
-                    <input
-                        type="text"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        placeholder="Phone"
+                    <input type="text" name="phone" value={formData.phone} onChange={handleChange} placeholder="Phone"
                         className="mb-3 w-full px-3 py-2 border rounded-md"
                         style={{
                             backgroundColor: "var(--bg-color)",
@@ -132,15 +102,9 @@ const SellerRegisterModal = ({ onClose }) => {
                         }}
                     />
 
-                    <label className="block mb-2" style={{ color: "var(--text-color)" }}>
-                        Skills:
-                    </label>
+                    <label className="block mb-2" style={{ color: "var(--text-color)" }}>Skills:</label>
                     {formData.skills.map((skill, index) => (
-                        <input
-                            key={index}
-                            type="text"
-                            value={skill}
-                            onChange={(e) => handleSkillChange(index, e.target.value)}
+                        <input key={index} type="text" value={skill} onChange={(e) => handleSkillChange(index, e.target.value)}
                             className="mb-2 w-full px-3 py-2 border rounded-md"
                             style={{
                                 backgroundColor: "var(--bg-color)",
@@ -149,17 +113,10 @@ const SellerRegisterModal = ({ onClose }) => {
                             }}
                         />
                     ))}
+                    <button onClick={addSkillField} className="text-sm mb-4"
+                        style={{ color: "var(--button-primary)" }}>+ Add Skill</button>
 
-                    <button
-                        onClick={addSkillField}
-                        className="text-sm mb-4"
-                        style={{ color: "var(--button-primary)" }}
-                    >
-                        + Add Skill
-                    </button>
-
-                    <label
-                        htmlFor="verificationPhoto"
+                    <label htmlFor="verificationPhoto"
                         className="block w-full px-3 py-2 border rounded-md cursor-pointer text-sm mb-5"
                         style={{
                             backgroundColor: "var(--bg-color)",
@@ -168,33 +125,16 @@ const SellerRegisterModal = ({ onClose }) => {
                         }}
                     >
                         {formData.verificationPhoto?.name || "+ Choose a file..."}
-                        <input
-                            id="verificationPhoto"
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFileChange}
-                            className="hidden"
-                        />
+                        <input id="verificationPhoto" type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
                     </label>
 
                     <div className="flex justify-end gap-3">
-                        <button
-                            onClick={onClose}
-                            className="px-4 py-2 rounded-md"
-                            style={{
-                                backgroundColor: "var(--hover-bg)",
-                                color: "var(--text-color)",
-                            }}
-                        >
+                        <button onClick={onClose} className="px-4 py-2 rounded-md"
+                            style={{ backgroundColor: "var(--hover-bg)", color: "var(--text-color)" }}>
                             Cancel
                         </button>
-                        <button
-                            onClick={handleSubmit}
-                            className="px-4 py-2 rounded-md text-white"
-                            style={{
-                                backgroundColor: "var(--button-primary)",
-                            }}
-                        >
+                        <button onClick={handleSubmit} className="px-4 py-2 rounded-md text-white"
+                            style={{ backgroundColor: "var(--button-primary)" }}>
                             Submit
                         </button>
                     </div>
@@ -202,7 +142,6 @@ const SellerRegisterModal = ({ onClose }) => {
             </div>
         </>
     );
-
 };
 
 export default SellerRegisterModal;

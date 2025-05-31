@@ -1,35 +1,26 @@
 import React, { useState } from "react";
-import NotificationToast from "../../components/NotificationToast";
 import axios from "../../utils/axiosInstance";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState("");
     const [otp, setOtp] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [notification, setNotification] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [step, setStep] = useState(1); // 1 = send email, 2 = verify OTP, 3 = reset password
+    const [step, setStep] = useState(1);
     const navigate = useNavigate();
 
     const handleSendResetLink = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
-
         try {
             const res = await axios.post("/auth/forgot-password", { email });
-            setNotification({
-                type: "success",
-                message: res.data.message || "Reset link or OTP sent to your email.",
-            });
+            toast.success(res.data.message || "Reset link or OTP sent to your email.");
             setStep(2);
         } catch (err) {
-            console.error(err);
-            setNotification({
-                type: "error",
-                message: err.response?.data?.message || "Error sending reset link.",
-            });
+            toast.error(err.response?.data?.message || "Error sending reset link.");
         } finally {
             setIsSubmitting(false);
         }
@@ -38,29 +29,15 @@ const ForgotPassword = () => {
     const handleVerifyOtp = async (e) => {
         e.preventDefault();
         if (!otp.trim()) {
-            return setNotification({ type: "error", message: "Please enter the OTP." });
+            return toast.error("Please enter the OTP.");
         }
-
         setIsSubmitting(true);
         try {
-            const res = await axios.post("/auth/verify-otp", {
-                email,
-                otpCode: otp,
-            });
-
-            setNotification({
-                type: "success",
-                message: res.data.message || "OTP verified successfully!",
-            });
-
-            // Move to reset password step
+            const res = await axios.post("/auth/verify-otp", { email, otpCode: otp });
+            toast.success(res.data.message || "OTP verified successfully!");
             setStep(3);
         } catch (err) {
-            console.error(err);
-            setNotification({
-                type: "error",
-                message: err.response?.data?.message || "Invalid or expired OTP.",
-            });
+            toast.error(err.response?.data?.message || "Invalid or expired OTP.");
         } finally {
             setIsSubmitting(false);
         }
@@ -69,30 +46,15 @@ const ForgotPassword = () => {
     const handleResetPassword = async (e) => {
         e.preventDefault();
         if (newPassword !== confirmPassword) {
-            return setNotification({ type: "error", message: "Passwords do not match." });
+            return toast.error("Passwords do not match.");
         }
-
         setIsSubmitting(true);
         try {
-            const res = await axios.post("/auth/reset-password", {
-                email,
-                newPassword,
-            });
-
-            setNotification({
-                type: "success",
-                message: res.data.message || "Password reset successful. Redirecting to login...",
-            });
-
-            setTimeout(() => {
-                navigate("/login");
-            }, 1500);
+            const res = await axios.post("/auth/reset-password", { email, newPassword });
+            toast.success(res.data.message || "Password reset successful. Redirecting...");
+            setTimeout(() => navigate("/login"), 1500);
         } catch (err) {
-            console.error(err);
-            setNotification({
-                type: "error",
-                message: err.response?.data?.message || "Error resetting password.",
-            });
+            toast.error(err.response?.data?.message || "Error resetting password.");
         } finally {
             setIsSubmitting(false);
         }
@@ -100,11 +62,6 @@ const ForgotPassword = () => {
 
     return (
         <div className="min-h-screen flex items-center justify-center font-Doto px-4 pt-8">
-            <NotificationToast
-                notification={notification}
-                onClose={() => setNotification(null)}
-            />
-
             <form
                 onSubmit={
                     step === 1
@@ -130,9 +87,7 @@ const ForgotPassword = () => {
 
                 {step === 1 && (
                     <div className="mb-5">
-                        <label htmlFor="email" className="block text-base font-semibold mb-1">
-                            Email
-                        </label>
+                        <label htmlFor="email" className="block text-base font-semibold mb-1">Email</label>
                         <input
                             id="email"
                             type="email"
@@ -156,9 +111,7 @@ const ForgotPassword = () => {
                             We’ve sent an OTP to <strong>{email}</strong>. Enter it below:
                         </p>
                         <div className="mb-5">
-                            <label htmlFor="otp" className="block text-base font-semibold mb-1">
-                                OTP Code
-                            </label>
+                            <label htmlFor="otp" className="block text-base font-semibold mb-1">OTP Code</label>
                             <input
                                 id="otp"
                                 type="text"
@@ -167,12 +120,11 @@ const ForgotPassword = () => {
                                 value={otp}
                                 onChange={(e) => setOtp(e.target.value)}
                                 required
-                                className="w-full px-4 py-2.5 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 tracking-widest text-center"
+                                className="w-full px-4 py-2.5 border rounded-md text-sm text-center tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 style={{
                                     backgroundColor: "var(--bg-color)",
                                     color: "var(--text-color)",
                                     borderColor: "var(--border-color)",
-                                    letterSpacing: "0.1em",
                                 }}
                             />
                         </div>
@@ -182,9 +134,7 @@ const ForgotPassword = () => {
                 {step === 3 && (
                     <>
                         <div className="mb-5">
-                            <label htmlFor="newPassword" className="block text-base font-semibold mb-1">
-                                New Password
-                            </label>
+                            <label htmlFor="newPassword" className="block text-base font-semibold mb-1">New Password</label>
                             <input
                                 id="newPassword"
                                 type="password"
@@ -201,9 +151,7 @@ const ForgotPassword = () => {
                             />
                         </div>
                         <div className="mb-5">
-                            <label htmlFor="confirmPassword" className="block text-base font-semibold mb-1">
-                                Confirm Password
-                            </label>
+                            <label htmlFor="confirmPassword" className="block text-base font-semibold mb-1">Confirm Password</label>
                             <input
                                 id="confirmPassword"
                                 type="password"

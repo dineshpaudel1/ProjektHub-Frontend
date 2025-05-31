@@ -2,22 +2,19 @@ import React, { useState } from "react";
 import { UploadCloud, X, ImageIcon } from "lucide-react";
 import axios from "../../utils/axiosInstance";
 import PhotoUploadModal from "../../modals/PhotoUploadModal";
-import NotificationToast from "../NotificationToast";
+import { toast } from "react-toastify";
 
 const GallerySection = ({ id, photos, refreshProject }) => {
     const [showModal, setShowModal] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
-    const [notification, setNotification] = useState(null);
     const [incomingFiles, setIncomingFiles] = useState([]);
 
     const token = localStorage.getItem("token");
+
     const CaptionWithToggle = ({ caption }) => {
         const [expanded, setExpanded] = useState(false);
-
         return (
-            <div
-                className="absolute bottom-2 left-2 right-2 text-white text-sm font-medium opacity-0 group-hover:opacity-100 transition duration-200"
-            >
+            <div className="absolute bottom-2 left-2 right-2 text-white text-sm font-medium opacity-0 group-hover:opacity-100 transition duration-200">
                 <div className={`overflow-hidden ${expanded ? '' : 'line-clamp-2'}`}>
                     {caption}
                 </div>
@@ -41,27 +38,16 @@ const GallerySection = ({ id, photos, refreshProject }) => {
         );
     };
 
-
     const handleDelete = async (photoId) => {
         try {
             await axios.delete(`/seller/project/${id}/photo/${photoId}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
+                headers: { Authorization: `Bearer ${token}` },
             });
-            setNotification({
-                type: "success",
-                message: "Photo deleted successfully.",
-            });
+            toast.success("Photo deleted successfully.");
             if (refreshProject) refreshProject();
         } catch (error) {
             console.error("Failed to delete photo:", error);
-            setNotification({
-                type: "error",
-                message: "Failed to delete photo.",
-            });
-        } finally {
-            setTimeout(() => setNotification(null), 3000);
+            toast.error("Failed to delete photo.");
         }
     };
 
@@ -75,7 +61,6 @@ const GallerySection = ({ id, photos, refreshProject }) => {
                 formData.append("files", file);
                 captions.push(caption || "");
             }
-
             formData.append("data", JSON.stringify({ captions }));
 
             await axios.post(
@@ -89,22 +74,14 @@ const GallerySection = ({ id, photos, refreshProject }) => {
                 }
             );
 
-            setNotification({
-                type: "success",
-                message: `${photoDataList.length} photo(s) uploaded successfully.`,
-            });
-
+            toast.success(`${photoDataList.length} photo(s) uploaded successfully.`);
             if (refreshProject) refreshProject();
             setShowModal(false);
         } catch (error) {
             console.error("Upload failed:", error);
-            setNotification({
-                type: "error",
-                message: "Failed to upload photos.",
-            });
+            toast.error("Failed to upload photos.");
         } finally {
             setIsUploading(false);
-            setTimeout(() => setNotification(null), 3000);
         }
     };
 
@@ -139,7 +116,6 @@ const GallerySection = ({ id, photos, refreshProject }) => {
                             {photo.caption && (
                                 <CaptionWithToggle caption={photo.caption} />
                             )}
-
                         </div>
                     </div>
                 ))}
@@ -167,13 +143,6 @@ const GallerySection = ({ id, photos, refreshProject }) => {
                 isUploading={isUploading}
                 defaultPhotos={incomingFiles}
             />
-
-            {notification && (
-                <NotificationToast
-                    notification={notification}
-                    onClose={() => setNotification(null)}
-                />
-            )}
         </div>
     );
 };

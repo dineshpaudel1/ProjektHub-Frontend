@@ -12,7 +12,7 @@ const UserProfile = () => {
         localStorage.getItem("theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
     );
 
-    const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem("token");
     console.log(user)
 
     useEffect(() => {
@@ -94,7 +94,7 @@ const UserProfile = () => {
                         </div>
                     </div>
 
-                    {/* <div>
+                    <div>
                         <label className="block text-sm font-medium mb-1">Set New Password</label>
                         <div className="flex flex-col md:flex-row gap-4">
                             <input
@@ -118,7 +118,7 @@ const UserProfile = () => {
                                 {notification.message}
                             </div>
                         )}
-                    </div> */}
+                    </div>
                 </div>
             </div>
         </div>

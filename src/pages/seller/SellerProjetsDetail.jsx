@@ -1,15 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "../../utils/axiosInstance";
-import {
-    Loader,
-    ArrowLeft,
-} from "lucide-react";
+import { Loader, ArrowLeft } from "lucide-react";
 import QuestionAnswerList from "../../components/SellerHelper/QuestionAnswerList";
 import ProjectDetailsSection from "../../components/SellerHelper/ProjectDetailsSection";
 import GallerySection from "../../components/SellerHelper/GallerySection";
-import NotificationToast from "../../components/NotificationToast";
 import TagDisplaySection from "../../components/SellerHelper/TagDisplaySection";
+import { toast } from "react-toastify";
 
 const SellerProjectDetail = () => {
     const { id } = useParams();
@@ -20,8 +17,8 @@ const SellerProjectDetail = () => {
     const [error, setError] = useState(null);
     const [questions, setQuestions] = useState([]);
     const [isExpanded, setIsExpanded] = useState(false);
-    const [notification, setNotification] = useState(null);
-
+    const [newTag, setNewTag] = useState("");
+    const [isTagSubmitting, setIsTagSubmitting] = useState(false);
 
     const fetchQuestions = async () => {
         try {
@@ -42,9 +39,7 @@ const SellerProjectDetail = () => {
         try {
             setLoading(true);
             const res = await axios.get(`/seller/project/details/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
+                headers: { Authorization: `Bearer ${token}` },
             });
             setProject(res.data.data);
         } catch (err) {
@@ -61,7 +56,7 @@ const SellerProjectDetail = () => {
 
         try {
             await axios.patch(
-                `http://localhost:8080/api/seller/project/${project.id}/visibility`,
+                `/seller/project/${project.id}/visibility`,
                 {},
                 {
                     headers: {
@@ -76,20 +71,42 @@ const SellerProjectDetail = () => {
                 visible: !prev.visible,
             }));
 
-            setNotification({
-                type: "success",
-                message: `Project marked as ${!project.visible ? "Public" : "Private"}`,
-            });
-
-            setTimeout(() => setNotification(null), 3000);
+            toast.success(`Project marked as ${!project.visible ? "Public" : "Private"}`);
         } catch (error) {
             console.error("Visibility toggle failed:", error);
-            setNotification({
-                type: "error",
-                message: "Failed to change project visibility.",
-            });
+            toast.error("Failed to change project visibility.");
+        }
+    };
 
-            setTimeout(() => setNotification(null), 3000);
+    const handleAddTag = async () => {
+        if (!newTag.trim()) return;
+        const token = localStorage.getItem("token");
+
+        try {
+            setIsTagSubmitting(true);
+            await axios.post(
+                `/seller/project/addTags/${project.id}`,
+                { tag: [newTag] },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            setProject((prev) => ({
+                ...prev,
+                tags: [...prev.tags, { id: Date.now(), tag: newTag }],
+            }));
+
+            setNewTag("");
+            toast.success("Tag added successfully!");
+        } catch (err) {
+            console.error("Failed to add tag:", err);
+            toast.error("Failed to add tag.");
+        } finally {
+            setIsTagSubmitting(false);
         }
     };
 
@@ -109,39 +126,6 @@ const SellerProjectDetail = () => {
         fetchProjectDetails();
         fetchQuestions();
     }, [id]);
-    const [newTag, setNewTag] = useState("");
-    const [isTagSubmitting, setIsTagSubmitting] = useState(false);
-
-    const handleAddTag = async () => {
-        if (!newTag.trim()) return;
-        const token = localStorage.getItem("token");
-        try {
-            setIsTagSubmitting(true);
-            await axios.post(`/seller/project/addTags/${project.id}`, {
-                tag: [newTag]
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json"
-                }
-            });
-
-            setProject(prev => ({
-                ...prev,
-                tags: [...prev.tags, { id: Date.now(), tag: newTag }]
-            }));
-
-            setNewTag("");
-            setNotification({ type: "success", message: "Tag added successfully!" });
-        } catch (err) {
-            console.error("Failed to add tag:", err);
-            setNotification({ type: "error", message: "Failed to add tag." });
-        } finally {
-            setIsTagSubmitting(false);
-            setTimeout(() => setNotification(null), 3000);
-        }
-    };
-
 
     if (loading) {
         return (
@@ -167,12 +151,6 @@ const SellerProjectDetail = () => {
 
     return (
         <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-[var(--bg-color)] text-[var(--text-color)] transition-all duration-300">
-            {/* ✅ Notification Toast */}
-            <NotificationToast
-                notification={notification}
-                onClose={() => setNotification(null)}
-            />
-
             <div className="max-w-6xl mx-auto">
                 <div className="flex justify-between items-center mb-8">
                     <button
@@ -183,15 +161,7 @@ const SellerProjectDetail = () => {
                         <span>Back to Projects</span>
                     </button>
 
-                    {/* <button
-                        onClick={() => navigate(`/seller/editprojects/${id}`)}
-                        className="px-4 py-2 bg-[var(--button-primary)] text-white rounded-md hover:bg-[var(--button-primary-hover)] transition-colors duration-200"
-                    >
-                        Edit Project
-                    </button> */}
-
                     <div className="flex items-center gap-2">
-
                         <label className="relative inline-flex items-center cursor-pointer">
                             <input
                                 type="checkbox"
@@ -206,7 +176,6 @@ const SellerProjectDetail = () => {
                 </div>
 
                 <div className="rounded-2xl shadow-lg overflow-hidden bg-[var(--menu-bg)] border border-[var(--border-color)]">
-                    {/* Video */}
                     <div className="relative h-96 w-full bg-black">
                         {embedUrl ? (
                             <iframe
@@ -229,15 +198,12 @@ const SellerProjectDetail = () => {
                         </div>
                     </div>
 
-                    {/* Content */}
                     <div className="p-8">
                         <ProjectDetailsSection
                             project={project}
                             setProject={setProject}
                             isExpanded={isExpanded}
                             setIsExpanded={setIsExpanded}
-                            notification={notification}
-                            setNotification={setNotification}
                         />
 
                         <TagDisplaySection
@@ -247,7 +213,6 @@ const SellerProjectDetail = () => {
                             setNewTag={setNewTag}
                             isTagSubmitting={isTagSubmitting}
                             setIsTagSubmitting={setIsTagSubmitting}
-                            setNotification={setNotification}
                         />
 
                         <GallerySection
@@ -255,7 +220,6 @@ const SellerProjectDetail = () => {
                             id={project.id}
                             refreshProject={fetchProjectDetails}
                         />
-
 
                         <QuestionAnswerList
                             questions={questions}
