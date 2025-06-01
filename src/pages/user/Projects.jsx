@@ -1,10 +1,7 @@
-"use client";
-
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, ChevronLeft, ChevronRight } from "lucide-react";
 import { useProjectContext } from "../../context/ProjectContext";
-import staticProjects from "../../utils/staticProjects";
 
 const SkeletonCard = () => (
     <div className="min-w-[300px] bg-white rounded-2xl border border-gray-100 overflow-hidden animate-pulse">
@@ -32,9 +29,6 @@ const Projects = () => {
     const handleNavigate = () => {
         navigate("/seeallproject");
     };
-
-    // Fallback to static projects if API data is not available
-    const projectsToDisplay = loadingProjects || projects.length === 0 ? staticProjects : projects;
 
     return (
         <section
@@ -72,9 +66,10 @@ const Projects = () => {
                 </div>
             </div>
 
+            {/* Projects Section */}
             <div className="relative max-w-7xl mx-auto">
-                {/* Navigation Buttons */}
-                {projectsToDisplay.length > 3 && (
+                {/* Scroll Buttons */}
+                {projects.length > 3 && (
                     <>
                         <button
                             onClick={() => scroll("left")}
@@ -95,59 +90,65 @@ const Projects = () => {
                 <div
                     ref={scrollRef}
                     className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-6"
+                    style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 >
-                    {(loadingProjects && projects.length === 0
+                    {loadingProjects || projects.length === 0
                         ? [...Array(4)].map((_, idx) => <SkeletonCard key={idx} />)
-                        : projectsToDisplay
-                    ).map((project) => (
-                        <div
-                            key={project.id}
-                            onClick={() => navigate(`/project/${project.id}`, { state: project })}
-                            className="min-w-[300px] rounded-2xl border overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 group"
-                            style={{
-                                backgroundColor: "var(--bg-color)",
-                                borderColor: "var(--border-color)",
-                            }}
-                        >
-                            <div className="relative overflow-hidden">
-                                <img
-                                    src={
-                                        typeof project.thumbnail === "string" && project.thumbnail.startsWith("project/")
-                                            ? `http://localhost:8080/api/media/photo?file=${project.thumbnail}`
-                                            : project.thumbnail
-                                    }
-                                    alt={project.title}
-                                />
-
-
-                                <div className="absolute top-4 left-4 bg-blue-600 text-white px-4 py-2 text-sm font-semibold rounded-full shadow-lg backdrop-blur-sm">
-                                    NPR {project.price || "3000"}
+                        : projects.map((project) => (
+                            <div
+                                key={project.id}
+                                onClick={() => navigate(`/project/${project.id}`)}
+                                className="min-w-[300px] rounded-2xl border overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 group"
+                                style={{
+                                    backgroundColor: "var(--bg-color)",
+                                    borderColor: "var(--border-color)",
+                                }}
+                            >
+                                {/* Image */}
+                                <div className="relative overflow-hidden">
+                                    <img
+                                        src={`http://localhost:8080/api/media/photo?file=${project.thumbnail}`}
+                                        alt={project.title}
+                                        className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-110"
+                                    />
+                                    {/* Price Tag */}
+                                    <div className="absolute top-4 left-4 bg-blue-600 text-white px-4 py-2 text-sm font-semibold rounded-full shadow-lg backdrop-blur-sm">
+                                        NPR {project.price || "3000"}
+                                    </div>
+                                    {/* Hover Overlay */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                 </div>
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            </div>
 
-                            <div className="p-6">
-                                <h3
-                                    className="text-lg font-semibold mb-3 line-clamp-2 leading-tight"
-                                    style={{ color: "var(--text-color)" }}
-                                >
-                                    {project.title}
-                                </h3>
-                                <p className="text-sm mb-4 font-medium" style={{ color: "var(--text-secondary)" }}>
-                                    Project Type - {project.categoryName || project.category?.name || "N/A"}
-                                </p>
-                                <div className="flex items-center gap-2 text-sm" style={{ color: "var(--text-secondary)" }}>
-                                    <div className="flex items-center gap-1">
-                                        <Eye size={16} />
-                                        <span>{project.views || 23} Views</span>
+                                {/* Info */}
+                                <div className="p-6">
+                                    <h3
+                                        className="text-lg font-semibold mb-3 line-clamp-2 leading-tight"
+                                        style={{ color: "var(--text-color)" }}
+                                    >
+                                        {project.title}
+                                    </h3>
+                                    <p
+                                        className="text-sm mb-4 font-medium"
+                                        style={{ color: "var(--text-secondary)" }}
+                                    >
+                                        Project Type - {project.categoryName || "N/A"}
+                                    </p>
+                                    <div
+                                        className="flex items-center gap-2 text-sm"
+                                        style={{ color: "var(--text-secondary)" }}
+                                    >
+                                        <div className="flex items-center gap-1">
+                                            <Eye size={16} />
+                                            <span>{project.views || 23} Views</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
                 </div>
             </div>
 
+            {/* See All Projects */}
             <div className="mt-12 flex justify-center sm:justify-end">
                 <button
                     onClick={handleNavigate}

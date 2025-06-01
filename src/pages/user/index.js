@@ -1,0 +1,11 @@
+export { default as MasterPage } from "./MasterPage";
+export { default as Projects } from "./Projects";
+export { default as Services } from "./Services";
+export { default as About } from "./About";
+export { default as UserLogin } from "./UserLogin";
+export { default as ForgotPassword } from "./ForgetPassword";
+export { default as UserProfile } from "./UserProfile";
+export { default as UserProjectDetail } from "./UserProjectDetail";
+export { default as SeeAllProject } from "./SeeAllProject";
+export { default as SeeSellerProfile } from "./SeeSellerProfile";
+export { default as MyOrder } from "./MyOrder";
