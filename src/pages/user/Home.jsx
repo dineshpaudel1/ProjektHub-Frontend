@@ -71,8 +71,8 @@ const Home = () => {
             </div>
 
             {/* Floating YouTube Video Popup */}
-            {/* Floating YouTube Video Popup */}
-            {/* {showVideo && (
+
+            {showVideo && (
                 <div
                     className="fixed z-50 shadow-lg rounded-xl overflow-hidden border"
                     style={{
@@ -102,11 +102,8 @@ const Home = () => {
                         </button>
                     </div>
                 </div>
-            )} */}
+            )}
 
-
-
-            {/* Floating WhatsApp Button */}
             {/* Floating WhatsApp Button */}
             <div className="fixed z-50 bottom-4 right-4 sm:bottom-6 sm:right-6">
                 <button
