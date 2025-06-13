@@ -1,31 +1,59 @@
 import axios from 'axios';
 
 const instance = axios.create({
-    baseURL: 'http://localhost:8080/api',
+    baseURL: import.meta.env.VITE_API_URL,
+    withCredentials: true,
 });
 
-// ✅ Automatically attach token to every request
-instance.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem('token');
+// Attach access token to every request
+instance.interceptors.request.use(config => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
 
-        // Define routes that should skip auth
-        const isPublicEndpoint =
-            config.url?.startsWith('/public') ||
-            config.url?.includes('/media/photo') ||
-            config.url?.includes('/auth') ||
-            config.url?.includes('/search') ||
-            config.url?.includes('/register') ||
-            config.method === 'get' && config.url?.includes('/projects');
+// // Auto refresh access token if expired
+// instance.interceptors.response.use(
+//     res => res,
+//     async err => {
+//         const originalRequest = err.config;
 
-        if (token && !isPublicEndpoint) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
+//         // Only handle if it's a 401 (unauthorized) and hasn't been retried yet
+//         if (err.response?.status === 401 && !originalRequest._retry) {
+//             originalRequest._retry = true;
 
-        return config;
-    },
-    (error) => Promise.reject(error)
-);
+//             try {
+//                 const refreshToken = localStorage.getItem('refreshToken');
+//                 console.log(refreshToken);
+//                 const res = await axios.post(`${import.meta.env.VITE_API_URL}/auth/refresh`, {
+//                     refreshToken: refreshToken
+//                 });
 
+//                 const newAccessToken = res.data.accessToken;
+//                 localStorage.setItem("token", newAccessToken);
+
+//                 // Retry original request with new access token
+//                 originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+//                 return instance(originalRequest);
+
+//             } catch (refreshErr) {
+//                 // 🛑 Refresh token failed — force logout and redirect
+
+//                 localStorage.clear();
+
+//                 const isAdmin = window.location.pathname.startsWith("/admin");
+//                 const redirectPath = isAdmin ? "/admin/login" : "/login";
+
+//                 window.location.href = redirectPath;
+
+//                 return Promise.reject(refreshErr);
+//             }
+//         }
+
+//         return Promise.reject(err);
+//     }
+// );
 
 export default instance;

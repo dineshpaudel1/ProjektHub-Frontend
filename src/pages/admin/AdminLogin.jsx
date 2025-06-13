@@ -15,14 +15,14 @@ const AdminLogin = () => {
         setError("");
 
         try {
-            const response = await axios.post("http://localhost:8080/api/auth/admin/login", {
+            const response = await axios.post("/auth/admin/login", {
                 identifier,
                 password,
             });
 
             const { accessToken, refreshToken, roles } = response?.data?.data || {};
 
-            // ❌ Check if ADMIN is in the roles
+            // ❌ Not an admin? Abort.
             if (!roles || !roles.includes("ADMIN")) {
                 setError("You are not authorized to access the admin panel.");
                 localStorage.clear();
@@ -32,24 +32,27 @@ const AdminLogin = () => {
 
             if (!accessToken || !refreshToken) {
                 localStorage.clear();
-                navigate("/admin/login");
+                setError("Login failed. No token received.");
+                setLoading(false);
                 return;
             }
 
+            // ✅ Save tokens
             localStorage.setItem("token", accessToken);
             localStorage.setItem("refreshToken", refreshToken);
             localStorage.setItem("isAuthenticated", "true");
 
+            // ✅ Redirect to admin dashboard
             navigate("/admin");
+
         } catch (err) {
-            console.error("Auth error:", err?.response || err.message);
+            console.error("Admin login error:", err?.response || err.message);
 
             localStorage.removeItem("token");
             localStorage.removeItem("refreshToken");
             localStorage.removeItem("isAuthenticated");
 
             setError("Invalid credentials or server error.");
-            navigate("/admin/login");
         } finally {
             setLoading(false);
         }

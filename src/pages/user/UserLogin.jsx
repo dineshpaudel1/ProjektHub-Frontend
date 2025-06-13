@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
 import { notifySuccess, notifyError } from '../../utils/toastNotify';
+import axiosInstance from '../../utils/axiosInstance';
 
 const UserLogin = () => {
     const [identifier, setIdentifier] = useState("");
@@ -14,7 +15,7 @@ const UserLogin = () => {
             const isDark = document.documentElement.classList.contains("dark");
 
             window.google.accounts.id.initialize({
-                client_id: "12680654953-a51mcs6na6dqs46buci6et88bf8hjt2o.apps.googleusercontent.com",
+                client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
                 callback: handleGoogleCallback,
             });
 
@@ -31,33 +32,28 @@ const UserLogin = () => {
 
     const handleGoogleCallback = async (response) => {
         const idToken = response.credential;
+        console.log(idToken);
         try {
-            const res = await fetch("http://localhost:8080/api/auth/login/google", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ token: idToken }),
-            });
+            const res = await axiosInstance.post('/auth/login/google', { token: idToken });
 
-            const data = await res.json();
-            if (res.ok && data?.status === "success") {
-                localStorage.setItem("token", data.data.accessToken);
-                localStorage.setItem("refreshToken", data.data.refreshToken);
-                setRoles(data.data.roles);
+            if (res.status === 200 && res.data?.status === "success") {
+                const { accessToken, refreshToken, roles } = res.data.data;
 
-                const userRes = await fetch("http://localhost:8080/api/user/me", {
-                    headers: {
-                        Authorization: `Bearer ${data.data.accessToken}`,
-                    },
+                localStorage.setItem("token", accessToken);
+                localStorage.setItem("refreshToken", refreshToken);
+                setRoles(roles);
+
+                const userRes = await axiosInstance.get('/user/me', {
+                    headers: { Authorization: `Bearer ${accessToken}` },
                 });
-                const userData = await userRes.json();
-                setUser(userData);
+                setUser(userRes.data);
 
-                notifySuccess("Login Succes");
+                notifySuccess("Login Success");
                 const redirectPath = localStorage.getItem("redirectAfterLogin") || "/";
                 localStorage.removeItem("redirectAfterLogin");
                 navigate(redirectPath);
             } else {
-                throw new Error(data.message || "Login failed");
+                throw new Error(res.data.message || "Login failed");
             }
         } catch (err) {
             console.error("Login failed:", err);
@@ -74,32 +70,28 @@ const UserLogin = () => {
         }
 
         try {
-            const res = await fetch("http://localhost:8080/api/auth/user/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ identifier, password }),
+            const res = await axiosInstance.post('/auth/user/login', {
+                identifier,
+                password,
             });
 
-            const data = await res.json();
+            if (res.status === 200 && res.data?.status === "success") {
+                const { accessToken, refreshToken } = res.data.data;
 
-            if (res.ok && data?.status === "success") {
-                localStorage.setItem("token", data.data.accessToken);
-                localStorage.setItem("refreshToken", data.data.refreshToken);
+                localStorage.setItem("token", accessToken);
+                localStorage.setItem("refreshToken", refreshToken);
 
-                const userRes = await fetch("http://localhost:8080/api/user/me", {
-                    headers: {
-                        Authorization: `Bearer ${data.data.accessToken}`,
-                    },
+                const userRes = await axiosInstance.get('/user/me', {
+                    headers: { Authorization: `Bearer ${accessToken}` },
                 });
-                const userData = await userRes.json();
-                setUser(userData);
+                setUser(userRes.data);
 
                 notifySuccess("Login successful!");
                 const redirectPath = localStorage.getItem("redirectAfterLogin") || "/";
                 localStorage.removeItem("redirectAfterLogin");
                 navigate(redirectPath);
             } else {
-                throw new Error(data.message || "Invalid credentials");
+                throw new Error(res.data.message || "Invalid credentials");
             }
         } catch (err) {
             console.error("Login error:", err);

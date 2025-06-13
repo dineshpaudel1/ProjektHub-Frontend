@@ -93,7 +93,7 @@ const SellerDashboard = () => {
     }).format(currentTime);
 
     return (
-        <div className="bg-gray-50 min-h-screen px-4 sm:px-6 lg:px-8">
+        <div className="bg-gray-50 min-h-screen px-4 sm:px-6 lg:px-8 mt-5">
             <div className="max-w-screen-xl mx-auto">
 
                 {/* Header */}

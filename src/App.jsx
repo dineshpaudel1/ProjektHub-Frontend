@@ -1,5 +1,5 @@
-import { HashRouter as Router, Routes, Route } from "react-router-dom";
-// import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+// import { HashRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AdminLayout from "./layouts/AdminLayout";
@@ -21,7 +21,6 @@ function App() {
       <ScrollToTop />
       <ToastContainer />
       <Routes>
-        {/* ✅ User Routes */}
         <Route
           path="/"
           element={
@@ -79,8 +78,6 @@ function App() {
           <Route path="profile" element={<SellerProfile />} />
           <Route path="sellerproject" element={<SellerProjects />} />
           <Route path="projects/:id" element={<EditProject />} />
-          {/* <Route path="projects/:id" element={<SellerProjectDetail />} />  */}
-          {/* <Route path="editprojects/:id" element={<EditMyProject />} /> */}
         </Route>
       </Routes>
     </Router>

@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import person from "../../assets/images/person.png";
+import { useNavigate } from 'react-router-dom';
+
 
 const Home = () => {
     const [showVideo, setShowVideo] = useState(true);
+    const navigate = useNavigate();
 
     const handleWhatsAppClick = () => {
         const phoneNumber = "9847503434";
@@ -40,9 +43,9 @@ const Home = () => {
                                 backgroundColor: "var(--button-primary)",
                                 color: "#ffffff",
                             }}
-                            onClick={() => alert("Place Order clicked")}
+                            onClick={() => navigate("/services")}
                         >
-                            Explore Us
+                            How to Order Project?
                         </button>
 
                         {/* Explore Projects Button */}
@@ -55,7 +58,7 @@ const Home = () => {
                             }}
                             onClick={() => alert("Explore clicked")}
                         >
-                            Our Services
+                            Explore Us
                         </button>
                     </div>
                 </div>
@@ -72,7 +75,7 @@ const Home = () => {
 
             {/* Floating YouTube Video Popup */}
 
-            {showVideo && (
+            {/* {showVideo && (
                 <div
                     className="fixed z-50 shadow-lg rounded-xl overflow-hidden border"
                     style={{
@@ -102,7 +105,7 @@ const Home = () => {
                         </button>
                     </div>
                 </div>
-            )}
+            )} */}
 
             {/* Floating WhatsApp Button */}
             <div className="fixed z-50 bottom-4 right-4 sm:bottom-6 sm:right-6">

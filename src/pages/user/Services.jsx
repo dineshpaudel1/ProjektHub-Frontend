@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaClock, FaLeaf, FaUsers, FaRobot } from "react-icons/fa";
+import CustomOrderModal from "../../modals/CustomOrderModal";
+import { useNavigate } from "react-router-dom";  // ✅ for redirection
 
 const services = [
     {
@@ -29,6 +31,19 @@ const services = [
 ];
 
 const Services = () => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const navigate = useNavigate(); // ✅ initialize navigation
+
+    const handleCustomOrderClick = () => {
+        const token = localStorage.getItem("token");  // ✅ check token (or whatever key you store token in)
+
+        if (token) {
+            setIsModalOpen(true);  // ✅ user is logged in
+        } else {
+            navigate("/login");  // ✅ redirect to login
+        }
+    };
+
     return (
         <section
             className="py-20 px-4 sm:px-6 lg:px-16 transition-all"
@@ -44,15 +59,6 @@ const Services = () => {
                 </h2>
                 <div className="h-1 w-24 mx-auto mt-2 mb-6 bg-[#5454D4] rounded-full"></div>
 
-                <p
-                    className="mb-12 max-w-2xl mx-auto text-base"
-                    style={{ color: "var(--text-secondary)" }}
-                >
-                    Our mission is to drive progress and enhance the lives of our customers
-                    by delivering superior products and services that exceed expectations.
-                </p>
-
-                {/* Grid Responsive */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
                     {services.map((service, index) => (
                         <div
@@ -94,9 +100,11 @@ const Services = () => {
                     onMouseOut={(e) =>
                         (e.currentTarget.style.backgroundColor = "var(--button-primary)")
                     }
+                    onClick={handleCustomOrderClick}
                 >
                     Make Custom Order →
                 </button>
+                <CustomOrderModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
             </div>
         </section>
     );

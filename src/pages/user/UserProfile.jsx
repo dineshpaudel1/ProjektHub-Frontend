@@ -7,6 +7,8 @@ const UserProfile = () => {
     const { user, setUser } = useUser(); // use context instead of local fetch
     const [loading, setLoading] = useState(!user); // only load if user is null
     const [newPassword, setNewPassword] = useState("");
+    const [imageLoaded, setImageLoaded] = useState(false);
+    const [imageSrc, setImageSrc] = useState("");
     const [notification, setNotification] = useState(null);
     const [theme, setTheme] = useState(() =>
         localStorage.getItem("theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
@@ -21,9 +23,17 @@ const UserProfile = () => {
     }, [theme]);
 
     useEffect(() => {
-        // No need to re-fetch here since context already does it
-        if (user) {
-            setLoading(false);
+        if (user?.profilePicture) {
+            const img = new Image();
+            img.src = user.profilePicture;
+            img.onload = () => {
+                setImageSrc(user.profilePicture);
+                setImageLoaded(true);
+            };
+            img.onerror = () => {
+                setImageSrc("https://via.placeholder.com/150");
+                setImageLoaded(true);
+            };
         }
     }, [user]);
 
@@ -70,10 +80,15 @@ const UserProfile = () => {
                 <div className="space-y-6">
                     <div className="flex flex-col items-center">
                         <img
-                            src={user.profilePicture || "https://via.placeholder.com/150"}
+                            src={user.profilePicture}
                             alt="Profile"
+                            onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = "https://via.placeholder.com/150";
+                            }}
                             className="w-32 h-32 rounded-full border border-green-500 object-cover"
                         />
+
 
                         <h2 className="text-xl font-semibold mt-3">{user.fullName}</h2>
                     </div>
