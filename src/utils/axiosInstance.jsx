@@ -9,51 +9,53 @@ const instance = axios.create({
 instance.interceptors.request.use(config => {
     const token = localStorage.getItem('token');
     if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+        config.headers['Authorization'] = `Bearer ${token}`;
     }
     return config;
 });
 
-// // Auto refresh access token if expired
-// instance.interceptors.response.use(
-//     res => res,
-//     async err => {
-//         const originalRequest = err.config;
+// Auto refresh access token if expired
+instance.interceptors.response.use(
+    res => res,
+    async err => {
+        const originalRequest = err.config;
 
-//         // Only handle if it's a 401 (unauthorized) and hasn't been retried yet
-//         if (err.response?.status === 401 && !originalRequest._retry) {
-//             originalRequest._retry = true;
+        if (originalRequest.url.includes('/auth/refresh')) {
+            return Promise.reject(err);
+        }
 
-//             try {
-//                 const refreshToken = localStorage.getItem('refreshToken');
-//                 console.log(refreshToken);
-//                 const res = await axios.post(`${import.meta.env.VITE_API_URL}/auth/refresh`, {
-//                     refreshToken: refreshToken
-//                 });
+        if (err.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
 
-//                 const newAccessToken = res.data.accessToken;
-//                 localStorage.setItem("token", newAccessToken);
+            try {
+                const refreshToken = localStorage.getItem('refreshToken');
+                if (!refreshToken) throw new Error("No refresh token found.");
 
-//                 // Retry original request with new access token
-//                 originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-//                 return instance(originalRequest);
+                // 🔥 REMOVE Authorization header here
+                const refreshRes = await axios.post(`${import.meta.env.VITE_API_URL}/auth/refresh`,
+                    { refreshToken: refreshToken },
+                    { withCredentials: true }
+                );
 
-//             } catch (refreshErr) {
-//                 // 🛑 Refresh token failed — force logout and redirect
+                const newAccessToken = refreshRes.data.data.accessToken;
+                localStorage.setItem("token", newAccessToken);
 
-//                 localStorage.clear();
+                // ✅ RETRY ORIGINAL REQUEST PROPERLY
+                originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+                return instance(originalRequest);
 
-//                 const isAdmin = window.location.pathname.startsWith("/admin");
-//                 const redirectPath = isAdmin ? "/admin/login" : "/login";
+            } catch (refreshErr) {
+                console.error("Refresh token failed:", refreshErr);
+                localStorage.clear();
+                const isAdmin = window.location.pathname.startsWith("/admin");
+                const redirectPath = isAdmin ? "/admin/login" : "/login";
+                window.location.href = redirectPath;
+                return Promise.reject(refreshErr);
+            }
+        }
 
-//                 window.location.href = redirectPath;
-
-//                 return Promise.reject(refreshErr);
-//             }
-//         }
-
-//         return Promise.reject(err);
-//     }
-// );
+        return Promise.reject(err);
+    }
+);
 
 export default instance;

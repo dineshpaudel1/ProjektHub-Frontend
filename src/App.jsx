@@ -12,7 +12,7 @@ import { UserProvider } from "./context/UserContext";
 
 import { AdminLogin, Dashboard, AdminProjects, AllProjectDetail, AdminProfile, OrderSummary, ApproveSeller, AdminOrderDetails } from "./pages/admin";
 import { SellerLogin, SellerDashboard, SellerProfile, SellerProjects, EditProject } from "./pages/seller";
-import { MasterPage, Projects, Services, About, UserLogin, ForgotPassword, UserProfile, UserProjectDetail, SeeAllProject, SeeSellerProfile, MyOrder } from "./pages/user";
+import { MasterPage, Projects, Services, About, UserLogin, ForgotPassword, UserProfile, UserProjectDetail, SeeAllProject, SeeSellerProfile, MyOrder, OrderDetail } from "./pages/user";
 
 
 function App() {
@@ -41,6 +41,8 @@ function App() {
           <Route path="/seller/:id" element={<SeeSellerProfile />} />
           <Route path="forgot-password" element={<ForgotPassword />} />
           <Route path="my-orders" element={<MyOrder />} />
+          <Route path="/my-order/:id" element={<OrderDetail />} />
+
         </Route>
 
         {/* ✅ Admin Routes */}

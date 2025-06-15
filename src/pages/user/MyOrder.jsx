@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "../../utils/axiosInstance"; // This should already be configured to attach token
 
 const MyOrder = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const fetchOrders = async () => {
     try {
@@ -40,8 +42,10 @@ const MyOrder = () => {
           {orders.map((order) => (
             <div
               key={order.orderId}
-              className="border border-gray-300 rounded-lg p-4 shadow-sm hover:shadow-md transition"
+              onClick={() => navigate(`/my-order/${order.orderId}`)}
+              className="cursor-pointer border border-gray-300 rounded-lg p-4 shadow-sm hover:shadow-md transition"
             >
+
               <div className="flex justify-between items-center mb-2">
                 <h2 className="text-lg font-semibold">
                   Order #{order.orderId}

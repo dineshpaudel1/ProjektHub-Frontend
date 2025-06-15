@@ -1,5 +1,3 @@
-// UserNavbar.jsx - Full code with mobile responsive notification modal
-
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, Moon, Sun, ShoppingCart, Bell } from "lucide-react";
@@ -8,6 +6,7 @@ import logoDark from "../../assets/images/logoblack.png";
 import { useUser } from "../../context/UserContext";
 import SellerRegisterModal from "../../modals/SellerRegisterModal";
 import axios from "../../utils/axiosInstance";
+import userphoto from "../../assets/images/user.png"
 
 const UserNavbar = () => {
     const navigate = useNavigate();
@@ -108,23 +107,43 @@ const UserNavbar = () => {
                                     {loadingNotifications ? (
                                         <div className="px-4 py-2 text-sm text-gray-500">Loading...</div>
                                     ) : notifications.length > 0 ? (
+
                                         notifications.map((note) => (
                                             <div
                                                 key={note.id}
-                                                className={`px-4 py-2 text-sm border-b flex items-start gap-2 cursor-pointer hover:bg-gray-100 ${theme === "dark" ? "border-gray-800" : "border-gray-100"
-                                                    }`}
-                                                onClick={() => {
-                                                    navigate("/my-orders");
-                                                    setShowNotifications(false);
+                                                className={`px-4 py-2 text-sm border-b flex items-start gap-2 cursor-pointer hover:bg-gray-100 ${theme === "dark" ? "border-gray-800" : "border-gray-100"}`}
+                                                onClick={async () => {
+                                                    try {
+                                                        // Mark as read API call
+                                                        await axios.put(`/notifications/${note.id}/read`);
+
+                                                        // Optimistically update local state
+                                                        setNotifications((prev) =>
+                                                            prev.map((n) =>
+                                                                n.id === note.id ? { ...n, read: true } : n
+                                                            )
+                                                        );
+
+                                                        // Navigate based on type
+                                                        if (note.targetType === "ORDER") {
+                                                            navigate(`/my-order/${note.targetId}`);
+                                                        } else if (note.targetType === "PROJECT") {
+                                                            navigate(`/project/${note.targetId}`);
+                                                        }
+                                                    } catch (err) {
+                                                        console.error("Failed to mark notification as read", err);
+                                                    } finally {
+                                                        setShowNotifications(false);
+                                                    }
                                                 }}
                                             >
-                                                {note.photoUrl && (
-                                                    <img
-                                                        src={`http://localhost:8080/api/media/photo?file=${note.photoUrl}`}
-                                                        alt="projkthub"
-                                                        className="w-8 h-8 object-cover rounded"
-                                                    />
-                                                )}
+
+                                                <img
+                                                    src={note.photoUrl ? `http://localhost:8080/api/media/photo?file=${note.photoUrl}` : userphoto}
+                                                    alt="projkthub"
+                                                    className="w-8 h-8 object-cover rounded"
+                                                />
+
                                                 <div className="flex-1">
                                                     <p className="font-medium">{note.message}</p>
                                                     <p className="text-xs text-gray-500">
@@ -133,6 +152,8 @@ const UserNavbar = () => {
                                                 </div>
                                             </div>
                                         ))
+
+
                                     ) : (
                                         <div className="px-4 py-2 text-sm text-gray-500">No notifications</div>
                                     )}

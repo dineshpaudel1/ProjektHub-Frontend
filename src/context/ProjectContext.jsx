@@ -21,7 +21,7 @@ export const ProjectProvider = ({ children }) => {
 
         try {
             setLoadingProjects(true);
-            const res = await axios.get("http://localhost:8080/api/public/projects");
+            const res = await axios.get("public/projects");
             if (res.data.status === "success") {
                 setProjects(res.data.data);
                 hasFetchedProjects.current = true; // 🧠 set ref after fetch
@@ -36,7 +36,7 @@ export const ProjectProvider = ({ children }) => {
     const fetchProjectDetail = async (id) => {
         try {
             setLoadingDetail(true);
-            const res = await axios.get(`http://localhost:8080/api/public/project/${id}`);
+            const res = await axios.get(`public/project/${id}`);
             if (res.data.status === "success") {
                 setProjectDetail(res.data.data);
             }
@@ -50,7 +50,7 @@ export const ProjectProvider = ({ children }) => {
     const fetchQuestions = async (id) => {
         try {
             setLoadingQuestions(true);
-            const res = await axios.get(`http://localhost:8080/api/public/project/${id}/interactions`);
+            const res = await axios.get(`public/project/${id}/interactions`);
             setQuestions(res.data.data || []);
         } catch (err) {
             console.error("Error fetching questions:", err);
