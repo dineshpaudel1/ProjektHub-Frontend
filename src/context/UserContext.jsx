@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import axios from "../utils/axiosInstance";
+import { protectedApi } from "../utils/axiosInstance";  // ✅ use protectedApi instead of axios
 
 const UserContext = createContext();
 
@@ -17,9 +17,7 @@ export const UserProvider = ({ children }) => {
             }
 
             try {
-                const res = await axios.get("/user/me", {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
+                const res = await protectedApi.get("/user/me");  // ✅ no need to manually set headers
                 setUser(res.data);
 
                 // ✅ Decode token and extract roles

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "../../utils/axiosInstance";
+import { publicApi, protectedApi } from "../../utils/axiosInstance";
 import { Loader, ArrowLeft } from "lucide-react";
 import QuestionAnswerList from "../../components/SellerHelper/QuestionAnswerList";
 import ProjectDetailsSection from "../../components/SellerHelper/ProjectDetailsSection";
@@ -22,7 +22,7 @@ const SellerProjectDetail = () => {
 
     const fetchQuestions = async () => {
         try {
-            const res = await axios.get(`/public/project/${id}/interactions`);
+            const res = await publicApi.get(`/public/project/${id}/interactions`);
             setQuestions(res.data.data || []);
         } catch (err) {
             console.error("Error fetching questions:", err);
@@ -30,17 +30,9 @@ const SellerProjectDetail = () => {
     };
 
     const fetchProjectDetails = async () => {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            setError("Unauthorized. Please login.");
-            return;
-        }
-
         try {
             setLoading(true);
-            const res = await axios.get(`/seller/project/details/${id}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
+            const res = await protectedApi.get(`/seller/project/details/${id}`);
             setProject(res.data.data);
         } catch (err) {
             setError("Failed to load project details.");
@@ -51,26 +43,11 @@ const SellerProjectDetail = () => {
     };
 
     const handleToggleVisibility = async () => {
-        const token = localStorage.getItem("token");
-        if (!token || !project) return;
+        if (!project) return;
 
         try {
-            await axios.patch(
-                `/seller/project/${project.id}/visibility`,
-                {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
-
-            setProject((prev) => ({
-                ...prev,
-                visible: !prev.visible,
-            }));
-
+            await protectedApi.patch(`/seller/project/${project.id}/visibility`);
+            setProject((prev) => ({ ...prev, visible: !prev.visible }));
             toast.success(`Project marked as ${!project.visible ? "Public" : "Private"}`);
         } catch (error) {
             console.error("Visibility toggle failed:", error);
@@ -80,26 +57,14 @@ const SellerProjectDetail = () => {
 
     const handleAddTag = async () => {
         if (!newTag.trim()) return;
-        const token = localStorage.getItem("token");
 
         try {
             setIsTagSubmitting(true);
-            await axios.post(
-                `/seller/project/addTags/${project.id}`,
-                { tag: [newTag] },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
-
+            await protectedApi.post(`/seller/project/addTags/${project.id}`, { tag: [newTag] });
             setProject((prev) => ({
                 ...prev,
                 tags: [...prev.tags, { id: Date.now(), tag: newTag }],
             }));
-
             setNewTag("");
             toast.success("Tag added successfully!");
         } catch (err) {
@@ -113,10 +78,7 @@ const SellerProjectDetail = () => {
     const getEmbedUrl = (url) => {
         try {
             const match = url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=)([^&]+)/);
-            if (match && match[1]) {
-                return `https://www.youtube.com/embed/${match[1]}`;
-            }
-            return null;
+            return match && match[1] ? `https://www.youtube.com/embed/${match[1]}` : null;
         } catch {
             return null;
         }

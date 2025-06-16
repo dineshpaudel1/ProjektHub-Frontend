@@ -1,12 +1,19 @@
 import axios from 'axios';
 
-const instance = axios.create({
+// ✅ 1️⃣ Public instance — for all public routes (no token required)
+export const publicApi = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
     withCredentials: true,
 });
 
-// Attach access token to every request
-instance.interceptors.request.use(config => {
+// ✅ 2️⃣ Protected instance — for authenticated routes
+export const protectedApi = axios.create({
+    baseURL: import.meta.env.VITE_API_URL,
+    withCredentials: true,
+});
+
+// ✅ Attach access token automatically to protected requests
+protectedApi.interceptors.request.use(config => {
     const token = localStorage.getItem('token');
     if (token) {
         config.headers['Authorization'] = `Bearer ${token}`;
@@ -14,42 +21,41 @@ instance.interceptors.request.use(config => {
     return config;
 });
 
-// Auto refresh access token if expired
-instance.interceptors.response.use(
+// ✅ Handle automatic refresh token logic
+protectedApi.interceptors.response.use(
     res => res,
     async err => {
         const originalRequest = err.config;
 
+        // Prevent infinite loop
         if (originalRequest.url.includes('/auth/refresh')) {
             return Promise.reject(err);
         }
 
-        if (err.response?.data.message === "Access token has expired" && !originalRequest._retry) {
+        // Handle only if token expired
+        if (err.response?.data?.message === "Access token has expired" && !originalRequest._retry) {
             originalRequest._retry = true;
 
             try {
                 const refreshToken = localStorage.getItem('refreshToken');
                 if (!refreshToken) throw new Error("No refresh token found.");
 
-                // 🔥 REMOVE Authorization header here
-                const refreshRes = await axios.post(`${import.meta.env.VITE_API_URL}/auth/refresh`,
-                    { refreshToken: refreshToken },
-                    { withCredentials: true }
-                );
+                // 🔥 Use publicApi for refresh to avoid nested interceptors
+                const refreshRes = await publicApi.post("/auth/refresh", { refreshToken });
 
-                const newAccessToken = refreshRes.data.data.accessToken;
+                const newAccessToken = refreshRes.data?.data?.accessToken;
+                if (!newAccessToken) throw new Error("No access token returned.");
+
+                // ✅ Save new token
                 localStorage.setItem("token", newAccessToken);
 
-                // ✅ RETRY ORIGINAL REQUEST PROPERLY
+                // ✅ Attach new token to failed request and retry
                 originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-                return instance(originalRequest);
+                return protectedApi(originalRequest);
 
             } catch (refreshErr) {
                 console.error("Refresh token failed:", refreshErr);
-                localStorage.clear();
-                const isAdmin = window.location.pathname.startsWith("/admin");
-                const redirectPath = isAdmin ? "/admin/login" : "/login";
-                window.location.href = redirectPath;
+                handleLogoutAndRedirect();
                 return Promise.reject(refreshErr);
             }
         }
@@ -58,4 +64,15 @@ instance.interceptors.response.use(
     }
 );
 
-export default instance;
+// ✅ Central logout + redirect function
+function handleLogoutAndRedirect() {
+    localStorage.clear();
+    const path = window.location.pathname;
+    if (path.startsWith("/admin")) {
+        window.location.href = "/admin/login";
+    } else if (path.startsWith("/seller")) {
+        window.location.href = "/seller/login";
+    } else {
+        window.location.href = "/login";
+    }
+}

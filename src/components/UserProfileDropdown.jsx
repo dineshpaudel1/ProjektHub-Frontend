@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import axios from "../../utils/axiosInstance";
+import { protectedApi } from "../../utils/axiosInstance";
 import {
     User,
     MessageSquare,
@@ -15,17 +15,12 @@ const UserProfileDropdown = () => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isOpen, setIsOpen] = useState(false);
-    const token = localStorage.getItem("accessToken");
     const dropdownRef = useRef();
 
     useEffect(() => {
         const fetchUserProfile = async () => {
             try {
-                const response = await axios.get("/user/me", {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
+                const response = await protectedApi.get("/user/me");
                 setUser(response.data);
             } catch (error) {
                 console.error("Failed to fetch user profile:", error);
@@ -35,7 +30,7 @@ const UserProfileDropdown = () => {
         };
 
         fetchUserProfile();
-    }, [token]);
+    }, []);
 
     useEffect(() => {
         const handleClickOutside = (event) => {

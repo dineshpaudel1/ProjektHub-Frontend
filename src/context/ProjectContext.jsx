@@ -1,12 +1,12 @@
 import React, { createContext, useContext, useEffect, useState, useRef } from "react";
-import axios from "../utils/axiosInstance";
+import { publicApi } from "../utils/axiosInstance";  // ✅ Updated import
 
 const ProjectContext = createContext();
 
 export const ProjectProvider = ({ children }) => {
     const [projects, setProjects] = useState([]);
     const [loadingProjects, setLoadingProjects] = useState(true);
-    const hasFetchedProjects = useRef(false); // 🧠 Ref does NOT trigger re-renders
+    const hasFetchedProjects = useRef(false);
 
     const [projectDetail, setProjectDetail] = useState(null);
     const [loadingDetail, setLoadingDetail] = useState(false);
@@ -15,16 +15,15 @@ export const ProjectProvider = ({ children }) => {
     const [loadingQuestions, setLoadingQuestions] = useState(false);
     const [selectedProject, setSelectedProject] = useState(null);
 
-
     const fetchProjects = async () => {
-        if (hasFetchedProjects.current) return; // ✅ Prevent re-fetching
+        if (hasFetchedProjects.current) return;
 
         try {
             setLoadingProjects(true);
-            const res = await axios.get("public/projects");
+            const res = await publicApi.get("public/projects");
             if (res.data.status === "success") {
                 setProjects(res.data.data);
-                hasFetchedProjects.current = true; // 🧠 set ref after fetch
+                hasFetchedProjects.current = true;
             }
         } catch (err) {
             console.error("Error fetching projects:", err);
@@ -36,7 +35,7 @@ export const ProjectProvider = ({ children }) => {
     const fetchProjectDetail = async (id) => {
         try {
             setLoadingDetail(true);
-            const res = await axios.get(`public/project/${id}`);
+            const res = await publicApi.get(`public/project/${id}`);
             if (res.data.status === "success") {
                 setProjectDetail(res.data.data);
             }
@@ -50,7 +49,7 @@ export const ProjectProvider = ({ children }) => {
     const fetchQuestions = async (id) => {
         try {
             setLoadingQuestions(true);
-            const res = await axios.get(`public/project/${id}/interactions`);
+            const res = await publicApi.get(`public/project/${id}/interactions`);
             setQuestions(res.data.data || []);
         } catch (err) {
             console.error("Error fetching questions:", err);
@@ -76,7 +75,7 @@ export const ProjectProvider = ({ children }) => {
                 loadingQuestions,
                 fetchQuestions,
                 selectedProject,
-                setSelectedProject, // ✅ Include both
+                setSelectedProject,
             }}
         >
             {children}

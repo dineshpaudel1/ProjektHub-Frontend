@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from '../../utils/axiosInstance';
+import { protectedApi } from '../../utils/axiosInstance';
 import {
     FaFolderOpen,
     FaUser,
@@ -59,17 +59,11 @@ const SellerDashboard = () => {
 
     useEffect(() => {
         const fetchDashboardData = async () => {
-            const token = localStorage.getItem("token");
-
             try {
-                const projectRes = await axios.get("/seller/project/my-projects", {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const projectRes = await protectedApi.get("/seller/project/my-projects");
                 setTotalProjects(projectRes.data?.data?.length || 0);
 
-                const questionRes = await axios.get("/seller/interactions/pending-questions", {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const questionRes = await protectedApi.get("/seller/interactions/pending-questions");
                 setPendingQuestions(questionRes.data?.data || []);
             } catch (error) {
                 console.error("❌ Failed to fetch dashboard data:", error);

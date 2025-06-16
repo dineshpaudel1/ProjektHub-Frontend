@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "../../utils/axiosInstance";
+import { protectedApi } from "../../utils/axiosInstance";
 import ProfileField from "../../components/ProfileField";
 import {
     User, Mail, Shield, Camera, CheckCircle,
@@ -16,25 +16,18 @@ const AdminProfile = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            setError("Authentication required");
-            setLoading(false);
-            return;
-        }
-
-        axios.get("http://localhost:8080/api/admin/me", {
-            headers: { Authorization: `Bearer ${token}` },
-        })
-            .then(res => {
+        const fetchProfile = async () => {
+            try {
+                const res = await protectedApi.get("/admin/me");
                 setAdmin(res.data.data);
-                setLoading(false);
-            })
-            .catch(err => {
+            } catch (err) {
                 console.error(err);
                 setError("Failed to fetch admin profile.");
+            } finally {
                 setLoading(false);
-            });
+            }
+        };
+        fetchProfile();
     }, []);
 
     const handleImageUpload = (e) => {
@@ -68,11 +61,9 @@ const AdminProfile = () => {
     return (
         <div className="min-h-screen bg-gray-50 py-8 px-4 max-w-4xl mx-auto">
             {notification && <NotificationBanner {...notification} onClose={() => setNotification(null)} />}
-
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Admin Profile</h1>
 
             <div className="flex flex-col md:flex-row gap-8 bg-white p-6 rounded-xl shadow-sm">
-                {/* Image */}
                 <div className="md:w-1/3 flex flex-col items-center">
                     <div className="relative group mb-4">
                         {admin.profileImage ? (
@@ -91,7 +82,6 @@ const AdminProfile = () => {
                     <p className="text-sm text-gray-600 mt-1">{admin.roles?.join(', ')}</p>
                 </div>
 
-                {/* Fields */}
                 <div className="md:w-2/3 space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <ProfileField label="Full Name" value={admin.fullName} icon={<User />} />

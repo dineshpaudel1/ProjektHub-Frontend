@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "../utils/axiosInstance";
+import { publicApi } from "../utils/axiosInstance";  // ✅ updated import
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -16,7 +16,7 @@ const ForgotPassword = () => {
         e.preventDefault();
         setIsSubmitting(true);
         try {
-            const res = await axios.post("/auth/forgot-password", { email });
+            const res = await publicApi.post("/auth/forgot-password", { email });
             toast.success(res.data.message || "Reset link or OTP sent to your email.");
             setStep(2);
         } catch (err) {
@@ -33,7 +33,7 @@ const ForgotPassword = () => {
         }
         setIsSubmitting(true);
         try {
-            const res = await axios.post("/auth/verify-otp", { email, otpCode: otp });
+            const res = await publicApi.post("/auth/verify-otp", { email, otpCode: otp });
             toast.success(res.data.message || "OTP verified successfully!");
             setStep(3);
         } catch (err) {
@@ -50,7 +50,7 @@ const ForgotPassword = () => {
         }
         setIsSubmitting(true);
         try {
-            const res = await axios.post("/auth/reset-password", { email, newPassword });
+            const res = await publicApi.post("/auth/reset-password", { email, newPassword });
             toast.success(res.data.message || "Password reset successful. Redirecting...");
             setTimeout(() => navigate("/login"), 1500);
         } catch (err) {

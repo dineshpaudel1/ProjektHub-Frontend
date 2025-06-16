@@ -3,7 +3,7 @@ import { Bell, Menu, Search, User, ChevronDown } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import user from "../../assets/images/user.png";
 import logo from "../../assets/images/logoblack.png";
-import axios from "../../utils/axiosInstance";
+import { protectedApi } from "../../utils/axiosInstance";  // ✅ updated import
 
 const SellerNav = ({ toggleSidebar }) => {
     const [showMenu, setShowMenu] = useState(false);
@@ -21,9 +21,7 @@ const SellerNav = ({ toggleSidebar }) => {
     useEffect(() => {
         const fetchSellerNotifications = async () => {
             try {
-                const res = await axios.get("/notifications?role=SELLER", {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const res = await protectedApi.get("/notifications?role=SELLER");
                 setNotifications(res.data?.data || []);
             } catch (error) {
                 console.error("Error fetching notifications:", error);
@@ -96,7 +94,6 @@ const SellerNav = ({ toggleSidebar }) => {
 
             {/* Right: Search Mobile + Notifications + User Menu */}
             <div className="flex items-center gap-2 md:gap-4">
-
                 {/* Mobile Search */}
                 <div className="md:hidden relative" ref={searchRef}>
                     <button onClick={() => setShowSearch(!showSearch)} className="p-2 rounded-full hover:bg-gray-100">
@@ -155,7 +152,7 @@ const SellerNav = ({ toggleSidebar }) => {
                                             }}
                                         >
                                             <img
-                                                src={note.photoUrl}
+                                                src={`http://localhost:8080/api/media/photo?file=${note.photoUrl}`}
                                                 alt="Notification"
                                                 className="w-9 h-9 rounded-full mt-1 object-cover border"
                                             />

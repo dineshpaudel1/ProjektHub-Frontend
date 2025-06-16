@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "../../utils/axiosInstance";
+import { publicApi } from "../../utils/axiosInstance";  // ✅ updated here
 
 const AdminLogin = () => {
     const navigate = useNavigate();
@@ -15,14 +15,13 @@ const AdminLogin = () => {
         setError("");
 
         try {
-            const response = await axios.post("/auth/admin/login", {
+            const response = await publicApi.post("/auth/admin/login", {
                 identifier,
                 password,
             });
 
             const { accessToken, refreshToken, roles } = response?.data?.data || {};
 
-            // ❌ Not an admin? Abort.
             if (!roles || !roles.includes("ADMIN")) {
                 setError("You are not authorized to access the admin panel.");
                 localStorage.clear();
@@ -37,12 +36,10 @@ const AdminLogin = () => {
                 return;
             }
 
-            // ✅ Save tokens
             localStorage.setItem("token", accessToken);
             localStorage.setItem("refreshToken", refreshToken);
             localStorage.setItem("isAuthenticated", "true");
 
-            // ✅ Redirect to admin dashboard
             navigate("/admin");
 
         } catch (err) {
@@ -59,19 +56,11 @@ const AdminLogin = () => {
     };
 
     return (
-        <div
-            className="min-h-screen flex items-center justify-center pt-8 font-primary px-4"
-            style={{
-                backgroundColor: "var(--bg-color)",
-                color: "var(--text-color)",
-            }}
+        <div className="min-h-screen flex items-center justify-center pt-8 font-primary px-4"
+            style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
         >
-            <div
-                className="w-full max-w-sm rounded-xl shadow-md px-6 py-10 border"
-                style={{
-                    backgroundColor: "var(--menu-bg)",
-                    borderColor: "var(--border-color)",
-                }}
+            <div className="w-full max-w-sm rounded-xl shadow-md px-6 py-10 border"
+                style={{ backgroundColor: "var(--menu-bg)", borderColor: "var(--border-color)" }}
             >
                 <h2 className="text-2xl font-bold text-center mb-6">Admin Login</h2>
 
@@ -79,58 +68,28 @@ const AdminLogin = () => {
 
                 <form onSubmit={handleLogin} className="space-y-5">
                     <div>
-                        <label htmlFor="email" className="block text-sm font-semibold mb-1">
-                            Email
-                        </label>
-                        <input
-                            id="email"
-                            type="text"
-                            placeholder="admin@example.com"
-                            value={identifier}
-                            onChange={(e) => setIdentifier(e.target.value)}
-                            required
+                        <label htmlFor="email" className="block text-sm font-semibold mb-1">Email</label>
+                        <input id="email" type="text" placeholder="admin@example.com"
+                            value={identifier} onChange={(e) => setIdentifier(e.target.value)} required
                             className="w-full px-4 py-2.5 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            style={{
-                                backgroundColor: "var(--bg-color)",
-                                color: "var(--text-color)",
-                                borderColor: "var(--border-color)",
-                            }}
+                            style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)", borderColor: "var(--border-color)" }}
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="password" className="block text-sm font-semibold mb-1">
-                            Password
-                        </label>
-                        <input
-                            id="password"
-                            type="password"
-                            placeholder="••••••••"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
+                        <label htmlFor="password" className="block text-sm font-semibold mb-1">Password</label>
+                        <input id="password" type="password" placeholder="••••••••"
+                            value={password} onChange={(e) => setPassword(e.target.value)} required
                             className="w-full px-4 py-2.5 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            style={{
-                                backgroundColor: "var(--bg-color)",
-                                color: "var(--text-color)",
-                                borderColor: "var(--border-color)",
-                            }}
+                            style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)", borderColor: "var(--border-color)" }}
                         />
                     </div>
 
-                    <button
-                        type="submit"
-                        disabled={loading}
+                    <button type="submit" disabled={loading}
                         className="w-full py-2.5 text-white font-semibold rounded-full transition duration-200"
-                        style={{
-                            backgroundColor: "var(--button-primary)",
-                        }}
-                        onMouseOver={(e) => {
-                            e.currentTarget.style.backgroundColor = "var(--button-primary-hover)";
-                        }}
-                        onMouseOut={(e) => {
-                            e.currentTarget.style.backgroundColor = "var(--button-primary)";
-                        }}
+                        style={{ backgroundColor: "var(--button-primary)" }}
+                        onMouseOver={(e) => { e.currentTarget.style.backgroundColor = "var(--button-primary-hover)"; }}
+                        onMouseOut={(e) => { e.currentTarget.style.backgroundColor = "var(--button-primary)"; }}
                     >
                         {loading ? "Logging in..." : "Login"}
                     </button>

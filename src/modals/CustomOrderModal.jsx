@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import axios from "../utils/axiosInstance";
+import { protectedApi } from "../utils/axiosInstance";  // ✅ updated import
 import { FaSpinner } from "react-icons/fa";
 import { toast } from "react-toastify";
 
@@ -59,7 +59,7 @@ const CustomOrderModal = ({ isOpen, onClose }) => {
 
         try {
             setLoading(true);
-            await axios.post("/user/order/custom", payload);
+            await protectedApi.post("/user/order/custom", payload);  // ✅ updated protected call
             toast.success("Custom order placed successfully!");
             onClose();
             resetForm();
@@ -81,7 +81,6 @@ const CustomOrderModal = ({ isOpen, onClose }) => {
         setErrors({});
     };
 
-    // ✅ Optional: Close modal when clicking outside
     useEffect(() => {
         const handleClickOutside = (e) => {
             if (modalRef.current && !modalRef.current.contains(e.target) && !loading) {
@@ -108,55 +107,30 @@ const CustomOrderModal = ({ isOpen, onClose }) => {
                 <h2 className="text-2xl font-semibold mb-4">Place Custom Order</h2>
                 <form onSubmit={handleSubmit}>
 
-                    {/* Phone Number */}
                     <div className="mb-3">
                         <label className="block font-medium mb-1">Phone Number</label>
-                        <input
-                            type="text"
-                            name="userPhoneNumber"
-                            value={formData.userPhoneNumber}
-                            onChange={handleChange}
-                            className={`w-full border rounded p-2 ${errors.userPhoneNumber ? "border-red-500" : ""}`}
-                        />
+                        <input type="text" name="userPhoneNumber" value={formData.userPhoneNumber} onChange={handleChange} className={`w-full border rounded p-2 ${errors.userPhoneNumber ? "border-red-500" : ""}`} />
                         {errors.userPhoneNumber && <p className="text-red-500 text-sm">{errors.userPhoneNumber}</p>}
                     </div>
 
-                    {/* Custom Title */}
                     <div className="mb-3">
                         <label className="block font-medium mb-1">Custom Title</label>
-                        <input
-                            type="text"
-                            name="customTitle"
-                            value={formData.customTitle}
-                            onChange={handleChange}
-                            className={`w-full border rounded p-2 ${errors.customTitle ? "border-red-500" : ""}`}
-                        />
+                        <input type="text" name="customTitle" value={formData.customTitle} onChange={handleChange} className={`w-full border rounded p-2 ${errors.customTitle ? "border-red-500" : ""}`} />
                         {errors.customTitle && <p className="text-red-500 text-sm">{errors.customTitle}</p>}
                     </div>
 
-                    {/* Custom Description */}
                     <div className="mb-3">
                         <label className="block font-medium mb-1">Custom Description</label>
-                        <textarea
-                            name="customDescription"
-                            value={formData.customDescription}
-                            onChange={handleChange}
-                            className={`w-full border rounded p-2 ${errors.customDescription ? "border-red-500" : ""}`}
-                        />
+                        <textarea name="customDescription" value={formData.customDescription} onChange={handleChange} className={`w-full border rounded p-2 ${errors.customDescription ? "border-red-500" : ""}`} />
                         {errors.customDescription && <p className="text-red-500 text-sm">{errors.customDescription}</p>}
                     </div>
 
-                    {/* Options */}
                     <div className="mb-3">
                         <label className="block font-medium mb-1">Select Options</label>
                         <div className="flex flex-wrap gap-4">
                             {availableOptions.map((option, idx) => (
                                 <label key={idx} className="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        checked={formData.selectedOptions.includes(option)}
-                                        onChange={() => handleOptionChange(option)}
-                                    />
+                                    <input type="checkbox" checked={formData.selectedOptions.includes(option)} onChange={() => handleOptionChange(option)} />
                                     {option}
                                 </label>
                             ))}

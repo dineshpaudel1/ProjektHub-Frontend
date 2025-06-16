@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "../utils/axiosInstance";
+import { publicApi } from "../utils/axiosInstance";  // ✅ updated import
 import { Loader } from "lucide-react";
 
 const SeeSellerProfile = () => {
@@ -14,7 +14,7 @@ const SeeSellerProfile = () => {
     useEffect(() => {
         const fetchSellerData = async () => {
             try {
-                const res = await axios.get(`http://localhost:8080/api/public/${id}/profile`);
+                const res = await publicApi.get(`/public/${id}/profile`);  // ✅ no need full URL
                 setSeller(res.data.data.seller);
                 setProjects(res.data.data.projects);
             } catch (error) {

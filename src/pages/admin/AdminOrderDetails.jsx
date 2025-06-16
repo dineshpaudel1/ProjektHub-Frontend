@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "../../utils/axiosInstance";
+import { protectedApi } from "../../utils/axiosInstance";  // ✅ USE protectedApi directly
 import { toast } from "react-toastify";
 
 const AdminOrderDetails = () => {
@@ -11,7 +11,7 @@ const AdminOrderDetails = () => {
 
     const fetchOrderDetails = async () => {
         try {
-            const res = await axios.get(`/admin/order/${id}`);
+            const res = await protectedApi.get(`/admin/order/${id}`);
             const responseData = res.data.data;
             setOrderType(responseData.orderType);
             setOrder(responseData.data);
@@ -24,7 +24,7 @@ const AdminOrderDetails = () => {
 
     const handleProcessOrder = async () => {
         try {
-            await axios.post(`/admin/order/${id}/process`);
+            await protectedApi.post(`/admin/order/${id}/process`);
             toast.success("Order processed successfully");
             fetchOrderDetails();
         } catch (err) {
@@ -35,7 +35,7 @@ const AdminOrderDetails = () => {
 
     const handleDeliverOrder = async () => {
         try {
-            await axios.put(`/admin/order/${id}/deliver`);
+            await protectedApi.put(`/admin/order/${id}/deliver`);
             toast.success("Order marked as delivered");
             fetchOrderDetails();
         } catch (err) {

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "../utils/axiosInstance";
+import { protectedApi } from "../utils/axiosInstance";  // ✅ updated import
 import { toast } from "react-toastify";
 
 const SellerRegisterModal = ({ onClose }) => {
@@ -38,15 +38,13 @@ const SellerRegisterModal = ({ onClose }) => {
         formData.skills.forEach(skill => data.append("skills", skill));
         data.append("verificationPhoto", formData.verificationPhoto);
 
-        const token = localStorage.getItem("token");
-
         try {
-            await axios.post("http://localhost:8080/api/user/seller-register", data, {
+            await protectedApi.post("/user/seller-register", data, {
                 headers: {
                     "Content-Type": "multipart/form-data",
-                    Authorization: `Bearer ${token}`,
                 },
             });
+
             toast.success("Seller registration submitted successfully!");
             setTimeout(() => onClose(), 1500);
         } catch (error) {

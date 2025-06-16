@@ -1,7 +1,6 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from '../../utils/axiosInstance';
+import { protectedApi } from '../../utils/axiosInstance';
 
 import NotificationToast from '../../porjectdetailhelper/NotificationToast';
 import ThumbnailUpload from '../../porjectdetailhelper/ThumbnailUpload';
@@ -31,12 +30,8 @@ const ProjectDetail = () => {
     const [isPhotoUploading, setIsPhotoUploading] = useState(false);
 
     const fetchProjectDetails = async () => {
-        const token = localStorage.getItem('token');
-        if (!token) return setError("Unauthorized. Please login.");
         try {
-            const res = await axios.get(`http://localhost:8080/api/seller/project/details/${id}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
+            const res = await protectedApi.get(`/seller/project/details/${id}`);
             const data = res.data.data;
             setProject(data);
             setForm({
@@ -62,20 +57,13 @@ const ProjectDetail = () => {
     };
 
     const handleUpdate = async () => {
-        const token = localStorage.getItem('token');
-        if (!token) return alert("Unauthorized");
         setIsSubmitting(true);
         try {
-            await axios.patch(`http://localhost:8080/api/seller/project/update/${id}`, {
+            await protectedApi.patch(`/seller/project/update/${id}`, {
                 title: form.title,
                 description: form.description,
                 previewVideoUrl: form.previewVideoUrl,
                 price: Number(form.price)
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
             });
             setNotification({ type: 'success', message: 'Project updated successfully!' });
             await fetchProjectDetails();
@@ -89,17 +77,13 @@ const ProjectDetail = () => {
     };
 
     const handleThumbnailUpdate = async () => {
-        const token = localStorage.getItem('token');
-        if (!thumbnailFile || !token) return alert("Please select a file");
+        if (!thumbnailFile) return alert("Please select a file");
         setIsUploading(true);
         const formData = new FormData();
         formData.append('file', thumbnailFile);
         try {
-            await axios.patch(`http://localhost:8080/api/seller/project/${id}/thumbnail`, formData, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data'
-                }
+            await protectedApi.patch(`/seller/project/${id}/thumbnail`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
             setNotification({ type: 'success', message: 'Thumbnail updated successfully!' });
             await fetchProjectDetails();
@@ -115,16 +99,8 @@ const ProjectDetail = () => {
     const handleAddTag = async () => {
         if (!newTag.trim()) return;
         setIsTagSubmitting(true);
-        const token = localStorage.getItem('token');
         try {
-            await axios.post(`http://localhost:8080/api/seller/project/addTags/${id}`, {
-                tag: [newTag]
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
+            await protectedApi.post(`/seller/project/addTags/${id}`, { tag: [newTag] });
             setNewTag('');
             setNotification({ type: 'success', message: 'Tag added successfully!' });
             await fetchProjectDetails();
@@ -140,21 +116,13 @@ const ProjectDetail = () => {
     const handlePhotoUpload = async () => {
         if (!photoFile || !photoCaption) return;
         setIsPhotoUploading(true);
-        const token = localStorage.getItem('token');
         const formData = new FormData();
-
-        formData.append('files', photoFile); // key name must be `files`
-        formData.append(
-            'data',
-            JSON.stringify({ captions: [photoCaption] }) // JSON string for `data`
-        );
+        formData.append('files', photoFile);
+        formData.append('data', JSON.stringify({ captions: [photoCaption] }));
 
         try {
-            await axios.post(`http://localhost:8080/api/seller/project/${id}/photos/upload`, formData, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data'
-                }
+            await protectedApi.post(`/seller/project/${id}/photos/upload`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
             setPhotoFile(null);
             setPhotoCaption('');
@@ -169,7 +137,6 @@ const ProjectDetail = () => {
             setTimeout(() => setNotification(null), 3000);
         }
     };
-
 
     return (
         <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

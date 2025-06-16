@@ -3,7 +3,7 @@ import { Bell, Menu, Search, User, ChevronDown } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import user from "../../assets/images/user.png";
 import logo from "../../assets/images/logoblack.png";
-import axios from "../../utils/axiosInstance";
+import { publicApi, protectedApi } from "../../utils/axiosInstance";  // 👈 updated here
 
 const AdminNav = ({ toggleSidebar }) => {
     const [showMenu, setShowMenu] = useState(false);
@@ -14,7 +14,6 @@ const AdminNav = ({ toggleSidebar }) => {
     const [notifications, setNotifications] = useState([]);
     const unreadCount = notifications.filter(n => !n.read).length + unapprovedSellers.length;
 
-
     const menuRef = useRef();
     const searchRef = useRef();
     const notificationRef = useRef();
@@ -24,16 +23,17 @@ const AdminNav = ({ toggleSidebar }) => {
 
     const fetchAdminNotifications = async () => {
         try {
-            const res = await axios.get("/notifications?role=ADMIN");
+            const res = await protectedApi.get("/notifications?role=ADMIN");  // 👈 protected API used
             setNotifications(res.data.data || []);
         } catch (err) {
             console.error("Error fetching admin notifications", err);
         }
     };
 
+    // If unapprovedSellers also need auth, use protectedApi as well
     // const fetchUnapprovedSellers = async () => {
     //     try {
-    //         const res = await axios.get("/admin/unapproved-sellers");
+    //         const res = await protectedApi.get("/admin/unapproved-sellers");
     //         setUnapprovedSellers(res.data.data || []);
     //     } catch (err) {
     //         console.error("Error fetching unapproved sellers", err);

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "../../utils/axiosInstance";
+import { protectedApi, publicApi } from "../../utils/axiosInstance";
 import { Loader, MessageCircle } from "lucide-react";
 import UserQuestionAnswerList from "../../components/UserHelper/QuestionAnswerList";
 import UserProjectDetailHelper from "../../components/UserHelper/UserProjectDetailHelper";
@@ -39,30 +39,29 @@ const UserProjectDetail = () => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
 
-
     const handleAskQuestion = async (e) => {
         e.preventDefault();
         if (!questionText.trim()) return;
 
         const token = localStorage.getItem("token");
-
         if (!token) {
-            notifyError("Please Login to Ask a Question");
+            notifyError("Please login to ask a question.");
             localStorage.setItem("redirectAfterLogin", `/project/${id}`);
-            setTimeout(() => navigate("/login"));
+            navigate("/login");
             return;
         }
 
         try {
-            await axios.post(
-                `/user/interactions/question`,
-                { projectId: id, questionText },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            await protectedApi.post("/user/interactions/question", {
+                projectId: id, questionText
+            });
+
             setQuestionText("");
             fetchQuestions(id);
+            notifySuccess("Question submitted successfully!");
         } catch (err) {
-            notifyError("Error Submitting question");
+            console.error("Error submitting question:", err);
+            notifyError("Failed to submit question");
         }
     };
 
@@ -119,9 +118,7 @@ const UserProjectDetail = () => {
                             </div>
                         </div>
 
-
                         <div className="p-4 sm:p-6 lg:p-8">
-
                             {/* Project Info */}
                             <UserProjectDetailHelper
                                 project={project}
@@ -131,16 +128,14 @@ const UserProjectDetail = () => {
                                 onRequestBuy={() => {
                                     const token = localStorage.getItem("token");
                                     if (!token) {
-                                        notifyError("Before Placing Order Please login");;
+                                        notifyError("Please login before placing an order.");
                                         navigate("/login");
                                         return;
                                     }
                                     setSelectedProject(project);
                                     setIsOrderModalOpen(true);
-
                                 }}
                             />
-
 
                             {/* Gallery */}
                             <UserGallerySection photos={project.photos} />
@@ -179,7 +174,6 @@ const UserProjectDetail = () => {
             </div>
 
             <OrderModal isOpen={isOrderModalOpen} onClose={() => setIsOrderModalOpen(false)} />
-
         </>
     );
 };

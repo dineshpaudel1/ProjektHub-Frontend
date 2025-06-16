@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "../../utils/axiosInstance";
+import { publicApi } from "../../utils/axiosInstance";
 
 const SellerLogin = () => {
     const navigate = useNavigate();
@@ -15,14 +15,13 @@ const SellerLogin = () => {
         setError("");
 
         try {
-            const response = await axios.post("http://localhost:8080/api/auth/seller/login", {
+            const response = await publicApi.post("/auth/seller/login", {
                 identifier,
                 password,
             });
 
             const { accessToken, refreshToken, roles } = response?.data?.data || {};
 
-            // ❌ Check if SELLER is in the roles
             if (!roles || !roles.includes("SELLER")) {
                 setError("You are not authorized to access the seller panel.");
                 localStorage.clear();
@@ -43,11 +42,9 @@ const SellerLogin = () => {
             navigate("/seller");
         } catch (err) {
             console.error("Auth error:", err?.response || err.message);
-
             localStorage.removeItem("token");
             localStorage.removeItem("refreshToken");
             localStorage.removeItem("isAuthenticated");
-
             setError("Invalid credentials.");
             navigate("/seller/login");
         } finally {
@@ -58,27 +55,18 @@ const SellerLogin = () => {
     return (
         <div
             className="min-h-screen flex items-center justify-center pt-8 font-primary px-4"
-            style={{
-                backgroundColor: "var(--bg-color)",
-                color: "var(--text-color)",
-            }}
+            style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
         >
             <div
                 className="w-full max-w-sm rounded-xl shadow-md px-6 py-10 border"
-                style={{
-                    backgroundColor: "var(--menu-bg)",
-                    borderColor: "var(--border-color)",
-                }}
+                style={{ backgroundColor: "var(--menu-bg)", borderColor: "var(--border-color)" }}
             >
                 <h2 className="text-2xl font-bold text-center mb-6">Seller Login</h2>
-
                 {error && <p className="text-sm text-red-500 mb-4">{error}</p>}
 
                 <form onSubmit={handleLogin} className="space-y-5">
                     <div>
-                        <label htmlFor="email" className="block text-sm font-semibold mb-1">
-                            Email
-                        </label>
+                        <label htmlFor="email" className="block text-sm font-semibold mb-1">Email</label>
                         <input
                             id="email"
                             type="text"
@@ -90,15 +78,13 @@ const SellerLogin = () => {
                             style={{
                                 backgroundColor: "var(--bg-color)",
                                 color: "var(--text-color)",
-                                borderColor: "var(--border-color)",
+                                borderColor: "var(--border-color)"
                             }}
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="password" className="block text-sm font-semibold mb-1">
-                            Password
-                        </label>
+                        <label htmlFor="password" className="block text-sm font-semibold mb-1">Password</label>
                         <input
                             id="password"
                             type="password"
@@ -110,7 +96,7 @@ const SellerLogin = () => {
                             style={{
                                 backgroundColor: "var(--bg-color)",
                                 color: "var(--text-color)",
-                                borderColor: "var(--border-color)",
+                                borderColor: "var(--border-color)"
                             }}
                         />
                     </div>
@@ -119,15 +105,9 @@ const SellerLogin = () => {
                         type="submit"
                         disabled={loading}
                         className="w-full py-2.5 text-white font-semibold rounded-full transition duration-200"
-                        style={{
-                            backgroundColor: "var(--button-primary)",
-                        }}
-                        onMouseOver={(e) => {
-                            e.currentTarget.style.backgroundColor = "var(--button-primary-hover)";
-                        }}
-                        onMouseOut={(e) => {
-                            e.currentTarget.style.backgroundColor = "var(--button-primary)";
-                        }}
+                        style={{ backgroundColor: "var(--button-primary)" }}
+                        onMouseOver={(e) => e.currentTarget.style.backgroundColor = "var(--button-primary-hover)"}
+                        onMouseOut={(e) => e.currentTarget.style.backgroundColor = "var(--button-primary)"}
                     >
                         {loading ? "Logging in..." : "Login"}
                     </button>

@@ -1,23 +1,15 @@
 // src/apis/ProjectApi.jsx
-import axios from "../utils/axiosInstance";
+import { protectedApi } from "../utils/axiosInstance";  // ✅ updated
 
-// Add new project (unchanged)
+// Add new project (simplified ✅)
 export const addProject = async ({ title, description, categoryId }) => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("Authentication token not found.");
-
     try {
-        const response = await axios.post(
-            "http://localhost:8080/api/seller/project/add",
+        const response = await protectedApi.post(
+            "/seller/project/add",  // ✅ no need full URL, you're already using baseURL
             {
                 title,
                 description,
                 categoryId: Number(categoryId),
-            },
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
             }
         );
         return response.data;
@@ -27,20 +19,11 @@ export const addProject = async ({ title, description, categoryId }) => {
     }
 };
 
-// Fetch seller projects → return raw response
+// Fetch seller projects (simplified ✅)
 export const getSellerProjects = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("Authentication token not found.");
-
     try {
-        const response = await axios.get("http://localhost:8080/api/seller/project/my-projects", {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
+        const response = await protectedApi.get("/seller/project/my-projects");
         return response.data;
-
-
     } catch (error) {
         console.error("Failed to fetch seller projects:", error.response || error.message);
         throw error;

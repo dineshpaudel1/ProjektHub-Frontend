@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "../../utils/axiosInstance";
+import { protectedApi } from "../../utils/axiosInstance";
 import ProfileField from "../../components/ProfileField";
 import {
   User, Camera, Calendar, Edit2,
@@ -17,16 +17,7 @@ const SellerProfile = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setError("Authentication required");
-      setLoading(false);
-      return;
-    }
-
-    axios.get("http://localhost:8080/api/seller/profile", {
-      headers: { Authorization: `Bearer ${token}` }
-    })
+    protectedApi.get("/seller/profile")
       .then(res => {
         setSeller(res.data.data);
         setLoading(false);
@@ -74,7 +65,6 @@ const SellerProfile = () => {
       <h1 className="text-2xl font-bold text-gray-900 mb-4">Seller Profile</h1>
 
       <div className="flex flex-col md:flex-row gap-8 bg-white p-6 rounded-xl shadow-sm">
-        {/* Image */}
         <div className="md:w-1/3 flex flex-col items-center">
           <div className="relative group mb-4">
             {seller.profilePicture ? (
@@ -96,8 +86,7 @@ const SellerProfile = () => {
           <h3 className="text-lg font-semibold">{seller.sellerName}</h3>
           <p className="text-sm text-gray-600 mt-1">
             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${seller.status === 'active' ? 'bg-green-100 text-green-800' :
-              seller.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                'bg-gray-100 text-gray-800'
+              seller.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'
               }`}>
               {seller.status === 'active' && <CheckCircle className="w-3 h-3 mr-1" />}
               {seller.status === 'pending' && <Clock className="w-3 h-3 mr-1" />}
@@ -112,7 +101,6 @@ const SellerProfile = () => {
           )}
         </div>
 
-        {/* Fields */}
         <div className="md:w-2/3 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <ProfileField label="Seller Name" value={seller.sellerName} icon={<User />} />

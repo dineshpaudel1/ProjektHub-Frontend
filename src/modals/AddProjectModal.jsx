@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from '../utils/axiosInstance';
+import { publicApi } from '../utils/axiosInstance';
 
 const AddProjectModal = ({ isOpen, onClose, onCreate, formData, setFormData }) => {
     const [categories, setCategories] = useState([]);
@@ -7,7 +7,7 @@ const AddProjectModal = ({ isOpen, onClose, onCreate, formData, setFormData }) =
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await axios.get('/public/category',);
+                const response = await publicApi.get('/public/category');
                 setCategories(response.data.data);
             } catch (error) {
                 console.error('❌ Error fetching categories:', error);

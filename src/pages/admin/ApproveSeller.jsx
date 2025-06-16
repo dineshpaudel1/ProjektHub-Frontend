@@ -1,39 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "../../utils/axiosInstance";
+import { protectedApi } from "../../utils/axiosInstance";
 
 const ApproveSeller = () => {
     const { sellerId } = useParams();
     const navigate = useNavigate();
     const [seller, setSeller] = useState(null);
 
-    const token = localStorage.getItem("token");
-    console.log(token)
-    console.log(sellerId)
-
     useEffect(() => {
         const fetchSellerDetails = async () => {
             try {
-                const res = await axios.get(`/admin/sellers/${sellerId}`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
+                const res = await protectedApi.get(`/admin/sellers/${sellerId}`);
                 setSeller(res.data.data);
-                console.log(res.data)
             } catch (error) {
                 console.error("Error fetching seller details:", error);
             }
         };
 
         fetchSellerDetails();
-    }, [sellerId, token]);
+    }, [sellerId]);
 
     const handleApprove = async () => {
         try {
-            await axios.put(`/admin/sellers/${sellerId}/approve`, {}, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
+            await protectedApi.put(`/admin/sellers/${sellerId}/approve`);
             alert("Seller approved!");
-            navigate("/admin"); // or to pending list
+            navigate("/admin");
         } catch (error) {
             console.error("Approval failed:", error);
         }
@@ -41,9 +32,7 @@ const ApproveSeller = () => {
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`/admin/sellers/${sellerId}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
+            await protectedApi.delete(`/admin/sellers/${sellerId}`);
             alert("Seller deleted.");
             navigate("/admin");
         } catch (error) {

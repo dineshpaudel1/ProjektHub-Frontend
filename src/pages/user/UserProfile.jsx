@@ -1,55 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useUser } from "../../context/UserContext";
-import axios from "../../utils/axiosInstance";
+import { protectedApi } from "../../utils/axiosInstance";
 import { Loader, Mail, User } from "lucide-react";
 
 const UserProfile = () => {
-    const { user, setUser } = useUser(); // use context instead of local fetch
-    const [loading, setLoading] = useState(!user); // only load if user is null
+    const { user } = useUser();
     const [newPassword, setNewPassword] = useState("");
-    const [imageLoaded, setImageLoaded] = useState(false);
-    const [imageSrc, setImageSrc] = useState("");
     const [notification, setNotification] = useState(null);
-    const [theme, setTheme] = useState(() =>
-        localStorage.getItem("theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
-    );
-
-    const token = localStorage.getItem("token");
-    console.log(user)
-
-    useEffect(() => {
-        document.documentElement.setAttribute("data-theme", theme);
-        localStorage.setItem("theme", theme);
-    }, [theme]);
-
-    useEffect(() => {
-        if (user?.profilePicture) {
-            const img = new Image();
-            img.src = user.profilePicture;
-            img.onload = () => {
-                setImageSrc(user.profilePicture);
-                setImageLoaded(true);
-            };
-            img.onerror = () => {
-                setImageSrc("https://via.placeholder.com/150");
-                setImageLoaded(true);
-            };
-        }
-    }, [user]);
 
     const handleSetPassword = async () => {
         if (!newPassword) return;
         try {
-            await axios.post(
-                "/user/set-password",
-                { newPassword },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
+            await protectedApi.post("/user/set-password", { newPassword });
             setNotification({ type: "success", message: "Password updated successfully!" });
             setNewPassword("");
         } catch (error) {
@@ -58,18 +20,10 @@ const UserProfile = () => {
         }
     };
 
-    if (loading) {
+    if (!user) {
         return (
             <div className="flex justify-center items-center h-screen">
                 <Loader className="animate-spin w-8 h-8" />
-            </div>
-        );
-    }
-
-    if (!user) {
-        return (
-            <div className="text-center mt-10 text-red-500">
-                Failed to load user data.
             </div>
         );
     }
@@ -80,16 +34,11 @@ const UserProfile = () => {
                 <div className="space-y-6">
                     <div className="flex flex-col items-center">
                         <img
-                            src={`http://localhost:8080/api/media/photo?file=${user.profilePicture}`}
+                            src={user.profilePicture ? `http://localhost:8080/api/media/photo?file=${user.profilePicture}` : "https://via.placeholder.com/150"}
                             alt="Profile"
-                            onError={(e) => {
-                                e.target.onerror = null;
-                                e.target.src = "https://via.placeholder.com/150";
-                            }}
+                            onError={(e) => { e.target.src = "https://via.placeholder.com/150" }}
                             className="w-32 h-32 rounded-full border border-green-500 object-cover"
                         />
-
-
                         <h2 className="text-xl font-semibold mt-3">{user.fullName}</h2>
                     </div>
 
@@ -128,6 +77,7 @@ const UserProfile = () => {
                                 Save Password
                             </button>
                         </div>
+
                         {notification && (
                             <div className={`mt-3 px-4 py-2 rounded text-sm ${notification.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
                                 {notification.message}
@@ -138,7 +88,6 @@ const UserProfile = () => {
             </div>
         </div>
     );
-
 };
 
 export default UserProfile;

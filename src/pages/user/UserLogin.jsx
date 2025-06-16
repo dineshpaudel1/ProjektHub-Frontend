@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
 import { notifySuccess, notifyError } from '../../utils/toastNotify';
-import axiosInstance from '../../utils/axiosInstance';
+import { publicApi, protectedApi } from '../../utils/axiosInstance';
 
 const UserLogin = () => {
     const [identifier, setIdentifier] = useState("");
@@ -13,105 +13,73 @@ const UserLogin = () => {
     useEffect(() => {
         if (window.google) {
             const isDark = document.documentElement.classList.contains("dark");
-
             window.google.accounts.id.initialize({
                 client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
                 callback: handleGoogleCallback,
             });
-
             window.google.accounts.id.renderButton(
                 document.getElementById("google-signin-button"),
-                {
-                    theme: isDark ? "filled_black" : "outline",
-                    size: "large",
-                    width: "100%",
-                }
+                { theme: isDark ? "filled_black" : "outline", size: "large", width: "100%" }
             );
         }
     }, []);
 
     const handleGoogleCallback = async (response) => {
         const idToken = response.credential;
-        console.log(idToken);
         try {
-            const res = await axiosInstance.post('/auth/login/google', { token: idToken });
+            const res = await publicApi.post('/auth/login/google', { token: idToken });
+            const { accessToken, refreshToken, roles } = res?.data?.data;
 
-            if (res.status === 200 && res.data?.status === "success") {
-                const { accessToken, refreshToken, roles } = res.data.data;
+            localStorage.setItem("token", accessToken);
+            localStorage.setItem("refreshToken", refreshToken);
+            setRoles(roles);
 
-                localStorage.setItem("token", accessToken);
-                localStorage.setItem("refreshToken", refreshToken);
-                setRoles(roles);
+            const userRes = await protectedApi.get('/user/me');
+            setUser(userRes.data);
+            notifySuccess("Login Success");
 
-                const userRes = await axiosInstance.get('/user/me', {
-                    headers: { Authorization: `Bearer ${accessToken}` },
-                });
-                setUser(userRes.data);
-
-                notifySuccess("Login Success");
-                const redirectPath = localStorage.getItem("redirectAfterLogin") || "/";
-                localStorage.removeItem("redirectAfterLogin");
-                navigate(redirectPath);
-            } else {
-                throw new Error(res.data.message || "Login failed");
-            }
+            const redirectPath = localStorage.getItem("redirectAfterLogin") || "/";
+            localStorage.removeItem("redirectAfterLogin");
+            navigate(redirectPath);
         } catch (err) {
-            console.error("Login failed:", err);
-            notifyError("Something went wrong");
+            console.error("Google login failed:", err);
+            notifyError("Something went wrong during Google login.");
         }
     };
 
     const handleManualLogin = async (e) => {
         e.preventDefault();
-
         if (!identifier || !password) {
             notifyError("Please enter both email and password.");
             return;
         }
-
         try {
-            const res = await axiosInstance.post('/auth/user/login', {
-                identifier,
-                password,
-            });
+            const res = await publicApi.post('/auth/user/login', { identifier, password });
+            const { accessToken, refreshToken } = res.data.data;
 
-            if (res.status === 200 && res.data?.status === "success") {
-                const { accessToken, refreshToken } = res.data.data;
+            localStorage.setItem("token", accessToken);
+            localStorage.setItem("refreshToken", refreshToken);
 
-                localStorage.setItem("token", accessToken);
-                localStorage.setItem("refreshToken", refreshToken);
+            const userRes = await protectedApi.get('/user/me');
+            setUser(userRes.data);
 
-                const userRes = await axiosInstance.get('/user/me', {
-                    headers: { Authorization: `Bearer ${accessToken}` },
-                });
-                setUser(userRes.data);
-
-                notifySuccess("Login successful!");
-                const redirectPath = localStorage.getItem("redirectAfterLogin") || "/";
-                localStorage.removeItem("redirectAfterLogin");
-                navigate(redirectPath);
-            } else {
-                throw new Error(res.data.message || "Invalid credentials");
-            }
+            notifySuccess("Login successful!");
+            const redirectPath = localStorage.getItem("redirectAfterLogin") || "/";
+            localStorage.removeItem("redirectAfterLogin");
+            navigate(redirectPath);
         } catch (err) {
-            console.error("Login error:", err);
-            notifyError(err.message || "Login failed");
+            console.error("Manual login error:", err);
+            notifyError(err?.response?.data?.message || "Invalid credentials");
         }
     };
 
     return (
-        <div
-            className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 font-Doto pt-8"
-            style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
-        >
+        <div className="min-h-screen flex items-center justify-center px-4 font-Doto pt-8"
+            style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}>
             <div className="flex flex-col justify-center items-center w-full max-w-[480px]">
-                <form
-                    onSubmit={handleManualLogin}
-                    className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-md xl:max-w-sm 2xl:max-w-sm rounded-xl shadow-md px-6 sm:px-8 py-10 border"
-                    style={{
-                        backgroundColor: "var(--menu-bg)",
-                        borderColor: "var(--border-color)",
-                    }}
+                <form onSubmit={handleManualLogin}
+                    className="w-full max-w-sm rounded-xl shadow-md px-6 py-10 border"
+                    style={{ backgroundColor: "var(--menu-bg)", borderColor: "var(--border-color)" }}
                 >
                     <h2 className="text-2xl font-bold text-center mb-5">Login</h2>
 
@@ -124,22 +92,15 @@ const UserLogin = () => {
                             value={identifier}
                             onChange={(e) => setIdentifier(e.target.value)}
                             required
-                            className="w-full px-4 py-2.5 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            style={{
-                                backgroundColor: "var(--bg-color)",
-                                color: "var(--text-color)",
-                                borderColor: "var(--border-color)",
-                            }}
+                            className="w-full px-4 py-2.5 border rounded-md text-sm"
+                            style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)", borderColor: "var(--border-color)" }}
                         />
                     </div>
 
                     <div className="mb-6">
                         <div className="flex justify-between items-center mb-1">
                             <label htmlFor="password" className="text-base font-semibold">Password</label>
-                            <span
-                                onClick={() => navigate("/forgot-password")}
-                                className="text-sm font-semibold hover:underline cursor-pointer"
-                            >
+                            <span onClick={() => navigate("/forgot-password")} className="text-sm font-semibold hover:underline cursor-pointer">
                                 Forgot password?
                             </span>
                         </div>
@@ -150,19 +111,13 @@ const UserLogin = () => {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
-                            className="w-full px-4 py-2.5 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            style={{
-                                backgroundColor: "var(--bg-color)",
-                                color: "var(--text-color)",
-                                borderColor: "var(--border-color)",
-                            }}
+                            className="w-full px-4 py-2.5 border rounded-md text-sm"
+                            style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)", borderColor: "var(--border-color)" }}
                         />
                     </div>
 
-                    <button
-                        type="submit"
-                        className="w-full py-2.5 text-white bg-blue-600 rounded-full font-semibold hover:bg-blue-700 transition duration-200"
-                    >
+                    <button type="submit"
+                        className="w-full py-2.5 text-white bg-blue-600 rounded-full font-semibold hover:bg-blue-700">
                         Login
                     </button>
 
@@ -175,8 +130,7 @@ const UserLogin = () => {
                     <div id="google-signin-button" className="w-full flex justify-center" />
 
                     <p className="text-center text-sm mt-6">
-                        Don't have an account?{" "}
-                        <a href="#" className="font-bold underline">Signup</a>
+                        Don't have an account? <a href="#" className="font-bold underline">Signup</a>
                     </p>
                 </form>
             </div>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "../../utils/axiosInstance"; // This should already be configured to attach token
+import { protectedApi } from "../../utils/axiosInstance";
 
 const MyOrder = () => {
   const [orders, setOrders] = useState([]);
@@ -9,15 +9,8 @@ const MyOrder = () => {
 
   const fetchOrders = async () => {
     try {
-      const token = localStorage.getItem("token");
-
-      const res = await axios.get("http://localhost:8080/api/user/order", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setOrders(res.data.data);
+      const res = await protectedApi.get("/user/order");
+      setOrders(res.data.data || []);
     } catch (err) {
       console.error("Failed to fetch orders", err);
     } finally {
@@ -30,7 +23,7 @@ const MyOrder = () => {
   }, []);
 
   return (
-    <div className=" mt-10 min-h-screen bg-[var(--bg-color)] text-[var(--text-color)] px-4 sm:px-8 lg:px-16 py-10">
+    <div className="mt-10 min-h-screen bg-[var(--bg-color)] text-[var(--text-color)] px-4 sm:px-8 lg:px-16 py-10">
       <h1 className="text-2xl font-bold mb-6">My Orders</h1>
 
       {loading ? (
@@ -45,7 +38,6 @@ const MyOrder = () => {
               onClick={() => navigate(`/my-order/${order.orderId}`)}
               className="cursor-pointer border border-gray-300 rounded-lg p-4 shadow-sm hover:shadow-md transition"
             >
-
               <div className="flex justify-between items-center mb-2">
                 <h2 className="text-lg font-semibold">
                   Order #{order.orderId}
@@ -63,8 +55,7 @@ const MyOrder = () => {
                 Placed on: {new Date(order.createdAt).toLocaleString()}
               </p>
               <p className="text-sm mt-1">
-                Total Items:{" "}
-                <span className="font-medium">{order.numberOfItems}</span>
+                Total Items: <span className="font-medium">{order.numberOfItems}</span>
               </p>
               <p className="text-sm">
                 Total Price:{" "}

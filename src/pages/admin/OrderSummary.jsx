@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { protectedApi } from "../../utils/axiosInstance";  // ✅ updated axios import
 import { ClipboardList, Package, DollarSign } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -10,11 +10,7 @@ const OrderSummary = () => {
 
     const fetchOrderSummary = async () => {
         try {
-            const token = localStorage.getItem("token");
-            const response = await axios.get("http://localhost:8080/api/admin/order/summary", {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-
+            const response = await protectedApi.get("/admin/order/summary");
             if (response.data.statusCode === 200) {
                 setOrders(response.data.data);
             }
