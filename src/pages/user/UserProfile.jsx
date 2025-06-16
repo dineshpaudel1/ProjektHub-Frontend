@@ -80,7 +80,7 @@ const UserProfile = () => {
                 <div className="space-y-6">
                     <div className="flex flex-col items-center">
                         <img
-                            src={user.profilePicture}
+                            src={`http://localhost:8080/api/media/photo?file=${user.profilePicture}`}
                             alt="Profile"
                             onError={(e) => {
                                 e.target.onerror = null;

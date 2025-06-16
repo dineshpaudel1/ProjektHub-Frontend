@@ -168,7 +168,7 @@ const UserNavbar = () => {
                         <div className="relative profile-dropdown">
                             <div onClick={() => setDropdownOpen(!dropdownOpen)} className="w-9 h-9 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden cursor-pointer border border-gray-400">
                                 {user.profilePicture ? (
-                                    <img src={user.profilePicture} alt="Profile" className="w-full h-full object-cover rounded-full" />
+                                    <img src={`http://localhost:8080/api/media/photo?file=${user.profilePicture}`} alt="Profile" className="w-full h-full object-cover rounded-full" />
                                 ) : (
                                     <span className="text-sm font-semibold text-white bg-indigo-600 w-full h-full flex items-center justify-center rounded-full">{user.username?.charAt(0).toUpperCase()}</span>
                                 )}

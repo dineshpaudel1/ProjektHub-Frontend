@@ -24,7 +24,7 @@ instance.interceptors.response.use(
             return Promise.reject(err);
         }
 
-        if (err.response?.status === 401 && !originalRequest._retry) {
+        if (err.response?.data.message === "Access token has expired" && !originalRequest._retry) {
             originalRequest._retry = true;
 
             try {
