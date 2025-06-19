@@ -125,7 +125,7 @@ const SellerDashboard = () => {
                             iconBg="bg-green-600"
                             change="3%"
                             changeType="increase"
-                            navigateTo="/admin/sellers"
+                            navigateTo="/seller/sellerproject"
                         />
                         <StatCard
                             title="Sold Projects"
@@ -134,7 +134,7 @@ const SellerDashboard = () => {
                             iconBg="bg-amber-500"
                             change="5%"
                             changeType="increase"
-                            navigateTo="/admin/sold-projects"
+                            navigateTo="/seller/sellerproject"
                         />
                     </div>
                 </div>
@@ -156,6 +156,7 @@ const SellerDashboard = () => {
                                 description={`Asked by @${q.askedByUsername}: ${q.questionText}`}
                                 icon={<FaUser size={16} />}
                                 iconBg="bg-green-600"
+                                navigateTo={`/seller/sellerproject/${q.projectId}`}  // 🔁 Dynamic project ID
                             />
                         )) : (
                             <div className="p-4 text-center text-sm text-gray-500">No recent questions.</div>

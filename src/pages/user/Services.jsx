@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaClock, FaLeaf, FaUsers, FaRobot } from "react-icons/fa";
 import CustomOrderModal from "../../modals/CustomOrderModal";
-import { useNavigate } from "react-router-dom";  // ✅ for redirection
+import { useNavigate, useLocation } from "react-router-dom";
 
 const services = [
     {
@@ -32,21 +32,45 @@ const services = [
 
 const Services = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const navigate = useNavigate(); // ✅ initialize navigation
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    useEffect(() => {
+        if (localStorage.getItem("openCustomOrderModal") === "true") {
+            setIsModalOpen(true);                       // ✅ Open modal
+            localStorage.removeItem("openCustomOrderModal"); // 🧹 Clean up
+        }
+    }, []);
+
+
+    useEffect(() => {
+        if (location.state?.scrollTo) {
+            const element = document.getElementById(location.state.scrollTo);
+            if (element) {
+                element.scrollIntoView({ behavior: "smooth" });
+            }
+        }
+    }, [location]);
 
     const handleCustomOrderClick = () => {
-        const token = localStorage.getItem("token");  // ✅ check token (or whatever key you store token in)
-
+        const token = localStorage.getItem("token");
         if (token) {
-            setIsModalOpen(true);  // ✅ user is logged in
+            setIsModalOpen(true);
         } else {
-            navigate("/login");  // ✅ redirect to login
+            localStorage.setItem("redirectAfterLogin", "/");
+            localStorage.setItem("scrollTo", "services");
+            localStorage.setItem("openCustomOrderModal", "true");
+            navigate("/login", { state: { from: "/" } });
         }
     };
 
+
+
+
+
     return (
-        <section
-            className="py-20 px-4 sm:px-6 lg:px-16 transition-all"
+        <section id="services"
+            className="py-30 px-4 sm:px-6 lg:px-16 transition-all"
             style={{
                 backgroundColor: "var(--bg-color)",
                 color: "var(--text-color)",
@@ -74,22 +98,31 @@ const Services = () => {
                                 {service.icon}
                             </div>
                             <h3 className="text-xl font-bold mb-2">{service.title}</h3>
-                            <p className="text-sm mb-4" style={{ color: "var(--text-secondary)" }}>
+                            <p
+                                className="text-sm mb-4 truncate"
+                                style={{
+                                    color: "var(--text-secondary)",
+                                    whiteSpace: "nowrap",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                }}
+                            >
                                 {service.desc}
                             </p>
+
                             <a
-                                href="#"
                                 className="font-semibold text-sm hover:underline inline-flex items-center gap-1"
                                 style={{ color: "var(--button-primary)" }}
+                                onClick={handleCustomOrderClick}
                             >
-                                Read more →
+                                Click here to develop →
                             </a>
                         </div>
                     ))}
                 </div>
 
                 <button
-                    className="px-6 py-3 rounded-full text-sm font-semibold transition"
+                    className="px-6 py-3 text-sm font-semibold transition"
                     style={{
                         backgroundColor: "var(--button-primary)",
                         color: "#fff",
@@ -102,7 +135,7 @@ const Services = () => {
                     }
                     onClick={handleCustomOrderClick}
                 >
-                    Make Custom Order →
+                    Click here to Make Custom Order →
                 </button>
                 <CustomOrderModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
             </div>

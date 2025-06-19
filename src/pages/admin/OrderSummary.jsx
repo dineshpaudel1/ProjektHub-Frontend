@@ -108,7 +108,14 @@ const OrderSummary = () => {
                                     <tr
                                         key={order.orderId}
                                         className="hover:bg-gray-50 cursor-pointer"
-                                        onClick={() => navigate(`/admin/orders/${order.orderId}`)}
+                                        onClick={() => {
+                                            if (order.orderType === "PREMADE") {
+                                                navigate(`/admin/premade-orders/${order.orderId}`);
+                                            } else if (order.orderType === "CUSTOM") {
+                                                navigate(`/admin/custom-orders/${order.orderId}`);
+                                            }
+                                        }}
+
                                     >
                                         <td className="px-6 py-4 font-medium text-gray-900">#{order.orderId}</td>
                                         <td className="px-6 py-4">

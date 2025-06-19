@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
 import { notifySuccess, notifyError } from '../../utils/toastNotify';
 import { publicApi, protectedApi } from '../../utils/axiosInstance';
@@ -7,6 +7,7 @@ import { publicApi, protectedApi } from '../../utils/axiosInstance';
 const UserLogin = () => {
     const [identifier, setIdentifier] = useState("");
     const [password, setPassword] = useState("");
+    const location = useLocation();
     const navigate = useNavigate();
     const { setUser, setRoles } = useUser();
 
@@ -37,10 +38,10 @@ const UserLogin = () => {
             const userRes = await protectedApi.get('/user/me');
             setUser(userRes.data);
             notifySuccess("Login Success");
-
-            const redirectPath = localStorage.getItem("redirectAfterLogin") || "/";
+            const redirectPath = location.state?.from || localStorage.getItem("redirectAfterLogin") || "/";
             localStorage.removeItem("redirectAfterLogin");
             navigate(redirectPath);
+
         } catch (err) {
             console.error("Google login failed:", err);
             notifyError("Something went wrong during Google login.");
@@ -64,9 +65,10 @@ const UserLogin = () => {
             setUser(userRes.data);
 
             notifySuccess("Login successful!");
-            const redirectPath = localStorage.getItem("redirectAfterLogin") || "/";
+            const redirectPath = location.state?.from || localStorage.getItem("redirectAfterLogin") || "/";
             localStorage.removeItem("redirectAfterLogin");
             navigate(redirectPath);
+
         } catch (err) {
             console.error("Manual login error:", err);
             notifyError(err?.response?.data?.message || "Invalid credentials");

@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect } from "react";
-import { protectedApi } from "../utils/axiosInstance";  // ✅ updated import
-import { FaSpinner } from "react-icons/fa";
+import React, { useState, useRef } from "react";
+import { FaSpinner, FaTimes } from "react-icons/fa";
 import { toast } from "react-toastify";
+import { protectedApi } from "../utils/axiosInstance"
 
 const CustomOrderModal = ({ isOpen, onClose }) => {
     const [formData, setFormData] = useState({
@@ -18,48 +18,50 @@ const CustomOrderModal = ({ isOpen, onClose }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
 
     const handleOptionChange = (option) => {
-        const updatedOptions = formData.selectedOptions.includes(option)
-            ? formData.selectedOptions.filter(item => item !== option)
-            : [...formData.selectedOptions, option];
-        setFormData({ ...formData, selectedOptions: updatedOptions });
+        setFormData(prev => {
+            const selected = prev.selectedOptions.includes(option)
+                ? prev.selectedOptions.filter(item => item !== option)
+                : [...prev.selectedOptions, option];
+            return { ...prev, selectedOptions: selected };
+        });
     };
 
-    const validateForm = () => {
-        const errs = {};
-        if (!formData.userPhoneNumber.match(/^98\d{8}$/)) {
-            errs.userPhoneNumber = "Phone number must start with 98 and be 10 digits.";
+    const validate = () => {
+        const newErrors = {};
+        if (!/^\d{10}$/.test(formData.userPhoneNumber)) {
+            newErrors.userPhoneNumber = "Phone number must be 10 digits.";
         }
         if (!formData.customTitle.trim()) {
-            errs.customTitle = "Custom Title is required.";
+            newErrors.customTitle = "Title is required.";
         }
         if (!formData.customDescription.trim()) {
-            errs.customDescription = "Custom Description is required.";
+            newErrors.customDescription = "Description is required.";
         }
         if (formData.selectedOptions.length === 0) {
-            errs.selectedOptions = "At least one option must be selected.";
+            newErrors.selectedOptions = "Select at least one option.";
         }
-        setErrors(errs);
-        return Object.keys(errs).length === 0;
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!validateForm()) return;
+        if (!validate()) return;
 
         const payload = {
             userPhoneNumber: formData.userPhoneNumber,
             customTitle: formData.customTitle,
             customDescription: formData.customDescription,
-            selectedOptions: formData.selectedOptions.map(option => ({ optionName: option }))
+            selectedOptions: formData.selectedOptions   // ✅ directly array of strings
         };
 
         try {
             setLoading(true);
-            await protectedApi.post("/user/order/custom", payload);  // ✅ updated protected call
+            await protectedApi.post("/user/order/custom", payload);
             toast.success("Custom order placed successfully!");
             onClose();
             resetForm();
@@ -70,7 +72,6 @@ const CustomOrderModal = ({ isOpen, onClose }) => {
             setLoading(false);
         }
     };
-
     const resetForm = () => {
         setFormData({
             userPhoneNumber: "",
@@ -81,72 +82,152 @@ const CustomOrderModal = ({ isOpen, onClose }) => {
         setErrors({});
     };
 
-    useEffect(() => {
-        const handleClickOutside = (e) => {
-            if (modalRef.current && !modalRef.current.contains(e.target) && !loading) {
-                onClose();
-            }
-        };
-
-        if (isOpen) {
-            document.addEventListener("mousedown", handleClickOutside);
-        }
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [isOpen, loading, onClose]);
 
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center z-50 px-4 backdrop-blur-sm bg-black/10 font-[var(--font-primary)]">
-            <div ref={modalRef} className="bg-white p-6 rounded-xl w-full max-w-lg relative shadow-xl text-black max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+            <div
+                ref={modalRef}
+                className="rounded-lg w-full max-w-md mx-4 overflow-hidden shadow-xl"
+                style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)", border: "1px solid var(--border-color)" }}
+            >
+                <div className="flex items-center justify-between p-4 border-b" style={{ borderColor: "var(--border-color)" }}>
+                    <h2 className="text-xl font-semibold">Place Custom Order</h2>
+                    <button
+                        onClick={onClose}
+                        disabled={loading}
+                        className="hover:opacity-80"
+                        style={{ color: "var(--text-secondary)" }}
+                    >
+                        <FaTimes />
+                    </button>
+                </div>
 
-                <button onClick={onClose} disabled={loading} className="absolute top-3 right-4 text-xl font-bold">×</button>
-
-                <h2 className="text-2xl font-semibold mb-4">Place Custom Order</h2>
-                <form onSubmit={handleSubmit}>
-
-                    <div className="mb-3">
-                        <label className="block font-medium mb-1">Phone Number</label>
-                        <input type="text" name="userPhoneNumber" value={formData.userPhoneNumber} onChange={handleChange} className={`w-full border rounded p-2 ${errors.userPhoneNumber ? "border-red-500" : ""}`} />
-                        {errors.userPhoneNumber && <p className="text-red-500 text-sm">{errors.userPhoneNumber}</p>}
-                    </div>
-
-                    <div className="mb-3">
-                        <label className="block font-medium mb-1">Custom Title</label>
-                        <input type="text" name="customTitle" value={formData.customTitle} onChange={handleChange} className={`w-full border rounded p-2 ${errors.customTitle ? "border-red-500" : ""}`} />
-                        {errors.customTitle && <p className="text-red-500 text-sm">{errors.customTitle}</p>}
-                    </div>
-
-                    <div className="mb-3">
-                        <label className="block font-medium mb-1">Custom Description</label>
-                        <textarea name="customDescription" value={formData.customDescription} onChange={handleChange} className={`w-full border rounded p-2 ${errors.customDescription ? "border-red-500" : ""}`} />
-                        {errors.customDescription && <p className="text-red-500 text-sm">{errors.customDescription}</p>}
-                    </div>
-
-                    <div className="mb-3">
-                        <label className="block font-medium mb-1">Select Options</label>
-                        <div className="flex flex-wrap gap-4">
-                            {availableOptions.map((option, idx) => (
-                                <label key={idx} className="flex items-center gap-2">
-                                    <input type="checkbox" checked={formData.selectedOptions.includes(option)} onChange={() => handleOptionChange(option)} />
-                                    {option}
+                <div className="p-6">
+                    <form onSubmit={handleSubmit}>
+                        <div className="space-y-4 text-left">
+                            {/* Title */}
+                            <div>
+                                <label className="block text-sm font-medium mb-1 pl-1" style={{ color: "var(--text-secondary)" }}>
+                                    Title
                                 </label>
-                            ))}
-                        </div>
-                        {errors.selectedOptions && <p className="text-red-500 text-sm">{errors.selectedOptions}</p>}
-                    </div>
+                                <input
+                                    placeholder="Enter your project title."
+                                    type="text"
+                                    name="customTitle"
+                                    value={formData.customTitle}
+                                    onChange={handleChange}
+                                    className={`w-full px-3 py-2 border rounded-md ${errors.customTitle ? "border-red-500" : ""}`}
+                                    style={{
+                                        borderColor: errors.customTitle ? "#ef4444" : "var(--border-color)",
+                                        backgroundColor: "transparent",
+                                        color: "var(--text-color)"
+                                    }}
+                                />
+                                {errors.customTitle && (
+                                    <p className="mt-1 text-sm text-red-500">{errors.customTitle}</p>
+                                )}
+                            </div>
 
-                    <div className="flex justify-end gap-3 mt-4">
-                        <button type="button" onClick={onClose} disabled={loading} className="px-4 py-2 bg-gray-300 rounded">
-                            Cancel
-                        </button>
-                        <button type="submit" disabled={loading} className="px-4 py-2 bg-blue-600 text-white rounded flex items-center justify-center gap-2">
-                            {loading && <FaSpinner className="animate-spin" />} Place Order
-                        </button>
-                    </div>
-                </form>
+                            {/* Description */}
+                            <div>
+                                <label className="block text-sm font-medium mb-1 pl-1" style={{ color: "var(--text-secondary)" }}>
+                                    Description
+                                </label>
+                                <textarea
+                                    placeholder="Please provide detailed description of your project"
+                                    name="customDescription"
+                                    value={formData.customDescription}
+                                    onChange={handleChange}
+                                    rows={3}
+                                    className={`w-full px-3 py-2 border rounded-md ${errors.customDescription ? "border-red-500" : ""}`}
+                                    style={{
+                                        borderColor: errors.customDescription ? "#ef4444" : "var(--border-color)",
+                                        backgroundColor: "transparent",
+                                        color: "var(--text-color)"
+                                    }}
+                                />
+                                {errors.customDescription && (
+                                    <p className="mt-1 text-sm text-red-500">{errors.customDescription}</p>
+                                )}
+                            </div>
+
+                            {/* Options */}
+                            <div>
+                                <label className="block text-sm font-medium mb-2 pl-1" style={{ color: "var(--text-secondary)" }}>
+                                    Options(Select Option for what you want to build)
+                                </label>
+                                <div className="flex flex-col gap-2">
+                                    {availableOptions.map((option, idx) => (
+                                        <label key={idx} className="flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                checked={formData.selectedOptions.includes(option)}
+                                                onChange={() => handleOptionChange(option)}
+                                                className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                                            />
+                                            <span className="ml-2 text-sm" style={{ color: "var(--text-color)" }}>{option}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                                {errors.selectedOptions && (
+                                    <p className="mt-1 text-sm text-red-500">{errors.selectedOptions}</p>
+                                )}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1 pl-1" style={{ color: "var(--text-secondary)" }}>
+                                    Phone Number (you will be contacted via whatsapp)
+                                </label>
+                                <input
+                                    type="text"
+                                    name="userPhoneNumber"
+                                    value={formData.userPhoneNumber}
+                                    onChange={handleChange}
+                                    placeholder="98XXXXXXXX"
+                                    className={`w-full px-3 py-2 border rounded-md ${errors.userPhoneNumber ? "border-red-500" : ""}`}
+                                    style={{
+                                        borderColor: errors.userPhoneNumber ? "#ef4444" : "var(--border-color)",
+                                        backgroundColor: "transparent",
+                                        color: "var(--text-color)"
+                                    }}
+                                />
+                                {errors.userPhoneNumber && (
+                                    <p className="mt-1 text-sm text-red-500">{errors.userPhoneNumber}</p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="mt-6 flex justify-end space-x-3">
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                disabled={loading}
+                                className="px-4 py-2 text-sm font-medium rounded-md focus:outline-none"
+                                style={{
+                                    backgroundColor: "var(--hover-bg)",
+                                    color: "var(--text-color)",
+                                    border: "1px solid var(--border-color)"
+                                }}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="px-4 py-2 text-sm font-medium text-white rounded-md flex items-center justify-center"
+                                style={{
+                                    backgroundColor: "var(--button-primary)"
+                                }}
+                            >
+                                {loading && <FaSpinner className="animate-spin mr-2" />}
+                                Place Order
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
             </div>
         </div>
     );

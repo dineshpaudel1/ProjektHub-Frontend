@@ -11,6 +11,8 @@ const SellerNav = ({ toggleSidebar }) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [notifications, setNotifications] = useState([]);
     const [showNotifications, setShowNotifications] = useState(false);
+    const unreadCount = notifications.filter(n => !n.read).length;
+
     const menuRef = useRef();
     const searchRef = useRef();
     const notificationRef = useRef();
@@ -120,11 +122,12 @@ const SellerNav = ({ toggleSidebar }) => {
                 <div className="relative" ref={notificationRef}>
                     <button onClick={() => setShowNotifications(prev => !prev)} className="p-2 rounded-full hover:bg-gray-100 relative">
                         <Bell size={20} className="text-gray-700" />
-                        {notifications.length > 0 && (
+                        {unreadCount > 0 && (
                             <span className="absolute -top-1 -right-1 bg-red-600 text-[10px] text-white font-bold px-1.5 py-0.5 rounded-full shadow-sm">
-                                {notifications.length}
+                                {unreadCount > 9 ? "9+" : unreadCount}
                             </span>
                         )}
+
                     </button>
 
                     {showNotifications && (
@@ -144,12 +147,26 @@ const SellerNav = ({ toggleSidebar }) => {
                                         <div
                                             key={note.id}
                                             className="flex items-start gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded"
-                                            onClick={() => {
-                                                if (note.targetType === "QUESTION") {
-                                                    navigate(`/seller/questions/${note.targetId}`);
+                                            onClick={async () => {
+                                                try {
+                                                    await protectedApi.put(`/notifications/${note.id}/read`);
+                                                    setNotifications(prev =>
+                                                        prev.map(n => (n.id === note.id ? { ...n, read: true } : n))
+                                                    );
+                                                    if (note.targetType === "QUESTION") {
+                                                        navigate(`/seller/questions/${note.targetId}`);
+                                                    } else if (note.targetType === "PROJECT") {
+                                                        navigate(`/seller/project/${note.targetId}`);
+                                                    } else {
+                                                        console.warn("Unknown targetType:", note.targetType);
+                                                    }
+                                                } catch (err) {
+                                                    console.error("Failed to mark as read:", err);
+                                                } finally {
                                                     setShowNotifications(false);
                                                 }
                                             }}
+
                                         >
                                             <img
                                                 src={`http://localhost:8080/api/media/photo?file=${note.photoUrl}`}

@@ -10,7 +10,7 @@ import AdminPrivateRoute from "./utils/AdminPrivateRoute";
 import SellerPrivateRoute from "./utils/SellerPrivateRoute";
 import { UserProvider } from "./context/UserContext";
 
-import { AdminLogin, Dashboard, AdminProjects, AllProjectDetail, AdminProfile, OrderSummary, ApproveSeller, AdminOrderDetails } from "./pages/admin";
+import { AdminLogin, Dashboard, AdminProjects, AllProjectDetail, AdminProfile, OrderSummary, ApproveSeller, PremadeOrderDetails, CustomOrderDetails } from "./pages/admin";
 import { SellerLogin, SellerDashboard, SellerProfile, SellerProjects, EditProject } from "./pages/seller";
 import { MasterPage, Projects, Services, About, UserLogin, ForgotPassword, UserProfile, UserProjectDetail, SeeAllProject, SeeSellerProfile, MyOrder, OrderDetail } from "./pages/user";
 
@@ -62,7 +62,8 @@ function App() {
           <Route path="profile" element={<AdminProfile />} />
           <Route path="ordersummary" element={<OrderSummary />} />
           <Route path="approve-seller/:sellerId" element={<ApproveSeller />} />
-          <Route path="/admin/orders/:id" element={<AdminOrderDetails />} />
+          <Route path="/admin/premade-orders/:id" element={<PremadeOrderDetails />} />
+          <Route path="/admin/custom-orders/:id" element={<CustomOrderDetails />} />
         </Route>
 
         {/* ✅ Seller Routes */}
@@ -79,7 +80,7 @@ function App() {
           <Route path="sellerdashboard" element={<SellerDashboard />} />
           <Route path="profile" element={<SellerProfile />} />
           <Route path="sellerproject" element={<SellerProjects />} />
-          <Route path="projects/:id" element={<EditProject />} />
+          <Route path="project/:id" element={<EditProject />} />
         </Route>
       </Routes>
     </Router>

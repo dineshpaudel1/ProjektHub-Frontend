@@ -14,6 +14,7 @@ const AdminNav = ({ toggleSidebar }) => {
     const [notifications, setNotifications] = useState([]);
     const unreadCount = notifications.filter(n => !n.read).length + unapprovedSellers.length;
 
+
     const menuRef = useRef();
     const searchRef = useRef();
     const notificationRef = useRef();
@@ -29,16 +30,6 @@ const AdminNav = ({ toggleSidebar }) => {
             console.error("Error fetching admin notifications", err);
         }
     };
-
-    // If unapprovedSellers also need auth, use protectedApi as well
-    // const fetchUnapprovedSellers = async () => {
-    //     try {
-    //         const res = await protectedApi.get("/admin/unapproved-sellers");
-    //         setUnapprovedSellers(res.data.data || []);
-    //     } catch (err) {
-    //         console.error("Error fetching unapproved sellers", err);
-    //     }
-    // };
 
     const getUserRoles = () => {
         try {
@@ -83,19 +74,6 @@ const AdminNav = ({ toggleSidebar }) => {
 
         return () => document.removeEventListener("mousedown", handler);
     }, []);
-
-    const handleLogout = () => {
-        const roles = getUserRoles();
-        localStorage.removeItem("token");
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("isAuthenticated");
-
-        if (roles.includes("ADMIN")) {
-            navigate("/admin/login");
-        } else {
-            navigate("/admin/login");
-        }
-    };
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -160,7 +138,7 @@ const AdminNav = ({ toggleSidebar }) => {
                         aria-label="Notifications"
                     >
                         <Bell size={20} className="text-gray-700" />
-                        {(notifications.length > 0 || unapprovedSellers.length > 0) && (
+                        {unreadCount > 0 && (
                             <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
                                 {unreadCount > 9 ? "9+" : unreadCount}
                             </span>
@@ -181,41 +159,42 @@ const AdminNav = ({ toggleSidebar }) => {
                                     <div
                                         key={note.id}
                                         className="flex items-start gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded"
-                                        onClick={() => {
-                                            if (note.targetType === "ORDER") {
-                                                navigate(`/admin/orders/${note.targetId}`);
+                                        onClick={async () => {
+                                            try {
+                                                await protectedApi.put(`/notifications/${note.id}/read`);
+                                                setNotifications(prev =>
+                                                    prev.map(n => (n.id === note.id ? { ...n, read: true } : n))
+                                                );
+                                                // 🔁 Navigate based on type
+                                                if (note.targetType === "ORDER") {
+                                                    const res = await protectedApi.get(`/admin/order/${note.targetId}`);
+                                                    const orderType = res.data?.data?.orderType;
+
+                                                    if (orderType === "CUSTOM") {
+                                                        navigate(`/admin/custom-orders/${note.targetId}`);
+                                                    } else {
+                                                        navigate(`/admin/premade-orders/${note.targetId}`);
+                                                    }
+                                                }
+                                            } catch (err) {
+                                                console.error("❌ Failed to mark as read:", err);
+                                            } finally {
                                                 setShowNotifications(false);
                                             }
                                         }}
+
                                     >
                                         <img
-                                            src={note.photoUrl}
-                                            alt={note.photoUrl}
+                                            src={note.photoUrl ? `http://localhost:8080/api/media/photo?file=${note.photoUrl}` : user}
+                                            alt="Notification"
                                             className="w-9 h-9 rounded-full mt-1 object-cover border"
                                         />
+
                                         <div className="flex-1">
                                             <p className="font-medium text-gray-800">{note.message}</p>
                                             <p className="text-xs text-gray-400 mt-1">
                                                 {new Date(note.timeStamp).toLocaleString()}
                                             </p>
-                                        </div>
-                                    </div>
-                                ))}
-
-                                {unapprovedSellers.map((seller) => (
-                                    <div
-                                        key={seller.id}
-                                        className="flex items-start gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded"
-                                        onClick={() => navigate(`approve-seller/${seller.id}`)}
-                                    >
-                                        <img
-                                            src={`http://localhost:8080/api/media/photo?file=${seller.verificationPhotoPath}`}
-                                            alt={seller.sellerName}
-                                            className="w-9 h-9 rounded-full mt-1 object-cover border"
-                                        />
-                                        <div className="flex-1">
-                                            <p><strong>{seller.sellerName}</strong> has requested seller verification.</p>
-                                            <p className="text-xs text-gray-400 mt-1">Click to view details</p>
                                         </div>
                                     </div>
                                 ))}

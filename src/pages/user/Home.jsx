@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import person from "../../assets/images/person.png";
 import { useNavigate } from 'react-router-dom';
 
@@ -7,10 +7,30 @@ const Home = () => {
     const [showVideo, setShowVideo] = useState(true);
     const navigate = useNavigate();
 
+    useEffect(() => {
+        const scrollTarget = location.state?.scrollTo || localStorage.getItem("scrollTo");
+        if (scrollTarget) {
+            const element = document.getElementById(scrollTarget);
+            if (element) {
+                element.scrollIntoView({ behavior: "smooth" });
+            }
+            localStorage.removeItem("scrollTo"); // cleanup
+        }
+    }, [location]);
+
+
     const handleWhatsAppClick = () => {
         const phoneNumber = "9847503434";
         const message = encodeURIComponent("Hello, I’m interested in a project.");
         window.open(`https://wa.me/977${phoneNumber}?text=${message}`, "_blank");
+    };
+    const handleSectionClick = (sectionId) => {
+        if (location.pathname !== "/") {
+            navigate(`/#${sectionId}`);
+        } else {
+            const el = document.getElementById(sectionId);
+            if (el) el.scrollIntoView({ behavior: "smooth" });
+        }
     };
 
     return (
@@ -38,19 +58,19 @@ const Home = () => {
                     <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start mt-10">
                         {/* Place Order Button */}
                         <button
-                            className="min-w-[170px] px-6 py-3 rounded font-semibold transition text-center"
+                            className="min-w-[170px] px-6 py-3  font-semibold transition text-center"
                             style={{
                                 backgroundColor: "var(--button-primary)",
                                 color: "#ffffff",
                             }}
-                            onClick={() => navigate("/services")}
+                            onClick={() => handleSectionClick("services")}
                         >
                             How to Order Project?
                         </button>
 
                         {/* Explore Projects Button */}
                         <button
-                            className="min-w-[170px] border-1  px-6 py-3 rounded font-semibold transition text-center"
+                            className="min-w-[170px] border-1  px-6 py-3 font-semibold transition text-center"
                             style={{
                                 backgroundColor: "var(--button-bg)",
                                 color: "var(--button-text, var(--button-primary))",
@@ -68,9 +88,10 @@ const Home = () => {
                     <img
                         src={person}
                         alt="Illustration"
-                        className="w-[80%] max-w-md"
+                        className="w-[100%] max-w-lg h-auto md:h-[350px]"
                     />
                 </div>
+
             </div>
 
             {/* Floating YouTube Video Popup */}

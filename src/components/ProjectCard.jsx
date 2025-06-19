@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Trash, MoreVertical, ExternalLink, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { protectedApi } from '../utils/axiosInstance';  // ✅ updated import
+import { confirmDelete, showSuccess, showError } from '../utils/sweetAlertUtils';
 
 const ProjectCard = ({
     id,
@@ -36,16 +37,17 @@ const ProjectCard = ({
         }
     };
 
-    const handleDelete = async (projectId) => {
-        if (!window.confirm("Are you sure you want to delete this project?")) return;
-
-        try {
-            await protectedApi.delete(`/seller/project/${projectId}`);  // ✅ simplified call
-            alert("Project deleted successfully.");
-            window.location.reload();
-        } catch (err) {
-            console.error("❌ Failed to delete project:", err);
-            alert("Failed to delete project.");
+    const handleDelete = async () => {
+        const result = await confirmDelete('project');
+        if (result.isConfirmed) {
+            try {
+                await protectedApi.delete(`/seller/project/${id}`);
+                await showSuccess('Project deleted successfully!');
+                window.location.reload();
+            } catch (err) {
+                console.error(err);
+                showError('Failed to delete project');
+            }
         }
     };
 
@@ -68,10 +70,16 @@ const ProjectCard = ({
 
                         {showActions && (
                             <div className="absolute bottom-full left-2 mb-2 bg-white rounded-lg shadow-lg py-2 w-36 z-10">
-                                <button onClick={(e) => { e.stopPropagation(); navigate(`/seller/editprojects/${id}`); }}
-                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2">
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigate(`/seller/project/${id}`);
+                                    }}
+                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                                >
                                     <ExternalLink size={14} /> View Details
                                 </button>
+
 
                                 <button onClick={(e) => { e.stopPropagation(); handleDelete(id); }}
                                     className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">

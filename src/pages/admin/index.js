@@ -5,4 +5,5 @@ export { default as AllProjectDetail } from "./AllProjectDetail";
 export { default as AdminProfile } from "./AdminProfile";
 export { default as OrderSummary } from "./OrderSummary";
 export { default as ApproveSeller } from "./ApproveSeller";
-export { default as AdminOrderDetails } from "./AdminOrderDetails";
+export { default as PremadeOrderDetails } from "./PremadeOrderDetails";
+export { default as CustomOrderDetails } from "./CustomOrderdetails";

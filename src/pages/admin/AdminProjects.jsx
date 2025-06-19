@@ -1,72 +1,41 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
+import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
-import {
-    FaFolderOpen, FaSearch, FaPlus,
-} from 'react-icons/fa';
+import { FaFolderOpen, FaSearch, FaPlus } from 'react-icons/fa';
 import { Loader, AlertCircle, X } from 'lucide-react';
 import ProjectCard from '../../components/ProjectCard';
 import AddCategoryModal from '../../modals/AddCategoryModal';
-import { publicApi, protectedApi } from "../../utils/axiosInstance";
+import { protectedApi } from "../../utils/axiosInstance";
+import { useProjectContext } from '../../context/ProjectContext';
 
 const AdminProjects = () => {
     const navigate = useNavigate();
     const searchRef = useRef(null);
-
     const [showCategoryModal, setShowCategoryModal] = useState(false);
     const [categoryName, setCategoryName] = useState('');
-    const [categories, setCategories] = useState([]);
-    const [projects, setProjects] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [viewMode, setViewMode] = useState('grid');
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [sortBy, setSortBy] = useState('newest');
     const [notification, setNotification] = useState(null);
+    const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const response = await publicApi.get('/public/category');
-                setCategories(response.data.data || []);
-            } catch (error) {
-                console.error('❌ Failed to fetch categories:', error);
-                setError("Failed to load categories");
-            }
-        };
-        fetchCategories();
-    }, []);
-
-    useEffect(() => {
-        const fetchProjects = async () => {
-            try {
-                setLoading(true);
-                const response = await publicApi.get('/public/projects');
-                setProjects(response.data.data || []);
-            } catch (error) {
-                console.error("❌ Failed to fetch projects:", error);
-                setError("Failed to load projects");
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchProjects();
-    }, []);
+    const {
+        projects,
+        loadingProjects: loading,
+        fetchCategories,
+        categories,
+        setCategories
+    } = useProjectContext();
 
     const handleCreateCategory = async () => {
         if (!categoryName.trim()) return;
-
         try {
             setNotification({ type: 'info', message: 'Creating category...' });
-
             await protectedApi.post("/admin/category/add", { name: categoryName });
-
             setShowCategoryModal(false);
             setCategoryName('');
-
-            const refreshed = await publicApi.get('/public/category');
-            setCategories(refreshed.data.data || []);
-
+            await fetchCategories();
             setNotification({ type: 'success', message: 'Category created successfully!' });
             setTimeout(() => setNotification(null), 3000);
         } catch (error) {
@@ -76,11 +45,35 @@ const AdminProjects = () => {
         }
     };
 
+    const handleDeleteCategory = async (categoryId) => {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "This will delete the category permanently!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await protectedApi.delete(`/admin/category/delete/${categoryId}`);
+                setCategories(prev => prev.filter(cat => cat.id !== categoryId));
+                setNotification({ type: 'success', message: 'Category deleted successfully!' });
+                setTimeout(() => setNotification(null), 3000);
+                Swal.fire('Deleted!', 'Category has been deleted.', 'success');
+            } catch (err) {
+                console.error("❌ Failed to delete category:", err);
+                Swal.fire('Error', 'Failed to delete category.', 'error');
+            }
+        }
+    };
+
     const filteredProjects = projects.filter(project => {
         const matchesSearch = searchQuery === '' ||
             project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             project.description?.toLowerCase().includes(searchQuery.toLowerCase());
-
         const matchesCategory = selectedCategory === 'all' || project.categoryName === selectedCategory;
         return matchesSearch && matchesCategory;
     });
@@ -131,10 +124,23 @@ const AdminProjects = () => {
                 <button onClick={() => setSelectedCategory('all')} className={`px-4 py-2 rounded-lg ${selectedCategory === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}`}>
                     All Categories
                 </button>
-                {categories.map((cat) => (
-                    <button key={cat.id} onClick={() => setSelectedCategory(cat.name)} className={`px-4 py-2 rounded-lg ${selectedCategory === cat.name ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}`}>
-                        {cat.name}
-                    </button>
+
+                {Array.isArray(categories) && categories.map((cat) => (
+                    <div key={cat.id} className="relative group">
+                        <button
+                            onClick={() => setSelectedCategory(cat.name)}
+                            className={`px-4 py-2 rounded-lg mr-1 ${selectedCategory === cat.name ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}`}
+                        >
+                            {cat.name}
+                        </button>
+                        <button
+                            onClick={() => handleDeleteCategory(cat.id)}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 text-xs hidden group-hover:block"
+                            title="Delete Category"
+                        >
+                            ×
+                        </button>
+                    </div>
                 ))}
             </div>
 

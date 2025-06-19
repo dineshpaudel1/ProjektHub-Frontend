@@ -1,7 +1,18 @@
-import React from "react";
-import aboutPhoto from "../../assets/images/about.jpg";
+import { React, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import aboutPhoto from "../../assets/images/about.png";
 
 const About = () => {
+
+    useEffect(() => {
+        if (location.state?.scrollTo) {
+            const element = document.getElementById(location.state.scrollTo);
+            if (element) {
+                element.scrollIntoView({ behavior: "smooth" });
+            }
+        }
+    }, [location]);
+
     return (
         <section
             id="about"
@@ -40,7 +51,7 @@ const About = () => {
                         We use creativity and code to help students and businesses bring their ideas to life. From final year
                         projects to scalable platforms, we tailor each solution with precision and care.
                     </p>
-                    <button className="bg-[var(--button-primary)] hover:bg-[var(--button-primary-hover)] text-white px-6 py-3 rounded-full font-semibold text-sm transition">
+                    <button className="bg-[var(--button-primary)] hover:bg-[var(--button-primary-hover)] text-white px-6 py-3 font-semibold text-sm transition">
                         Let's Build With Us
                     </button>
                 </div>

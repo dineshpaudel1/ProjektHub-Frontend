@@ -41,9 +41,10 @@ const ProjectDetailsSection = ({ project, setProject, isExpanded, setIsExpanded 
 
     const handleSaveDeliveryLink = async () => {
         try {
-            const res = await protectedApi.put(`/seller/project/${project.id}/delivery-link`, {
+            const res = await protectedApi.put(`/${project.id}/delivery-link`, {
                 deliveryLink: form.deliveryLink
             });
+
 
             setProject(prev => ({
                 ...prev,

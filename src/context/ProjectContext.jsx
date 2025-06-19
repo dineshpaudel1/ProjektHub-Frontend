@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useRef } from "react";
-import { publicApi } from "../utils/axiosInstance";  // ✅ Updated import
+import { publicApi } from "../utils/axiosInstance";
 
 const ProjectContext = createContext();
 
@@ -15,9 +15,25 @@ export const ProjectProvider = ({ children }) => {
     const [loadingQuestions, setLoadingQuestions] = useState(false);
     const [selectedProject, setSelectedProject] = useState(null);
 
+    const [categories, setCategories] = useState([]);
+    const [loadingCategories, setLoadingCategories] = useState(false);
+
+    const fetchCategories = async () => {
+        try {
+            setLoadingCategories(true);
+            const res = await publicApi.get("/public/category");
+            if (res.data.status === "success") {
+                setCategories(res.data.data);
+            }
+        } catch (err) {
+            console.error("Error fetching categories:", err);
+        } finally {
+            setLoadingCategories(false);
+        }
+    };
+
     const fetchProjects = async () => {
         if (hasFetchedProjects.current) return;
-
         try {
             setLoadingProjects(true);
             const res = await publicApi.get("public/projects");
@@ -60,6 +76,7 @@ export const ProjectProvider = ({ children }) => {
 
     useEffect(() => {
         fetchProjects();
+        fetchCategories();
     }, []);
 
     return (
@@ -76,6 +93,10 @@ export const ProjectProvider = ({ children }) => {
                 fetchQuestions,
                 selectedProject,
                 setSelectedProject,
+                fetchCategories,
+                categories,
+                setCategories,
+                loadingCategories
             }}
         >
             {children}

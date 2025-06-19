@@ -1,20 +1,22 @@
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Menu, X, Moon, Sun, ShoppingCart, Bell } from "lucide-react";
 import logowhite from "../../assets/images/logowhite.png";
 import logoDark from "../../assets/images/logoblack.png";
 import { useUser } from "../../context/UserContext";
 import SellerRegisterModal from "../../modals/SellerRegisterModal";
-import { protectedApi } from "../../utils/axiosInstance";  // ✅ Use protectedApi
+import { protectedApi } from "../../utils/axiosInstance";
 import userphoto from "../../assets/images/user.png";
 
 const UserNavbar = () => {
     const navigate = useNavigate();
-    const { user, setUser, roles } = useUser();
+    const location = useLocation();
+    const { user, setUser } = useUser();
 
     const [isOpen, setIsOpen] = useState(false);
     const [theme, setTheme] = useState(
-        localStorage.getItem("theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+        localStorage.getItem("theme") ||
+        (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
     );
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [showSellerModal, setShowSellerModal] = useState(false);
@@ -22,13 +24,60 @@ const UserNavbar = () => {
     const [loadingNotifications, setLoadingNotifications] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
     const unreadCount = notifications.filter((n) => !n.read).length;
+    const oneTapInitialized = useRef(false);
 
     useEffect(() => {
         document.documentElement.setAttribute("data-theme", theme);
         localStorage.setItem("theme", theme);
     }, [theme]);
 
-    const toggleDarkMode = () => setTheme(prev => prev === "dark" ? "light" : "dark");
+    const toggleDarkMode = () => setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+
+    const handleSectionClick = (sectionId) => {
+        if (location.pathname !== "/") {
+            navigate(`/#${sectionId}`);
+        } else {
+            const el = document.getElementById(sectionId);
+            if (el) el.scrollIntoView({ behavior: "smooth" });
+        }
+    };
+
+
+    useEffect(() => {
+        if (user || location.pathname === "/login" || oneTapInitialized.current) return;
+
+        if (window.google) {
+            oneTapInitialized.current = true;
+
+            window.google.accounts.id.initialize({
+                client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+                callback: async (response) => {
+                    try {
+                        const res = await publicApi.post('/auth/login/google', { token: response.credential });
+                        const { accessToken, refreshToken } = res.data.data;
+                        localStorage.setItem("token", accessToken);
+                        localStorage.setItem("refreshToken", refreshToken);
+                        const userRes = await protectedApi.get("/user/me");
+                        setUser(userRes.data);
+                        navigate("/");
+                    } catch (err) {
+                        console.error("One Tap Login Failed:", err);
+                        window.google.accounts.id.prompt((notif) => console.log(notif));
+                    }
+                },
+                auto_select: true,
+                cancel_on_tap_outside: false,
+            });
+
+            window.google.accounts.id.prompt((notif) => {
+                console.log("One Tap status:", notif);
+            });
+        }
+    }, [user, location.pathname]);
+
+
+
+
 
     useEffect(() => {
         const handleClickOutside = (e) => {
@@ -68,8 +117,12 @@ const UserNavbar = () => {
     return (
         <div className="fixed top-0 left-0 w-full z-50">
             <nav className="px-6 py-4 flex justify-between items-center backdrop-blur-md border-b"
-                style={{ color: "var(--text-color)", backgroundColor: theme === "dark" ? "rgba(25, 25, 27, 0.3)" : "rgba(255, 255, 255, 0.7)", borderColor: "var(--border-color)" }}>
-
+                style={{
+                    color: "var(--text-color)",
+                    backgroundColor: theme === "dark" ? "rgba(25, 25, 27, 0.3)" : "rgba(255, 255, 255, 0.7)",
+                    borderColor: "var(--border-color)"
+                }}
+            >
                 {/* Logo */}
                 <div className="flex items-center space-x-2 cursor-pointer" onClick={() => navigate("/")}>
                     <img src={theme === "dark" ? logowhite : logoDark} alt="Logo" className="h-8 w-auto" />
@@ -77,13 +130,13 @@ const UserNavbar = () => {
 
                 {/* Desktop Links */}
                 <div className="hidden md:flex space-x-10">
-                    <a onClick={() => navigate("/")} className="font-semibold hover:text-indigo-500 transition">Home</a>
-                    <a onClick={() => navigate("/projects")} className="font-semibold hover:text-indigo-500 transition">Projects</a>
-                    <a onClick={() => navigate("/services")} className="font-semibold hover:text-indigo-500 transition">Our Services</a>
-                    <a onClick={() => navigate("/about")} className="font-semibold hover:text-indigo-500 transition">About Us</a>
+                    <a onClick={() => handleSectionClick("home")} className="font-semibold hover:text-indigo-500 transition">Home</a>
+                    <a onClick={() => navigate("/", { state: { scrollTo: "projects" } })} className="font-semibold hover:text-indigo-500 transition">Projects</a>
+                    <a onClick={() => navigate("/", { state: { scrollTo: "services" } })} className="font-semibold hover:text-indigo-500 transition">Our Services</a>
+                    <a onClick={() => navigate("/", { state: { scrollTo: "about" } })} className="font-semibold hover:text-indigo-500 transition">About Us</a>
                 </div>
 
-                {/* Right Desktop */}
+                {/* Right Side */}
                 <div className="hidden md:flex items-center gap-4">
                     <button onClick={toggleDarkMode} className="p-2 rounded-full transition" style={{ backgroundColor: "var(--hover-bg)" }}>
                         {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
@@ -141,7 +194,6 @@ const UserNavbar = () => {
                         </div>
                     )}
 
-                    {/* Profile */}
                     {user ? (
                         <div className="relative profile-dropdown">
                             <div onClick={() => setDropdownOpen(!dropdownOpen)} className="w-9 h-9 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden cursor-pointer border border-gray-400">
@@ -173,6 +225,7 @@ const UserNavbar = () => {
             </nav>
 
             {/* Mobile Menu */}
+            {/* Mobile Menu */}
             {isOpen && (
                 <div className="md:hidden fixed inset-0 z-40 overflow-y-auto" style={{ backgroundColor: theme === "dark" ? "#111827" : "#ffffff", color: theme === "dark" ? "#ffffff" : "#111827" }}>
                     <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: theme === "dark" ? "#374151" : "#e5e7eb" }}>
@@ -183,12 +236,13 @@ const UserNavbar = () => {
                     </div>
 
                     <ul className="px-6 py-6 space-y-6 text-lg font-medium">
-                        <li><a onClick={() => { setIsOpen(false); navigate("/projects") }} className="block hover:text-indigo-500">Projects</a></li>
-                        <li><a onClick={() => { setIsOpen(false); navigate("/services") }} className="block hover:text-indigo-500">Our Services</a></li>
-                        <li><a onClick={() => { setIsOpen(false); navigate("/about") }} className="block hover:text-indigo-500">About Us</a></li>
+                        <li><a onClick={() => { setIsOpen(false); handleSectionClick("home"); }} className="block hover:text-indigo-500">Home</a></li>
+                        <li><a onClick={() => { setIsOpen(false); handleSectionClick("projects"); }} className="block hover:text-indigo-500">Projects</a></li>
+                        <li><a onClick={() => { setIsOpen(false); handleSectionClick("services"); }} className="block hover:text-indigo-500">Our Services</a></li>
+                        <li><a onClick={() => { setIsOpen(false); handleSectionClick("about"); }} className="block hover:text-indigo-500">About Us</a></li>
                     </ul>
 
-                    <div className="px-6 space-y-4 pb-8">
+                    <div className="px-6 py-4 space-y-4">
                         <button onClick={toggleDarkMode} className="w-full flex items-center justify-center gap-2 border py-2 rounded-full font-medium"
                             style={{ borderColor: theme === "dark" ? "#4b5563" : "#d1d5db", backgroundColor: theme === "dark" ? "#1f2937" : "#f9fafb" }}>
                             {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
@@ -196,13 +250,23 @@ const UserNavbar = () => {
                         </button>
 
                         {user ? (
-                            <button onClick={handleLogout} className="w-full bg-red-600 text-white py-2 rounded-full font-medium">Logout</button>
+                            <>
+                                <button onClick={() => { setIsOpen(false); navigate("/userprofile"); }} className="w-full bg-gray-500 text-white py-2 rounded-full font-medium">
+                                    Profile
+                                </button>
+                                <button onClick={handleLogout} className="w-full bg-red-600 text-white py-2 rounded-full font-medium">
+                                    Logout
+                                </button>
+                            </>
                         ) : (
-                            <button onClick={() => { setIsOpen(false); navigate("/login"); }} className="w-full bg-indigo-600 text-white py-2 rounded-full font-medium">Login</button>
+                            <button onClick={() => { setIsOpen(false); navigate("/login"); }} className="w-full bg-indigo-600 text-white py-2 rounded-full font-medium">
+                                Login
+                            </button>
                         )}
                     </div>
                 </div>
             )}
+
 
             {showSellerModal && <SellerRegisterModal onClose={() => setShowSellerModal(false)} />}
         </div>
