@@ -121,7 +121,7 @@ const Services = () => {
                 </div>
 
                 <button
-                    className="px-6 py-3 text-sm font-semibold transition"
+                    className="px-6 py-3 text-sm font-semibold transition rounded-xl"
                     style={{
                         backgroundColor: "var(--button-primary)",
                         color: "#fff",

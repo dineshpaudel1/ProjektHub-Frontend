@@ -1,7 +1,6 @@
 import { useRef, useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import { Eye, ChevronLeft, ChevronRight } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Eye, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 import { useProjectContext } from "../../context/ProjectContext";
 
 const SkeletonCard = () => (
@@ -17,13 +16,15 @@ const SkeletonCard = () => (
 
 const Projects = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { projects, loadingProjects, categories } = useProjectContext();
     const [selectedCategory, setSelectedCategory] = useState("ALL");
     const scrollRef = useRef();
 
-    const filteredProjects = selectedCategory === "ALL"
-        ? projects
-        : projects.filter(p => p.categoryName?.toUpperCase() === selectedCategory);
+    const filteredProjects =
+        selectedCategory === "ALL"
+            ? projects
+            : projects.filter((p) => p.categoryName?.toUpperCase() === selectedCategory);
 
     const scroll = (direction) => {
         const container = scrollRef.current;
@@ -35,6 +36,7 @@ const Projects = () => {
     const handleNavigate = () => {
         navigate("/seeallproject");
     };
+
     useEffect(() => {
         if (location.state?.scrollTo) {
             const element = document.getElementById(location.state.scrollTo);
@@ -51,7 +53,10 @@ const Projects = () => {
             style={{ backgroundColor: "var(--bg-color)" }}
         >
             <div className="text-center mb-12">
-                <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: "var(--text-color)" }}>
+                <h2
+                    className="text-3xl sm:text-4xl font-bold mb-4"
+                    style={{ color: "var(--text-color)" }}
+                >
                     Projects
                 </h2>
                 <div className="h-1 w-24 mx-auto bg-[#5454D4] rounded-full"></div>
@@ -59,7 +64,7 @@ const Projects = () => {
                 {/* Category Filter */}
                 <div className="mt-6 overflow-x-auto scrollbar-hide">
                     <div className="flex justify-start sm:justify-center items-center gap-6 min-w-max px-2 sm:px-0">
-                        {["ALL", ...categories.map(cat => cat.name.toUpperCase())].map((name) => (
+                        {["ALL", ...categories.map((cat) => cat.name.toUpperCase())].map((name) => (
                             <button
                                 key={name}
                                 onClick={() => setSelectedCategory(name)}
@@ -79,7 +84,6 @@ const Projects = () => {
                         ))}
                     </div>
                 </div>
-
             </div>
 
             {/* Projects Section */}
@@ -126,36 +130,47 @@ const Projects = () => {
                             <div
                                 key={project.id}
                                 onClick={() => navigate(`/project/${project.id}`)}
-                                className="min-w-[300px] max-w-[320px] rounded-2xl border overflow-hidden cursor-pointer bg-white dark:bg-[var(--bg-color)] border-gray-200 dark:border-[var(--border-color)] transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 group"
+                                className="flex-shrink-0 w-80 bg-white dark:bg-[var(--bg-color)] rounded-xl border border-gray-200 dark:border-[var(--border-color)] overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group"
                             >
                                 {/* Image */}
                                 <div className="relative overflow-hidden">
                                     <img
                                         src={`http://localhost:8080/api/media/photo?file=${project.thumbnail}`}
                                         alt={project.title}
-                                        className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-110"
+                                        className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105"
                                     />
-                                    {/* <div className="absolute top-4 left-4 bg-blue-600 text-white px-4 py-1.5 text-sm font-semibold rounded-full shadow-lg backdrop-blur-sm">
-                                        NPR {project.price || "3000"}
-                                    </div> */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                    <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 text-sm font-semibold rounded-full">
+                                        NPR {project.price?.toLocaleString() || "3000"}
+                                    </div>
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                 </div>
 
                                 {/* Info */}
-                                <div className="p-4 sm:p-6">
-                                    <h3
-                                        className="text-base sm:text-lg font-semibold mb-2 truncate"
-                                        style={{ color: "var(--text-color)" }}
-                                    >
+                                <div className="p-6">
+                                    <div className="mb-3">
+                                        <span className="inline-block bg-blue-50 text-blue-600 text-xs font-medium px-3 py-1 rounded-full">
+                                            {project.categoryName || "Uncategorized"}
+                                        </span>
+                                    </div>
+
+                                    <h3 className="text-lg font-semibold mb-2 group-hover:text-blue-600 transition-colors truncate" style={{ color: "var(--text-color)" }}>
                                         {project.title}
                                     </h3>
-                                    <p className="text-sm font-medium mb-3" style={{ color: "var(--text-secondary)" }}>
-                                        Project Type - {project.categoryName || "N/A"}
+
+                                    <p className="text-sm mb-4 line-clamp-2" style={{ color: "var(--text-secondary)" }}>
+
+                                        {project.description || "No description provided."}
                                     </p>
-                                    <div className="flex items-center gap-1 text-sm" style={{ color: "var(--text-secondary)" }}>
-                                        <Eye size={16} />
-                                        <span>{project.views || 23} Views</span>
-                                        <h3>NPR {project.price}</h3>
+
+                                    <div className="flex items-center justify-between text-sm" style={{ color: "var(--text-secondary)" }}>
+                                        <div className="flex items-center gap-1">
+                                            <Eye className="w-4 h-4" />
+                                            <span>{project.views || 0} views</span>
+                                        </div>
+                                        <div className="flex items-center gap-1 text-blue-600 group-hover:text-blue-700">
+                                            <span className="font-medium">View</span>
+                                            <ExternalLink className="w-4 h-4" />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -168,7 +183,7 @@ const Projects = () => {
             <div className="mt-12 flex justify-center sm:justify-end">
                 <button
                     onClick={handleNavigate}
-                    className="px-8 py-3 font-semibold text-white transition "
+                    className="px-8 py-3 font-semibold rounded-xl text-white transition"
                     style={{ backgroundColor: "var(--button-primary)" }}
                     onMouseOver={(e) =>
                         (e.currentTarget.style.backgroundColor = "var(--button-primary-hover)")

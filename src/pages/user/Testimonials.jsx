@@ -4,7 +4,7 @@ import myphoto from "../../assets/images/user.png";
 const testimonials = [
     {
         name: "Dinesh Paudel",
-        role: "CEO",
+        role: "CLIENTS",
         company: "TechCorp",
         photo: { myphoto },
         text: "Proin iaculis purus consequat sem cure digni ssim donec porttitor entum suscipit rhoncus.",
