@@ -135,9 +135,9 @@ const Projects = () => {
                                         alt={project.title}
                                         className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-110"
                                     />
-                                    <div className="absolute top-4 left-4 bg-blue-600 text-white px-4 py-1.5 text-sm font-semibold rounded-full shadow-lg backdrop-blur-sm">
+                                    {/* <div className="absolute top-4 left-4 bg-blue-600 text-white px-4 py-1.5 text-sm font-semibold rounded-full shadow-lg backdrop-blur-sm">
                                         NPR {project.price || "3000"}
-                                    </div>
+                                    </div> */}
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                 </div>
 
@@ -155,6 +155,7 @@ const Projects = () => {
                                     <div className="flex items-center gap-1 text-sm" style={{ color: "var(--text-secondary)" }}>
                                         <Eye size={16} />
                                         <span>{project.views || 23} Views</span>
+                                        <h3>NPR {project.price}</h3>
                                     </div>
                                 </div>
                             </div>

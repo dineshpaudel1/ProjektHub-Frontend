@@ -1,155 +1,212 @@
-import React, { useState, useEffect } from "react";
-import person from "../../assets/images/person.png";
-import { useNavigate } from 'react-router-dom';
-
+import { useEffect } from "react"
+import person from "../../assets/images/person.png"
+import { useNavigate } from "react-router-dom"
 
 const Home = () => {
-    const [showVideo, setShowVideo] = useState(true);
-    const navigate = useNavigate();
+    const navigate = useNavigate()
 
     useEffect(() => {
-        const scrollTarget = location.state?.scrollTo || localStorage.getItem("scrollTo");
+        const scrollTarget = location.state?.scrollTo || localStorage.getItem("scrollTo")
         if (scrollTarget) {
-            const element = document.getElementById(scrollTarget);
+            const element = document.getElementById(scrollTarget)
             if (element) {
-                element.scrollIntoView({ behavior: "smooth" });
+                element.scrollIntoView({ behavior: "smooth" })
             }
-            localStorage.removeItem("scrollTo"); // cleanup
+            localStorage.removeItem("scrollTo")
         }
-    }, [location]);
-
+    }, [location])
 
     const handleWhatsAppClick = () => {
-        const phoneNumber = "9847503434";
-        const message = encodeURIComponent("Hello, I’m interested in a project.");
-        window.open(`https://wa.me/977${phoneNumber}?text=${message}`, "_blank");
-    };
+        const phoneNumber = "9847503434"
+        const message = encodeURIComponent("Hello, I'm interested in a project.")
+        window.open(`https://wa.me/977${phoneNumber}?text=${message}`, "_blank")
+    }
+
     const handleSectionClick = (sectionId) => {
         if (location.pathname !== "/") {
-            navigate(`/#${sectionId}`);
+            navigate(`/#${sectionId}`)
         } else {
-            const el = document.getElementById(sectionId);
-            if (el) el.scrollIntoView({ behavior: "smooth" });
+            const el = document.getElementById(sectionId)
+            if (el) el.scrollIntoView({ behavior: "smooth" })
         }
-    };
+    }
 
     return (
         <section
             id="home"
-            className="relative min-h-screen flex items-center justify-center px-4 sm:px-8 lg:px-16"
+            className="relative min-h-screen flex items-center justify-center px-4 sm:px-8 lg:px-16 overflow-hidden"
             style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
         >
-            <div className="max-w-7xl w-full flex flex-col-reverse md:grid md:grid-cols-2 gap-10 items-center">
-
-                {/* Text Section */}
-                <div className="text-center md:text-left">
-                    <h1
-                        className="text-4xl sm:text-5xl font-extrabold leading-tight mb-4"
-                        style={{ color: "var(--text-color)" }}
-                    >
-                        Manifesting Ideas Into Reality
-                    </h1>
-                    <p
-                        className="text-base sm:text-lg"
-                        style={{ color: "var(--text-secondary)" }}
-                    >
-                        Turn your ideas into reality with Project Hub where your unique requirements are transformed into high-quality, custom-built projects designed to meet your goals.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start mt-10">
-                        {/* Place Order Button */}
-                        <button
-                            className="min-w-[170px] px-6 py-3  font-semibold transition text-center"
-                            style={{
-                                backgroundColor: "var(--button-primary)",
-                                color: "#ffffff",
-                            }}
-                            onClick={() => handleSectionClick("services")}
-                        >
-                            How to Order Project?
-                        </button>
-
-                        {/* Explore Projects Button */}
-                        <button
-                            className="min-w-[170px] border-1  px-6 py-3 font-semibold transition text-center"
-                            style={{
-                                backgroundColor: "var(--button-bg)",
-                                color: "var(--button-text, var(--button-primary))",
-                                borderColor: "var(--button-primary)",
-                            }}
-                            onClick={() => alert("Explore clicked")}
-                        >
-                            Explore Us
-                        </button>
-                    </div>
-                </div>
-
-                {/* Right Image */}
-                <div className="flex justify-center md:justify-end">
-                    <img
-                        src={person}
-                        alt="Illustration"
-                        className="w-[100%] max-w-lg h-auto md:h-[350px]"
-                    />
-                </div>
-
+            {/* Background Pattern */}
+            <div className="absolute inset-0 opacity-5 pointer-events-none">
+                <div className="absolute top-0 left-0 w-96 h-96 bg-blue-600 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
+                <div className="absolute top-0 right-0 w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-2000"></div>
+                <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-indigo-600 rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-4000"></div>
             </div>
 
-            {/* Floating YouTube Video Popup */}
-
-            {/* {showVideo && (
-                <div
-                    className="fixed z-50 shadow-lg rounded-xl overflow-hidden border"
-                    style={{
-                        backgroundColor: "var(--bg-color)",
-                        border: "1px solid var(--border-color)",
-                        width: "50%",
-                        maxWidth: "200px",
-                        height: "170px",
-                        left: "2rem",
-                        bottom: window.innerWidth < 640 ? "4.5rem" : "1rem", // Adjust position for small screens
-                    }}
-                >
-                    <div className="relative w-full h-full">
-                        <iframe
-                            className="w-full h-full"
-                            src="https://www.youtube.com/embed/M5QY2_8704o?start=2915"
-                            title="College Projects"
-                            frameBorder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                        />
-                        <button
-                            onClick={() => setShowVideo(false)}
-                            className="absolute top-1 right-1 bg-blue-600 text-white rounded-full w-6 h-6 text-sm flex items-center justify-center"
+            <div className="relative z-10 max-w-7xl w-full">
+                <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                    {/* Text Section */}
+                    <div className="text-center lg:text-left space-y-8">
+                        <div
+                            className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium"
+                            style={{
+                                backgroundColor: "var(--hover-bg)",
+                                color: "var(--button-primary)"
+                            }}
                         >
-                            ×
-                        </button>
+                            <span className="w-2 h-2 rounded-full mr-2 animate-pulse bg-blue-600"></span>
+                            Professional Development Services
+                        </div>
+
+                        {/* Heading */}
+                        <div className="space-y-4">
+                            <h1 className="text-4xl sm:text-5xl lg:text-5xl font-extrabold leading-tight break-words max-w-3xl mx-auto lg:mx-0"
+                                style={{ color: "var(--text-color)" }}
+                            >
+                                Manifesting Ideas Into{" "}
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+                                    Reality
+                                </span>
+                            </h1>
+
+                            <p className="text-lg sm:text-lg leading-relaxed max-w-2xl mx-auto lg:mx-0"
+                                style={{ color: "var(--text-secondary)" }}
+                            >
+                                Transform your vision into exceptional digital solutions. We specialize in creating custom-built
+                                projects
+                            </p>
+                        </div>
+
+                        {/* CTA */}
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
+                            <button
+                                onClick={() => handleSectionClick("services")}
+                                className="group relative px-8 py-4 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+                                style={{
+                                    background: "var(--button-primary)",
+                                }}
+                                onMouseOver={(e) =>
+                                    (e.currentTarget.style.backgroundColor = "var(--button-primary-hover)")
+                                }
+                                onMouseOut={(e) =>
+                                    (e.currentTarget.style.backgroundColor = "var(--button-primary)")
+                                }
+                            >
+                                <span className="relative z-10">How to Order Project?</span>
+                            </button>
+
+                            <button
+                                onClick={() => alert("Explore clicked")}
+                                className="group px-8 py-4 font-semibold rounded-xl border-2 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300"
+                                style={{
+                                    backgroundColor: "var(--bg-color)",
+                                    color: "var(--text-secondary)",
+                                    borderColor: "var(--border-color)"
+                                }}
+                            >
+                                <span className="flex items-center justify-center gap-2">
+                                    Explore Our Work
+                                    <svg
+                                        className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M17 8l4 4m0 0l-4 4m4-4H3"
+                                        />
+                                    </svg>
+                                </span>
+                            </button>
+                        </div>
+
+                        {/* Stats */}
+                        <div
+                            className="grid grid-cols-3 gap-8 pt-8 border-t"
+                            style={{ borderColor: "var(--border-color)" }}
+                        >
+                            {[
+                                { value: "00+", label: "Projects Delivered" },
+                                { value: "24/7", label: "Support Available" },
+                                { value: "00%", label: "Client Satisfaction" },
+                            ].map((stat, i) => (
+                                <div key={i} className="text-center lg:text-left">
+                                    <div className="text-2xl font-bold" style={{ color: "var(--text-color)" }}>
+                                        {stat.value}
+                                    </div>
+                                    <div className="text-sm" style={{ color: "var(--text-secondary)" }}>
+                                        {stat.label}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Image Section */}
+                    <div className="relative flex justify-center lg:justify-end">
+                        <div className="absolute -top-4 -left-4 w-24 h-24 bg-blue-200 rounded-full opacity-60 animate-bounce animation-delay-1000"></div>
+                        <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-purple-200 rounded-full opacity-60 animate-bounce animation-delay-3000"></div>
+
+                        <div className="relative">
+                            <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-500 rounded-3xl transform rotate-6 opacity-20"></div>
+                            <div className="relative rounded-3xl shadow-2xl p-8 transform hover:scale-105 transition-transform duration-500"
+                                style={{ backgroundColor: "var(--bg-color)" }}
+                            >
+                                <img
+                                    src={person || "/placeholder.svg"}
+                                    alt="Professional Illustration"
+                                    className="w-full max-w-md h-auto object-contain"
+                                />
+                            </div>
+                        </div>
                     </div>
                 </div>
-            )} */}
+            </div>
 
-            {/* Floating WhatsApp Button */}
-            <div className="fixed z-50 bottom-4 right-4 sm:bottom-6 sm:right-6">
+            {/* WhatsApp Button */}
+            {/* WhatsApp Button */}
+            <div className="fixed z-50 bottom-6 right-6">
                 <button
                     onClick={handleWhatsAppClick}
-                    className="bg-[#25D366] hover:bg-[#1EBE5D] text-white font-medium px-4 py-3 rounded-full flex items-center gap-2 shadow-lg"
+                    className="group relative bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium px-6 py-4 rounded-full flex items-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
                 >
+                    {/* WhatsApp SVG Icon */}
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        fill="white"
+                        className="w-6 h-6"
+                        fill="currentColor"
                         viewBox="0 0 24 24"
-                        width="20"
-                        height="20"
                     >
-                        <path d="M20.52 3.48A11.8 11.8 0 0012 0a11.8 11.8 0 00-8.52 3.48A11.8 11.8 0 000 12c0 2.02.52 3.98 1.52 5.72L0 24l6.28-1.64A11.77 11.77 0 0012 24c6.62 0 12-5.38 12-12a11.8 11.8 0 00-3.48-8.52zM12 21.82c-1.84 0-3.63-.49-5.22-1.4l-.37-.21-3.73.98.99-3.63-.24-.38a9.82 9.82 0 01-1.47-5.17c0-5.44 4.42-9.86 9.86-9.86S21.86 6.56 21.86 12 17.44 21.82 12 21.82z" />
-                        <path d="M17.34 14.31l-2.58-.73a.69.69 0 00-.66.17l-.76.78a6.44 6.44 0 01-3.09-3.09l.78-.76a.69.69 0 00.17-.66l-.73-2.58a.71.71 0 00-.66-.48H7.22a.69.69 0 00-.69.69c0 5.16 4.2 9.36 9.36 9.36a.69.69 0 00.69-.69v-2.31a.71.71 0 00-.48-.66z" />
+                        <path d="M16.8 14.8c-.3-.2-1.8-.9-2.1-1s-.5-.2-.7.1-.8 1-1 1.1-.4.2-.7 0c-.3-.1-1.2-.4-2.2-1.4s-1.3-1.9-1.4-2.2c-.1-.3 0-.4.1-.6s.5-.6.7-.9.3-.4.4-.6.1-.3 0-.6-.7-1.7-.9-2.3c-.2-.5-.5-.4-.7-.4h-.6c-.2 0-.6.1-.9.4s-1.2 1.2-1.2 2.9c0 1.7 1.2 3.3 1.3 3.6s2.4 3.8 5.9 5.2c.8.3 1.4.5 1.9.6.8.2 1.5.2 2 .1.6-.1 1.8-.7 2.1-1.3.3-.6.3-1.2.2-1.3 0-.1-.3-.2-.6-.3zm-4.8 6.2c-1.6 0-3.2-.4-4.6-1.1l-5.1 1.3 1.4-5c-.7-1.4-1.1-2.9-1.1-4.5 0-5.5 4.5-10 10-10s10 4.5 10 10-4.5 10-10 10z" />
                     </svg>
-                    Text Now
+
+                    <span className="hidden sm:block">Get Started</span>
+
+                    {/* Ping indicator */}
+                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping"></div>
+                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
                 </button>
             </div>
 
-        </section>
-    );
-};
 
-export default Home;
+            {/* Scroll indicator */}
+            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+                <div
+                    className="w-6 h-10 border-2 rounded-full flex justify-center"
+                    style={{ borderColor: "var(--text-secondary)" }}
+                >
+                    <div className="w-1 h-3 rounded-full mt-2 animate-pulse"
+                        style={{ backgroundColor: "var(--text-secondary)" }}
+                    ></div>
+                </div>
+            </div>
+        </section>
+
+    )
+}
+
+export default Home

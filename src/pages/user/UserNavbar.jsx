@@ -5,8 +5,9 @@ import logowhite from "../../assets/images/logowhite.png";
 import logoDark from "../../assets/images/logoblack.png";
 import { useUser } from "../../context/UserContext";
 import SellerRegisterModal from "../../modals/SellerRegisterModal";
-import { protectedApi } from "../../utils/axiosInstance";
+import { protectedApi, publicApi } from "../../utils/axiosInstance";
 import userphoto from "../../assets/images/user.png";
+import { useTheme } from "next-themes";
 
 const UserNavbar = () => {
     const navigate = useNavigate();
@@ -14,10 +15,6 @@ const UserNavbar = () => {
     const { user, setUser } = useUser();
 
     const [isOpen, setIsOpen] = useState(false);
-    const [theme, setTheme] = useState(
-        localStorage.getItem("theme") ||
-        (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
-    );
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [showSellerModal, setShowSellerModal] = useState(false);
     const [notifications, setNotifications] = useState([]);
@@ -26,12 +23,9 @@ const UserNavbar = () => {
     const unreadCount = notifications.filter((n) => !n.read).length;
     const oneTapInitialized = useRef(false);
 
-    useEffect(() => {
-        document.documentElement.setAttribute("data-theme", theme);
-        localStorage.setItem("theme", theme);
-    }, [theme]);
+    const { theme, setTheme } = useTheme();
+    const toggleDarkMode = () => setTheme(theme === "dark" ? "light" : "dark");
 
-    const toggleDarkMode = () => setTheme((prev) => (prev === "dark" ? "light" : "dark"));
 
     const handleSectionClick = (sectionId) => {
         if (location.pathname !== "/") {
@@ -41,7 +35,6 @@ const UserNavbar = () => {
             if (el) el.scrollIntoView({ behavior: "smooth" });
         }
     };
-
 
     useEffect(() => {
         if (user || location.pathname === "/login" || oneTapInitialized.current) return;
@@ -74,10 +67,6 @@ const UserNavbar = () => {
             });
         }
     }, [user, location.pathname]);
-
-
-
-
 
     useEffect(() => {
         const handleClickOutside = (e) => {
@@ -116,46 +105,62 @@ const UserNavbar = () => {
 
     return (
         <div className="fixed top-0 left-0 w-full z-50">
-            <nav className="px-6 py-4 flex justify-between items-center backdrop-blur-md border-b"
+            <nav
+                className="px-6 py-4 flex justify-between items-center backdrop-blur-md border-b"
                 style={{
+                    backgroundColor: "var(--navbar-bg)",
                     color: "var(--text-color)",
-                    backgroundColor: theme === "dark" ? "rgba(25, 25, 27, 0.3)" : "rgba(255, 255, 255, 0.7)",
-                    borderColor: "var(--border-color)"
+                    borderColor: "var(--border-color)",
                 }}
             >
                 {/* Logo */}
-                <div className="flex items-center space-x-2 cursor-pointer" onClick={() => navigate("/")}>
+                <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
                     <img src={theme === "dark" ? logowhite : logoDark} alt="Logo" className="h-8 w-auto" />
                 </div>
 
-                {/* Desktop Links */}
-                <div className="hidden md:flex space-x-10">
-                    <a onClick={() => handleSectionClick("home")} className="font-semibold hover:text-indigo-500 transition">Home</a>
-                    <a onClick={() => navigate("/", { state: { scrollTo: "projects" } })} className="font-semibold hover:text-indigo-500 transition">Projects</a>
-                    <a onClick={() => navigate("/", { state: { scrollTo: "services" } })} className="font-semibold hover:text-indigo-500 transition">Our Services</a>
-                    <a onClick={() => navigate("/", { state: { scrollTo: "about" } })} className="font-semibold hover:text-indigo-500 transition">About Us</a>
+                {/* Links */}
+                <div className="hidden md:flex items-center gap-8">
+                    <div className="relative">
+                        <input
+                            type="text"
+                            placeholder="Search your project name"
+                            className="rounded-full px-4 py-2 pl-10 w-[280px] text-black bg-gray-100 text-sm focus:outline-none"
+                        />
+                        <svg className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1110.5 3a7.5 7.5 0 016.15 13.65z" />
+                        </svg>
+                    </div>
+                    <a onClick={() => handleSectionClick("home")} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">Home</a>
+                    <a onClick={() => navigate("/", { state: { scrollTo: "projects" } })} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">Project</a>
+                    <a onClick={() => navigate("/", { state: { scrollTo: "services" } })} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">Services</a>
+                    <a onClick={() => navigate("/", { state: { scrollTo: "about" } })} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">About Us</a>
                 </div>
 
-                {/* Right Side */}
+                {/* Right */}
                 <div className="hidden md:flex items-center gap-4">
-                    <button onClick={toggleDarkMode} className="p-2 rounded-full transition" style={{ backgroundColor: "var(--hover-bg)" }}>
+                    {/* Theme Toggle */}
+                    <button onClick={toggleDarkMode} className="p-2 rounded-md border border-gray-400 hover:bg-gray-100 transition">
                         {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
                     </button>
 
-                    {user && <Link to="/my-orders" className="hover:text-indigo-500"><ShoppingCart /></Link>}
+                    {/* Orders */}
+                    {user && (
+                        <Link to="/my-orders" className="hover:text-blue-600">
+                            <ShoppingCart size={18} />
+                        </Link>
+                    )}
 
+                    {/* Notifications */}
                     {user && (
                         <div className="relative notification-dropdown">
-                            <button onClick={() => setShowNotifications(!showNotifications)} className="p-2 rounded-full transition" style={{ backgroundColor: "var(--hover-bg)" }}>
+                            <button onClick={() => setShowNotifications(!showNotifications)} className="p-2 hover:bg-gray-100 transition">
                                 <Bell size={18} />
                             </button>
-
                             {unreadCount > 0 && (
                                 <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full px-1.5 h-4 min-w-[1rem] flex items-center justify-center">
                                     {unreadCount > 9 ? "9+" : unreadCount}
                                 </span>
                             )}
-
                             {showNotifications && (
                                 <div className={`absolute right-0 mt-2 w-72 max-h-[400px] overflow-y-auto rounded-md shadow-lg py-2 z-50 border ${theme === "dark" ? "bg-gray-900 text-white border-gray-700" : "bg-white text-gray-800 border-gray-200"}`}>
                                     {loadingNotifications ? (
@@ -168,11 +173,8 @@ const UserNavbar = () => {
                                                     try {
                                                         await protectedApi.put(`/notifications/${note.id}/read`);
                                                         setNotifications(prev => prev.map(n => (n.id === note.id ? { ...n, read: true } : n)));
-                                                        if (note.targetType === "ORDER") {
-                                                            navigate(`/my-order/${note.targetId}`);
-                                                        } else if (note.targetType === "PROJECT") {
-                                                            navigate(`/project/${note.targetId}`);
-                                                        }
+                                                        if (note.targetType === "ORDER") navigate(`/my-order/${note.targetId}`);
+                                                        else if (note.targetType === "PROJECT") navigate(`/project/${note.targetId}`);
                                                     } catch (err) {
                                                         console.error("Failed to mark notification as read", err);
                                                     } finally {
@@ -194,6 +196,7 @@ const UserNavbar = () => {
                         </div>
                     )}
 
+                    {/* Profile or Login */}
                     {user ? (
                         <div className="relative profile-dropdown">
                             <div onClick={() => setDropdownOpen(!dropdownOpen)} className="w-9 h-9 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden cursor-pointer border border-gray-400">
@@ -203,7 +206,6 @@ const UserNavbar = () => {
                                     <span className="text-sm font-semibold text-white bg-indigo-600 w-full h-full flex items-center justify-center rounded-full">{user.username?.charAt(0).toUpperCase()}</span>
                                 )}
                             </div>
-
                             {dropdownOpen && (
                                 <div className={`absolute right-0 mt-2 w-40 rounded-md shadow-lg py-2 z-50 border ${theme === "dark" ? "bg-gray-900 text-white border-gray-700" : "bg-white text-gray-800 border-gray-200"}`}>
                                     <button onClick={() => { setDropdownOpen(false); navigate("/userprofile"); }} className={`w-full px-4 py-2 text-sm text-left ${theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-100"}`}>Profile</button>
@@ -212,11 +214,13 @@ const UserNavbar = () => {
                             )}
                         </div>
                     ) : (
-                        <button onClick={() => navigate("/login")} className="bg-indigo-600 text-white font-medium rounded-full px-5 py-2 hover:bg-indigo-700 transition">Login</button>
+                        <button onClick={() => navigate("/login")} className="bg-blue-600 text-white font-medium rounded px-6 py-2 hover:bg-blue-700 transition">
+                            Login
+                        </button>
                     )}
                 </div>
 
-                {/* Hamburger */}
+                {/* Mobile Menu Toggle */}
                 <div className="md:hidden z-30">
                     <button onClick={() => setIsOpen(!isOpen)} style={{ color: "var(--text-color)" }}>
                         {isOpen ? <X /> : <Menu />}
@@ -225,10 +229,9 @@ const UserNavbar = () => {
             </nav>
 
             {/* Mobile Menu */}
-            {/* Mobile Menu */}
             {isOpen && (
-                <div className="md:hidden fixed inset-0 z-40 overflow-y-auto" style={{ backgroundColor: theme === "dark" ? "#111827" : "#ffffff", color: theme === "dark" ? "#ffffff" : "#111827" }}>
-                    <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: theme === "dark" ? "#374151" : "#e5e7eb" }}>
+                <div className="md:hidden fixed inset-0 z-40 overflow-y-auto" style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}>
+                    <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: "var(--border-color)" }}>
                         <div className="flex items-center gap-3">
                             <img src={theme === "dark" ? logowhite : logoDark} alt="Logo" className="h-6 sm:h-7" />
                         </div>
@@ -244,7 +247,7 @@ const UserNavbar = () => {
 
                     <div className="px-6 py-4 space-y-4">
                         <button onClick={toggleDarkMode} className="w-full flex items-center justify-center gap-2 border py-2 rounded-full font-medium"
-                            style={{ borderColor: theme === "dark" ? "#4b5563" : "#d1d5db", backgroundColor: theme === "dark" ? "#1f2937" : "#f9fafb" }}>
+                            style={{ borderColor: "var(--border-color)", backgroundColor: "var(--hover-bg)" }}>
                             {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
                             {theme === "dark" ? "Light Mode" : "Dark Mode"}
                         </button>
@@ -266,7 +269,6 @@ const UserNavbar = () => {
                     </div>
                 </div>
             )}
-
 
             {showSellerModal && <SellerRegisterModal onClose={() => setShowSellerModal(false)} />}
         </div>

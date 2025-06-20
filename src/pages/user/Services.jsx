@@ -82,7 +82,6 @@ const Services = () => {
                     Our <span className="text-[var(--button-primary)]">Services</span>
                 </h2>
                 <div className="h-1 w-24 mx-auto mt-2 mb-6 bg-[#5454D4] rounded-full"></div>
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
                     {services.map((service, index) => (
                         <div
