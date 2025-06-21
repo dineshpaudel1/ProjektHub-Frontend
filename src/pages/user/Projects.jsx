@@ -153,20 +153,18 @@ const Projects = () => {
                                         </span>
                                     </div>
 
-                                    <h3 className="text-lg font-semibold mb-2 group-hover:text-blue-600 transition-colors truncate" style={{ color: "var(--text-color)" }}>
+                                    <h3 className="text-lg font-semibold mb-2 group-hover:text-blue-600 transition-colors truncate line-clamp-1" style={{ color: "var(--text-color)" }}>
                                         {project.title}
                                     </h3>
 
-                                    <p className="text-sm mb-4 line-clamp-2" style={{ color: "var(--text-secondary)" }}>
-
-                                        {project.description || "No description provided."}
+                                    <p className="text-sm mb-4 line-clamp-1" style={{ color: "var(--text-secondary)" }}>
+                                        {project.description || "No description available"}
                                     </p>
 
                                     <div className="flex items-center justify-between text-sm" style={{ color: "var(--text-secondary)" }}>
-                                        <div className="flex items-center gap-1">
-                                            <Eye className="w-4 h-4" />
-                                            <span>{project.views || 0} views</span>
-                                        </div>
+                                        <p className="text-sm  line-clamp-2" style={{ color: "var(--text-secondary)" }}>
+                                            By: {project.seller.name || "No description available"}
+                                        </p>
                                         <div className="flex items-center gap-1 text-blue-600 group-hover:text-blue-700">
                                             <span className="font-medium">View</span>
                                             <ExternalLink className="w-4 h-4" />

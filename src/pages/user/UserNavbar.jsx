@@ -20,12 +20,11 @@ const UserNavbar = () => {
     const [notifications, setNotifications] = useState([]);
     const [loadingNotifications, setLoadingNotifications] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
-    const unreadCount = notifications.filter((n) => !n.read).length;
     const oneTapInitialized = useRef(false);
-
     const { theme, setTheme } = useTheme();
-    const toggleDarkMode = () => setTheme(theme === "dark" ? "light" : "dark");
+    const unreadCount = notifications.filter((n) => !n.read).length;
 
+    const toggleDarkMode = () => setTheme(theme === "dark" ? "light" : "dark");
 
     const handleSectionClick = (sectionId) => {
         if (location.pathname !== "/") {
@@ -37,36 +36,43 @@ const UserNavbar = () => {
     };
 
     useEffect(() => {
-        if (user || location.pathname === "/login" || oneTapInitialized.current) return;
+        const accessToken = localStorage.getItem("token");
 
-        if (window.google) {
-            oneTapInitialized.current = true;
+        if (user || accessToken || oneTapInitialized.current || location.pathname === "/login") return;
 
-            window.google.accounts.id.initialize({
-                client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-                callback: async (response) => {
-                    try {
-                        const res = await publicApi.post('/auth/login/google', { token: response.credential });
-                        const { accessToken, refreshToken } = res.data.data;
-                        localStorage.setItem("token", accessToken);
-                        localStorage.setItem("refreshToken", refreshToken);
-                        const userRes = await protectedApi.get("/user/me");
-                        setUser(userRes.data);
-                        navigate("/");
-                    } catch (err) {
-                        console.error("One Tap Login Failed:", err);
-                        window.google.accounts.id.prompt((notif) => console.log(notif));
-                    }
-                },
-                auto_select: true,
-                cancel_on_tap_outside: false,
-            });
+        const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+        if (!CLIENT_ID || !window.google?.accounts?.id) return;
 
-            window.google.accounts.id.prompt((notif) => {
-                console.log("One Tap status:", notif);
-            });
-        }
+        oneTapInitialized.current = true;
+        document.cookie = "g_state=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        window.google.accounts.id.cancel();
+
+        window.google.accounts.id.initialize({
+            client_id: CLIENT_ID,
+            callback: async (response) => {
+                try {
+                    const idToken = response.credential;
+                    const res = await publicApi.post("/auth/login/google", { token: idToken });
+                    const { accessToken, refreshToken } = res.data.data;
+                    localStorage.setItem("token", accessToken);
+                    localStorage.setItem("refreshToken", refreshToken);
+                    const userRes = await protectedApi.get("/user/me");
+                    setUser(userRes.data);
+                    navigate("/");
+                } catch (err) {
+                    console.error("Google One Tap Login Failed:", err);
+                }
+            },
+            auto_select: true,
+            cancel_on_tap_outside: false,
+            context: "signin",
+        });
+
+        window.google.accounts.id.prompt((notification) => {
+            console.log("📢 One Tap status:", notification);
+        });
     }, [user, location.pathname]);
+
 
     useEffect(() => {
         const handleClickOutside = (e) => {
@@ -120,32 +126,61 @@ const UserNavbar = () => {
 
                 {/* Links */}
                 <div className="hidden md:flex items-center gap-8">
-                    <div className="relative">
-                        <input
-                            type="text"
-                            placeholder="Search your project name"
-                            className="rounded-full px-4 py-2 pl-10 w-[280px] text-black bg-gray-100 text-sm focus:outline-none"
-                        />
-                        <svg className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1110.5 3a7.5 7.5 0 016.15 13.65z" />
-                        </svg>
+                    <div className="hidden md:flex items-center gap-8">
+                        <div className="relative">
+                            <input
+                                type="text"
+                                placeholder="Search your project name"
+                                className="rounded-full px-4 py-2 pl-10 w-[280px] text-sm focus:outline-none transition-all duration-300 border-1 shadow-sm focus:shadow-sm"
+                                style={{
+                                    backgroundColor: "var(--bg-color)",
+                                    color: "var(--text-secondary)",
+                                    borderColor: "var(--border-color)",
+                                    caretColor: "var(--text-secondary)",
+                                }}
+                            />
+                            <svg
+                                className="absolute left-3 top-2.5 h-4 w-4 pointer-events-none"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth={2}
+                                viewBox="0 0 24 24"
+                                style={{ color: "var(--text-secondary)" }}
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1110.5 3a7.5 7.5 0 016.15 13.65z"
+                                />
+                            </svg>
+                        </div>
+
+                        <a onClick={() => handleSectionClick("home")} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">Home</a>
+                        <a onClick={() => navigate("/", { state: { scrollTo: "projects" } })} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">Project</a>
+                        <a onClick={() => navigate("/", { state: { scrollTo: "services" } })} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">Services</a>
+                        <a onClick={() => navigate("/", { state: { scrollTo: "about" } })} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">About Us</a>
                     </div>
-                    <a onClick={() => handleSectionClick("home")} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">Home</a>
-                    <a onClick={() => navigate("/", { state: { scrollTo: "projects" } })} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">Project</a>
-                    <a onClick={() => navigate("/", { state: { scrollTo: "services" } })} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">Services</a>
-                    <a onClick={() => navigate("/", { state: { scrollTo: "about" } })} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">About Us</a>
                 </div>
+
 
                 {/* Right */}
                 <div className="hidden md:flex items-center gap-4">
                     {/* Theme Toggle */}
-                    <button onClick={toggleDarkMode} className="p-2 rounded-md border border-gray-400 hover:bg-gray-100 transition">
+                    <button
+                        onClick={toggleDarkMode}
+                        className="p-2 rounded-md border hover:shadow-sm transition-all duration-300"
+                        style={{
+                            backgroundColor: "var(--bg-color)",
+                            color: "var(--text-secondary)",
+                            borderColor: "var(--border-color)",
+                        }}
+                    >
                         {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
                     </button>
 
                     {/* Orders */}
                     {user && (
-                        <Link to="/my-orders" className="hover:text-blue-600">
+                        <Link to="/my-orders" className="transition hover:text-blue-600" style={{ color: "var(--text-secondary)" }}>
                             <ShoppingCart size={18} />
                         </Link>
                     )}
@@ -153,7 +188,15 @@ const UserNavbar = () => {
                     {/* Notifications */}
                     {user && (
                         <div className="relative notification-dropdown">
-                            <button onClick={() => setShowNotifications(!showNotifications)} className="p-2 hover:bg-gray-100 transition">
+                            <button
+                                onClick={() => setShowNotifications(!showNotifications)}
+                                className="p-2 rounded-md transition-all duration-300"
+                                style={{
+                                    backgroundColor: "var(--bg-color)",
+                                    color: "var(--text-secondary)",
+                                    borderColor: "var(--border-color)",
+                                }}
+                            >
                                 <Bell size={18} />
                             </button>
                             {unreadCount > 0 && (
@@ -162,26 +205,48 @@ const UserNavbar = () => {
                                 </span>
                             )}
                             {showNotifications && (
-                                <div className={`absolute right-0 mt-2 w-72 max-h-[400px] overflow-y-auto rounded-md shadow-lg py-2 z-50 border ${theme === "dark" ? "bg-gray-900 text-white border-gray-700" : "bg-white text-gray-800 border-gray-200"}`}>
+                                <div
+                                    className="absolute right-0 mt-2 w-72 max-h-[400px] overflow-y-auto rounded-md shadow-lg py-2 z-50 border"
+                                    style={{
+                                        backgroundColor: "var(--bg-color)",
+                                        color: "var(--text-color)",
+                                        borderColor: "var(--border-color)",
+                                    }}
+                                >
                                     {loadingNotifications ? (
                                         <div className="px-4 py-2 text-sm text-gray-500">Loading...</div>
                                     ) : notifications.length > 0 ? (
                                         notifications.map((note) => (
-                                            <div key={note.id}
-                                                className={`px-4 py-2 text-sm border-b flex items-start gap-2 cursor-pointer hover:bg-gray-100 ${theme === "dark" ? "border-gray-800" : "border-gray-100"}`}
+                                            <div
+                                                key={note.id}
+                                                className="px-4 py-2 text-sm border-b flex items-start gap-2 cursor-pointer hover:brightness-95 transition-all duration-200"
+                                                style={{ borderColor: "var(--border-color)" }}
                                                 onClick={async () => {
                                                     try {
                                                         await protectedApi.put(`/notifications/${note.id}/read`);
-                                                        setNotifications(prev => prev.map(n => (n.id === note.id ? { ...n, read: true } : n)));
-                                                        if (note.targetType === "ORDER") navigate(`/my-order/${note.targetId}`);
-                                                        else if (note.targetType === "PROJECT") navigate(`/project/${note.targetId}`);
+                                                        setNotifications(prev =>
+                                                            prev.map(n => (n.id === note.id ? { ...n, read: true } : n))
+                                                        );
+                                                        if (note.targetType === "ORDER")
+                                                            navigate(`/my-order/${note.targetId}`);
+                                                        else if (note.targetType === "PROJECT")
+                                                            navigate(`/project/${note.targetId}`);
                                                     } catch (err) {
                                                         console.error("Failed to mark notification as read", err);
                                                     } finally {
                                                         setShowNotifications(false);
                                                     }
-                                                }}>
-                                                <img src={note.photoUrl ? `http://localhost:8080/api/media/photo?file=${note.photoUrl}` : userphoto} alt="notif" className="w-8 h-8 object-cover rounded" />
+                                                }}
+                                            >
+                                                <img
+                                                    src={
+                                                        note.photoUrl
+                                                            ? `http://localhost:8080/api/media/photo?file=${note.photoUrl}`
+                                                            : userphoto
+                                                    }
+                                                    alt="notif"
+                                                    className="w-8 h-8 object-cover rounded"
+                                                />
                                                 <div className="flex-1">
                                                     <p className="font-medium">{note.message}</p>
                                                     <p className="text-xs text-gray-500">{new Date(note.timeStamp).toLocaleString()}</p>
@@ -199,27 +264,63 @@ const UserNavbar = () => {
                     {/* Profile or Login */}
                     {user ? (
                         <div className="relative profile-dropdown">
-                            <div onClick={() => setDropdownOpen(!dropdownOpen)} className="w-9 h-9 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden cursor-pointer border border-gray-400">
+                            <div
+                                onClick={() => setDropdownOpen(!dropdownOpen)}
+                                className="w-9 h-9 rounded-full flex items-center justify-center overflow-hidden cursor-pointer border"
+                                style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+                            >
                                 {user.profilePicture ? (
-                                    <img src={`http://localhost:8080/api/media/photo?file=${user.profilePicture}`} alt="Profile" className="w-full h-full object-cover rounded-full" />
+                                    <img
+                                        src={`http://localhost:8080/api/media/photo?file=${user.profilePicture}`}
+                                        alt="Profile"
+                                        className="w-full h-full object-cover rounded-full"
+                                    />
                                 ) : (
-                                    <span className="text-sm font-semibold text-white bg-indigo-600 w-full h-full flex items-center justify-center rounded-full">{user.username?.charAt(0).toUpperCase()}</span>
+                                    <span className="text-sm font-semibold text-white bg-indigo-600 w-full h-full flex items-center justify-center rounded-full">
+                                        {user.username?.charAt(0).toUpperCase()}
+                                    </span>
                                 )}
                             </div>
                             {dropdownOpen && (
-                                <div className={`absolute right-0 mt-2 w-40 rounded-md shadow-lg py-2 z-50 border ${theme === "dark" ? "bg-gray-900 text-white border-gray-700" : "bg-white text-gray-800 border-gray-200"}`}>
-                                    <button onClick={() => { setDropdownOpen(false); navigate("/userprofile"); }} className={`w-full px-4 py-2 text-sm text-left ${theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-100"}`}>Profile</button>
-                                    <button onClick={handleLogout} className={`w-full px-4 py-2 text-sm text-left text-red-600 ${theme === "dark" ? "hover:bg-red-700" : "hover:bg-red-100"}`}>Logout</button>
+                                <div
+                                    className="absolute right-0 mt-2 w-40 rounded-md shadow-lg py-2 z-50 border"
+                                    style={{
+                                        backgroundColor: "var(--bg-color)",
+                                        color: "var(--text-color)",
+                                        borderColor: "var(--border-color)",
+                                    }}
+                                >
+                                    <button
+                                        onClick={() => {
+                                            setDropdownOpen(false);
+                                            navigate("/userprofile");
+                                        }}
+                                        className="w-full px-4 py-2 text-sm text-left hover:brightness-95 transition"
+                                    >
+                                        Profile
+                                    </button>
+                                    <button
+                                        onClick={handleLogout}
+                                        className="w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-100 dark:hover:bg-red-700"
+                                    >
+                                        Logout
+                                    </button>
                                 </div>
                             )}
                         </div>
                     ) : (
-                        <button onClick={() => navigate("/login")} className="bg-blue-600 text-white font-medium rounded px-6 py-2 hover:bg-blue-700 transition">
+                        <button
+                            onClick={() => navigate("/login")}
+                            className="font-medium rounded px-6 py-2 hover:shadow transition"
+                            style={{
+                                backgroundColor: "var(--button-primary, #2563eb)",
+                                color: "#fff",
+                            }}
+                        >
                             Login
                         </button>
                     )}
                 </div>
-
                 {/* Mobile Menu Toggle */}
                 <div className="md:hidden z-30">
                     <button onClick={() => setIsOpen(!isOpen)} style={{ color: "var(--text-color)" }}>

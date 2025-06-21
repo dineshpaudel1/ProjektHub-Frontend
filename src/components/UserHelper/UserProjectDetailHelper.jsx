@@ -14,18 +14,6 @@ const UserProjectDetailHelper = ({ project, isExpanded, setIsExpanded, onRequest
                     <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 text-[var(--text-color)]">
                         {project.title}
                     </h1>
-                    <div className="flex flex-wrap items-center gap-4 text-sm mb-4">
-                        <div className="flex items-center text-yellow-500">
-                            {[...Array(5)].map((_, i) => (
-                                <Star key={i} className="h-4 w-4 fill-current" />
-                            ))}
-                            <span className="ml-2 text-[var(--text-secondary)] font-medium">(128)</span>
-                        </div>
-                        <div className="flex items-center text-green-600 font-medium">
-                            <ShoppingBag className="h-4 w-4 mr-1" />
-                            1,234 purchases
-                        </div>
-                    </div>
                     <p className="text-[var(--text-secondary)] mb-2">
                         {isExpanded ? project.description : `${project.description?.slice(0, 80)}...`}
                     </p>
@@ -77,10 +65,8 @@ const UserProjectDetailHelper = ({ project, isExpanded, setIsExpanded, onRequest
                 <div className="space-y-4 sm:space-y-5">
                     <div className="space-y-1">
                         <div className="flex items-baseline justify-between">
-                            <p className="text-2xl sm:text-3xl font-bold text-[var(--button-primary)]">NPR {project.price}</p>
-                            <p className="text-sm line-through text-gray-500">NPR 2999.99</p>
+                            <p className="text-xl sm:text-3xl font-bold text-[var(--button-primary)]">NPR {project.price}</p>
                         </div>
-                        <p className="text-green-600 text-sm font-bold">33% OFF</p>
                     </div>
 
                     <div className="pt-2">

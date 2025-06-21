@@ -185,7 +185,7 @@ const AdminNav = ({ toggleSidebar }) => {
 
                                     >
                                         <img
-                                            src={note.photoUrl ? `http://localhost:8080/api/media/photo?file=${note.photoUrl}` : user}
+                                            src={`http://localhost:8080/api/media/photo?file=${note.photoUrl}`}
                                             alt="Notification"
                                             className="w-9 h-9 rounded-full mt-1 object-cover border"
                                         />

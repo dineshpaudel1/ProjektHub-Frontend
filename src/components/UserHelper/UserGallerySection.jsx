@@ -5,7 +5,7 @@ const UserGallerySection = ({ photos }) => {
     if (!photos || photos.length === 0) return null;
 
     return (
-        <div className="mt-12">
+        <div>
             <h2 className="flex items-center text-xl font-semibold mb-4">
                 <ImageIcon className="h-5 w-5 mr-2" />
                 Gallery
