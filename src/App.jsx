@@ -4,7 +4,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AdminLayout from "./layouts/AdminLayout";
 import UserLayout from "./layouts/UserLayout";
-import ScrollToTop from "./components/ScrollToTop";
+import ScrollToTop from "./components/common/ScrollToTop";
 import SellerLayout from "./layouts/SellerLayout";
 import AdminPrivateRoute from "./utils/AdminPrivateRoute";
 import SellerPrivateRoute from "./utils/SellerPrivateRoute";

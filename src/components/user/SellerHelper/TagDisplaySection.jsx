@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Tag, X, Info, Plus, Save } from "lucide-react";
-import { protectedApi } from "../../utils/axiosInstance";  // ✅ updated import
+import { protectedApi } from "../../../services/axiosInstance";  // ✅ updated import
 
 const TagDisplaySection = ({
     project,

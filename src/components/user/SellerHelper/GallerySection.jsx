@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { UploadCloud, X, ImageIcon } from "lucide-react";
-import { protectedApi } from "../../utils/axiosInstance";  // ✅ updated import
-import PhotoUploadModal from "../../modals/PhotoUploadModal";
+import { protectedApi } from "../../../services/axiosInstance";
+import PhotoUploadModal from "../../../modals/PhotoUploadModal"
 import { toast } from "react-toastify";
 
 const GallerySection = ({ id, photos, refreshProject }) => {

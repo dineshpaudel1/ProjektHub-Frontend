@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useProjectContext } from '../context/ProjectContext';
 import { useUser } from "../context/UserContext";
-import { protectedApi } from "../utils/axiosInstance";  // ✅ updated import
+import { protectedApi } from "../services/axiosInstance";  
 import logo from '../assets/images/logoblack.png';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';

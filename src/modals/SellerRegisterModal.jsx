@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { protectedApi } from "../utils/axiosInstance";  // ✅ updated import
+import { protectedApi } from "../services/axiosInstance";
 import { toast } from "react-toastify";
 
 const SellerRegisterModal = ({ onClose }) => {

@@ -3,7 +3,7 @@ import { Bell, Menu, Search, User, ChevronDown } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import user from "../../assets/images/user.png";
 import logo from "../../assets/images/logoblack.png";
-import { protectedApi } from "../../utils/axiosInstance";  // ✅ updated import
+import { protectedApi } from "../../services/axiosInstance";  // ✅ updated import
 
 const SellerNav = ({ toggleSidebar }) => {
     const [showMenu, setShowMenu] = useState(false);

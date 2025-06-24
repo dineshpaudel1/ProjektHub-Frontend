@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { MessageCircle } from "lucide-react";
-import { protectedApi } from "../../utils/axiosInstance";  // ✅ updated import
-import { toast } from "react-toastify";
+import { protectedApi } from "../../../services/axiosInstance"; import { toast } from "react-toastify";
 
 const QuestionAnswerList = ({ questions, refreshQuestions }) => {
     const [answerMap, setAnswerMap] = useState({});

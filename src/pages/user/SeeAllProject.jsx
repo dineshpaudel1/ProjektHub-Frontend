@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useProjectContext } from "../context/ProjectContext";
-import SocialModal from "../modals/SocialModal";
+import { useProjectContext } from "../../context/ProjectContext";
+import SocialModal from "../../modals/SocialModal";
 import { useNavigate } from "react-router-dom";
 
 const SkeletonCard = () => (

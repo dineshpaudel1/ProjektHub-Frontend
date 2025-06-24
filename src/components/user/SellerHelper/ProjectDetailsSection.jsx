@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ShoppingBag, Star, Pencil, UploadCloud, Save } from "lucide-react";
-import { protectedApi } from "../../utils/axiosInstance";  // ✅ updated import
+import { protectedApi } from "../../../services/axiosInstance";
 import { toast } from "react-toastify";
 
 const ProjectDetailsSection = ({ project, setProject, isExpanded, setIsExpanded }) => {

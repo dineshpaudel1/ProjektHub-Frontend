@@ -5,9 +5,10 @@ import logowhite from "../../assets/images/logowhite.png";
 import logoDark from "../../assets/images/logoblack.png";
 import { useUser } from "../../context/UserContext";
 import SellerRegisterModal from "../../modals/SellerRegisterModal";
-import { protectedApi, publicApi } from "../../utils/axiosInstance";
+import { protectedApi, publicApi } from "../../services/axiosInstance";
 import userphoto from "../../assets/images/user.png";
 import { useTheme } from "next-themes";
+import { toast } from "react-toastify";
 
 const UserNavbar = () => {
     const navigate = useNavigate();
@@ -43,6 +44,9 @@ const UserNavbar = () => {
         const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
         if (!CLIENT_ID || !window.google?.accounts?.id) return;
 
+        // ✅ Store current path before triggering One Tap
+        localStorage.setItem("redirectAfterLogin", location.pathname);
+
         oneTapInitialized.current = true;
         document.cookie = "g_state=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         window.google.accounts.id.cancel();
@@ -54,13 +58,19 @@ const UserNavbar = () => {
                     const idToken = response.credential;
                     const res = await publicApi.post("/auth/login/google", { token: idToken });
                     const { accessToken, refreshToken } = res.data.data;
+
                     localStorage.setItem("token", accessToken);
                     localStorage.setItem("refreshToken", refreshToken);
+
                     const userRes = await protectedApi.get("/user/me");
                     setUser(userRes.data);
-                    navigate("/");
+
+                    // ✅ Redirect back to stored page
+                    const redirectPath = location.state?.from || localStorage.getItem("redirectAfterLogin") || "/";
+                    localStorage.removeItem("redirectAfterLogin");
+                    navigate(redirectPath);
                 } catch (err) {
-                    console.error("Google One Tap Login Failed:", err);
+                    console.error("❌ Google One Tap Login Failed:", err);
                 }
             },
             auto_select: true,
@@ -72,6 +82,7 @@ const UserNavbar = () => {
             console.log("📢 One Tap status:", notification);
         });
     }, [user, location.pathname]);
+
 
 
     useEffect(() => {
@@ -126,45 +137,45 @@ const UserNavbar = () => {
 
                 {/* Links */}
                 <div className="hidden md:flex items-center gap-8">
-                    <div className="hidden md:flex items-center gap-8">
-                        <div className="relative">
-                            <input
-                                type="text"
-                                placeholder="Search your project name"
-                                className="rounded-full px-4 py-2 pl-10 w-[280px] text-sm focus:outline-none transition-all duration-300 border-1 shadow-sm focus:shadow-sm"
-                                style={{
-                                    backgroundColor: "var(--bg-color)",
-                                    color: "var(--text-secondary)",
-                                    borderColor: "var(--border-color)",
-                                    caretColor: "var(--text-secondary)",
-                                }}
-                            />
-                            <svg
-                                className="absolute left-3 top-2.5 h-4 w-4 pointer-events-none"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth={2}
-                                viewBox="0 0 24 24"
-                                style={{ color: "var(--text-secondary)" }}
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1110.5 3a7.5 7.5 0 016.15 13.65z"
-                                />
-                            </svg>
-                        </div>
-
+                    <div className="hidden md:flex items-center gap-8 ml-[250px]">
                         <a onClick={() => handleSectionClick("home")} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">Home</a>
                         <a onClick={() => navigate("/", { state: { scrollTo: "projects" } })} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">Project</a>
                         <a onClick={() => navigate("/", { state: { scrollTo: "services" } })} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">Services</a>
                         <a onClick={() => navigate("/", { state: { scrollTo: "about" } })} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">About Us</a>
                     </div>
+
                 </div>
 
 
                 {/* Right */}
                 <div className="hidden md:flex items-center gap-4">
+                    <div className="relative">
+                        <input
+                            type="text"
+                            placeholder="Search your project name"
+                            className="rounded-full px-4 py-2 pl-10 w-[280px] text-sm focus:outline-none transition-all duration-300 border-1 shadow-sm focus:shadow-sm"
+                            style={{
+                                backgroundColor: "var(--bg-color)",
+                                color: "var(--text-secondary)",
+                                borderColor: "var(--border-color)",
+                                caretColor: "var(--text-secondary)",
+                            }}
+                        />
+                        <svg
+                            className="absolute left-3 top-2.5 h-4 w-4 pointer-events-none"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                            viewBox="0 0 24 24"
+                            style={{ color: "var(--text-secondary)" }}
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1110.5 3a7.5 7.5 0 016.15 13.65z"
+                            />
+                        </svg>
+                    </div>
                     {/* Theme Toggle */}
                     <button
                         onClick={toggleDarkMode}

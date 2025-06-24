@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { publicApi } from '../utils/axiosInstance';
+import { publicApi } from "../services/axiosInstance";
+
 
 const AddProjectModal = ({ isOpen, onClose, onCreate, formData, setFormData }) => {
     const [categories, setCategories] = useState([]);

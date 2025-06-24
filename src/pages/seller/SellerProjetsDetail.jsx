@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { publicApi, protectedApi } from "../../utils/axiosInstance";
+import { publicApi, protectedApi } from "../../services/axiosInstance";
 import { Loader, ArrowLeft } from "lucide-react";
-import QuestionAnswerList from "../../components/SellerHelper/QuestionAnswerList";
-import ProjectDetailsSection from "../../components/SellerHelper/ProjectDetailsSection";
-import GallerySection from "../../components/SellerHelper/GallerySection";
-import TagDisplaySection from "../../components/SellerHelper/TagDisplaySection";
+import QuestionAnswerList from "../../components/user/SellerHelper/QuestionAnswerList";
+import ProjectDetailsSection from "../../components/user/SellerHelper/ProjectDetailsSection";
+import GallerySection from "../../components/user/SellerHelper/GallerySection";
+import TagDisplaySection from "../../components/user/SellerHelper/TagDisplaySection";
 import { toast } from "react-toastify";
 
 const SellerProjectDetail = () => {

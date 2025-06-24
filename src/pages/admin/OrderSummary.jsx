@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { protectedApi } from "../../utils/axiosInstance";  // ✅ updated axios import
+import { protectedApi } from "../../services/axiosInstance";  // ✅ updated axios import
 import { ClipboardList, Package, DollarSign } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 

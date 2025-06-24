@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { protectedApi, publicApi } from "../../utils/axiosInstance";
+import { protectedApi, publicApi } from "../../services/axiosInstance";
 import { Loader, MessageCircle } from "lucide-react";
-import UserQuestionAnswerList from "../../components/UserHelper/QuestionAnswerList";
-import UserProjectDetailHelper from "../../components/UserHelper/UserProjectDetailHelper";
-import UserGallerySection from "../../components/UserHelper/UserGallerySection";
+import UserQuestionAnswerList from "../../components/user/UserHelper/QuestionAnswerList";
+import UserProjectDetailHelper from "../../components/user/UserHelper/UserProjectDetailHelper";
+import UserGallerySection from "../../components/user/UserHelper/UserGallerySection";
 import { useProjectContext } from "../../context/ProjectContext";
 import OrderModal from "../../modals/OrderModal";
-import { notifySuccess, notifyError } from '../../utils/toastNotify';
+import { notifySuccess, notifyError } from "../../utils/toastNotify";
 
 const getEmbedUrl = (url) => {
     try {
@@ -136,10 +136,6 @@ const UserProjectDetail = () => {
                                     setIsOrderModalOpen(true);
                                 }}
                             />
-
-                            {/* Gallery */}
-                            <UserGallerySection photos={project.photos} />
-
                             {/* Ask a Question */}
                             <div className="mt-10 pt-8 border-t border-[var(--border-color)]">
                                 <h2 className="flex items-center text-xl font-semibold mb-4">

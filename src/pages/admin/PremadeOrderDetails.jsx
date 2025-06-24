@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { protectedApi } from "../../utils/axiosInstance";  // ✅ USE protectedApi directly
+import { protectedApi } from "../../services/axiosInstance";  // ✅ USE protectedApi directly
 import { toast } from "react-toastify";
 
 const AdminOrderDetails = () => {
@@ -8,6 +8,8 @@ const AdminOrderDetails = () => {
     const [order, setOrder] = useState(null);
     const [orderType, setOrderType] = useState("");
     const [loading, setLoading] = useState(true);
+    const [isProcessing, setIsProcessing] = useState(false);
+
 
     const fetchOrderDetails = async () => {
         try {

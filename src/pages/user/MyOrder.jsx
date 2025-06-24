@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { protectedApi } from "../../utils/axiosInstance";
+import { protectedApi } from "../../services/axiosInstance";
 
 const MyOrder = () => {
   const [orders, setOrders] = useState([]);
@@ -40,7 +40,7 @@ const MyOrder = () => {
             >
               <div className="flex justify-between items-center mb-2">
                 <h2 className="text-lg font-semibold">
-                  Order #{order.orderId}
+                  Recent Order
                 </h2>
                 <span
                   className={`text-sm font-medium px-3 py-1 rounded-full ${order.status === "PLACED"
@@ -60,7 +60,7 @@ const MyOrder = () => {
               <p className="text-sm">
                 Total Price:{" "}
                 <span className="font-semibold text-indigo-600">
-                  Rs. {order.totalPrice}
+                  {order.totalPrice > 0 ? `Rs. ${order.totalPrice}` : "Not determine"}
                 </span>
               </p>
             </div>

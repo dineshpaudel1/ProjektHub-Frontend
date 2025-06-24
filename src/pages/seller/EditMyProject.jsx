@@ -1,7 +1,7 @@
 
 // import React, { useEffect, useState } from 'react';
 // import { useParams, useNavigate } from 'react-router-dom';
-// import axios from '../../utils/axiosInstance';
+// import axios from "../../services/axiosInstance";
 
 // import NotificationToast from '../../components/NotificationToast';
 // // import ThumbnailUpload from '../../porjectdetailhelper/ThumbnailUpload';

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { protectedApi } from "../utils/axiosInstance";  // ✅ use protectedApi instead of axios
+import { protectedApi } from "../services/axiosInstance";  // ✅ use protectedApi instead of axios
 
 const UserContext = createContext();
 

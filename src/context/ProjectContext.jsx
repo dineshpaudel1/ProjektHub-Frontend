@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useRef } from "react";
-import { publicApi } from "../utils/axiosInstance";
+import { publicApi } from "../services/axiosInstance";
 
 const ProjectContext = createContext();
 

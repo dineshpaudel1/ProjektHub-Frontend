@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { protectedApi } from "../../utils/axiosInstance";
-import ProfileField from "../../components/ProfileField";
+import { protectedApi } from "../../services/axiosInstance";
+import ProfileField from "../../components/user/ProfileField";
 import {
     User, Mail, Shield, Camera, CheckCircle,
     AlertCircle, Clock, Loader, Save, X

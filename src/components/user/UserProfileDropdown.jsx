@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { protectedApi } from "../../utils/axiosInstance";
+import { protectedApi } from "../../services/axiosInstance";
 import {
     User,
     MessageSquare,

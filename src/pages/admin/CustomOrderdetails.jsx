@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { protectedApi } from "../../utils/axiosInstance";
+import { protectedApi } from "../../services/axiosInstance";
 import { toast } from "react-toastify";
 import ProcessCustomOrderModal from "../../modals/ProcessCustomOrderModal";
 import OptionStatusModal from "../../modals/OptionStatusModal";

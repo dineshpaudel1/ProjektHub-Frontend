@@ -1,7 +1,8 @@
 import React, { useState, useRef } from "react";
 import { FaSpinner, FaTimes } from "react-icons/fa";
 import { toast } from "react-toastify";
-import { protectedApi } from "../utils/axiosInstance"
+import { protectedApi } from "../services/axiosInstance"
+import { useNavigate } from "react-router-dom";
 
 const CustomOrderModal = ({ isOpen, onClose }) => {
     const [formData, setFormData] = useState({
@@ -15,6 +16,7 @@ const CustomOrderModal = ({ isOpen, onClose }) => {
     const [errors, setErrors] = useState({});
     const availableOptions = ["Project", "Document", "Figma"];
     const modalRef = useRef();
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -64,6 +66,7 @@ const CustomOrderModal = ({ isOpen, onClose }) => {
             await protectedApi.post("/user/order/custom", payload);
             toast.success("Custom order placed successfully!");
             onClose();
+            navigate("/my-orders");
             resetForm();
         } catch (error) {
             console.error("Error placing order:", error);

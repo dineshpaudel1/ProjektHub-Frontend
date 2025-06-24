@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { publicApi } from "../utils/axiosInstance";  // ✅ updated import
+import { publicApi } from "../../services/axiosInstance";  // ✅ updated import
 import { Loader } from "lucide-react";
 
 const SeeSellerProfile = () => {

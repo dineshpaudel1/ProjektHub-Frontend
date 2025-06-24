@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { protectedApi } from "../../utils/axiosInstance";
+import { protectedApi } from "../../services/axiosInstance";
 
 const ApproveSeller = () => {
     const { sellerId } = useParams();

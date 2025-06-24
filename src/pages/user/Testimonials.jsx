@@ -3,26 +3,23 @@ import myphoto from "../../assets/images/user.png";
 
 const testimonials = [
     {
-        name: "Dinesh Paudel",
+        name: "Kushal guragain",
+        role: "CLIENT",
+        photo: { myphoto },
+        text: "I received excellent service from Project Hub during my project development time.",
+        rating: 5,
+    },
+    {
+        name: "Sandeep Oli",
+        role: "CLIENT",
+        photo: { myphoto },
+        text: "I received excellent service from Project Hub during my project development career.",
+        rating: 5,
+    },
+    {
+        name: "Aakash Pun",
         role: "CLIENTS",
-        company: "TechCorp",
-        photo: { myphoto },
-        text: "Proin iaculis purus consequat sem cure digni ssim donec porttitor entum suscipit rhoncus.",
-        rating: 5,
-    },
-    {
-        name: "Aniruddha Bishwokarma",
-        role: "CTO",
-        company: "InnovateLabs",
-        photo: { myphoto },
-        text: "Export tempor illum tamen malis eram quae irure esse labore quem cillum quid cillum eram malis.",
-        rating: 5,
-    },
-    {
-        name: "Sarah Johnson",
-        role: "Product Manager",
-        company: "StartupXYZ",
-        text: "Outstanding service and exceptional results. The team delivered beyond our expectations.",
+        text: "I received excellent service from Project Hub during my project development career.",
         rating: 5,
     },
 ];
@@ -75,7 +72,7 @@ const Testimonials = () => {
                             </div>
 
                             {/* Testimonial Text */}
-                            <blockquote className="text-base leading-relaxed mb-6">
+                            <blockquote className="text-base leading-relaxed mb-6 line-clamp-2">
                                 "{testimonial.text}"
                             </blockquote>
 
@@ -91,7 +88,6 @@ const Testimonials = () => {
                                 <div className="ml-3">
                                     <h4 className="font-semibold text-base">{testimonial.name}</h4>
                                     <p className="text-sm" style={{ color: "var(--text-secondary)" }}>{testimonial.role}</p>
-                                    <p className="text-blue-600 text-xs">{testimonial.company}</p>
                                 </div>
                             </div>
 
@@ -115,7 +111,7 @@ const Testimonials = () => {
                             ))}
                         </div>
                         <span className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
-                            Join 500+ happy clients
+                            Join 10+ happy clients
                         </span>
                     </div>
                 </div>

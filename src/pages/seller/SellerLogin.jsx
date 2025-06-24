@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { publicApi } from "../../utils/axiosInstance";
+import { publicApi } from "../../services/axiosInstance";
 
 const SellerLogin = () => {
     const navigate = useNavigate();

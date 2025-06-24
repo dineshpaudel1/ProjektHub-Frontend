@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useUser } from "../../context/UserContext";
-import { protectedApi } from "../../utils/axiosInstance";
+import { protectedApi } from "../../services/axiosInstance";
 import { Loader, Mail, User } from "lucide-react";
 
 const UserProfile = () => {

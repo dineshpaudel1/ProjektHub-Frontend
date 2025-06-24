@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Trash, MoreVertical, ExternalLink, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { protectedApi } from '../utils/axiosInstance';  // ✅ updated import
-import { confirmDelete, showSuccess, showError } from '../utils/sweetAlertUtils';
+import { protectedApi } from "../../services/axiosInstance";  // ✅ updated import
+import { confirmDelete, showSuccess, showError } from "../../utils/sweetAlertUtils";
 
 const ProjectCard = ({
     id,

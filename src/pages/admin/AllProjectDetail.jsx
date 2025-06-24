@@ -3,9 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Loader, ArrowLeft, MessageCircle } from "lucide-react";
 import { useProjectContext } from "../../context/ProjectContext";
 
-import UserProjectDetailHelper from "../../components/UserHelper/UserProjectDetailHelper";
-import UserGallerySection from "../../components/UserHelper/UserGallerySection";
-import UserQuestionAnswerList from "../../components/UserHelper/QuestionAnswerList";
+import UserProjectDetailHelper from "../../components/user/UserHelper/UserProjectDetailHelper";
+import UserGallerySection from "../../components/user/UserHelper/UserGallerySection";
+import UserQuestionAnswerList from "../../components/user/UserHelper/QuestionAnswerList";
 
 const getEmbedUrl = (url) => {
     try {
@@ -104,7 +104,7 @@ const AllProjectDetail = () => {
                             project={project}
                             isExpanded={isExpanded}
                             setIsExpanded={setIsExpanded}
-                            onRequestBuy={null} // Admins don't need this, pass null or skip
+                            onRequestBuy={null} // Admins don"t need this, pass null or skip
                         />
 
                         {/* Gallery */}

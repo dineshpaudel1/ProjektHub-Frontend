@@ -3,9 +3,9 @@ import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { FaFolderOpen, FaSearch, FaPlus } from 'react-icons/fa';
 import { Loader, AlertCircle, X } from 'lucide-react';
-import ProjectCard from '../../components/ProjectCard';
+import ProjectCard from "../../components/project/ProjectCard";
 import AddCategoryModal from '../../modals/AddCategoryModal';
-import { protectedApi } from "../../utils/axiosInstance";
+import { protectedApi } from "../../services/axiosInstance";
 import { useProjectContext } from '../../context/ProjectContext';
 
 const AdminProjects = () => {

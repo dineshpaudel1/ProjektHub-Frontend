@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { protectedApi } from '../../utils/axiosInstance';
+import { protectedApi } from "../../services/axiosInstance";
 import {
     FaFolderOpen,
     FaUser,

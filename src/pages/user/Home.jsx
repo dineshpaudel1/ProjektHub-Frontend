@@ -1,6 +1,7 @@
 import { useEffect } from "react"
 import person from "../../assets/images/person.png"
 import { useNavigate } from "react-router-dom"
+import { FaWhatsapp, FaArrowRight } from "react-icons/fa";
 
 const Home = () => {
     const navigate = useNavigate()
@@ -97,7 +98,7 @@ const Home = () => {
                             </button>
 
                             <button
-                                onClick={() => alert("Explore clicked")}
+                                onClick={() => handleSectionClick("projects")}
                                 className="group px-8 py-4 font-semibold rounded-xl border-2 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300"
                                 style={{
                                     backgroundColor: "var(--bg-color)",
@@ -107,19 +108,7 @@ const Home = () => {
                             >
                                 <span className="flex items-center justify-center gap-2">
                                     Explore Our Work
-                                    <svg
-                                        className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M17 8l4 4m0 0l-4 4m4-4H3"
-                                        />
-                                    </svg>
+                                    <FaArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
                                 </span>
                             </button>
                         </div>
@@ -174,25 +163,16 @@ const Home = () => {
                     onClick={handleWhatsAppClick}
                     className="group relative bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium px-6 py-4 rounded-full flex items-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
                 >
-                    {/* WhatsApp SVG Icon */}
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="w-6 h-6"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path d="M16.8 14.8c-.3-.2-1.8-.9-2.1-1s-.5-.2-.7.1-.8 1-1 1.1-.4.2-.7 0c-.3-.1-1.2-.4-2.2-1.4s-1.3-1.9-1.4-2.2c-.1-.3 0-.4.1-.6s.5-.6.7-.9.3-.4.4-.6.1-.3 0-.6-.7-1.7-.9-2.3c-.2-.5-.5-.4-.7-.4h-.6c-.2 0-.6.1-.9.4s-1.2 1.2-1.2 2.9c0 1.7 1.2 3.3 1.3 3.6s2.4 3.8 5.9 5.2c.8.3 1.4.5 1.9.6.8.2 1.5.2 2 .1.6-.1 1.8-.7 2.1-1.3.3-.6.3-1.2.2-1.3 0-.1-.3-.2-.6-.3zm-4.8 6.2c-1.6 0-3.2-.4-4.6-1.1l-5.1 1.3 1.4-5c-.7-1.4-1.1-2.9-1.1-4.5 0-5.5 4.5-10 10-10s10 4.5 10 10-4.5 10-10 10z" />
-                    </svg>
+                    {/* React Icon */}
+                    <FaWhatsapp className="w-6 h-6" />
 
-                    <span className="hidden sm:block">Get Started</span>
+                    <span className="hidden sm:block">Text now</span>
 
                     {/* Ping indicator */}
                     <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping"></div>
                     <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
                 </button>
             </div>
-
-
             {/* Scroll indicator */}
             <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
                 <div

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { protectedApi } from "../utils/axiosInstance";  // ✅ updated import
+import { protectedApi } from "../../services/axiosInstance";  // ✅ updated import
 
 const OrderDetail = () => {
     const { id } = useParams();
@@ -35,7 +35,6 @@ const OrderDetail = () => {
 
             <div className="border border-gray-300 rounded-lg p-6 shadow">
                 <div className="flex justify-between mb-4">
-                    <h2 className="text-xl font-semibold">Order #{data.orderId}</h2>
                     <span className={`text-sm font-medium px-3 py-1 rounded-full ${data.status === "PLACED" ? "bg-yellow-100 text-yellow-800" : "bg-green-100 text-green-800"}`}>
                         {data.status}
                     </span>
@@ -64,16 +63,16 @@ const OrderDetail = () => {
                             <h4 className="font-semibold">{item.customTitle}</h4>
                             <p className="text-sm mb-2">{item.customDescription}</p>
                             <div className="mb-2">
-                                <p className="font-semibold">Selected Options:</p>
+
                                 <ul className="list-disc list-inside">
                                     {item.selectedOptions.map((option, i) => (
                                         <li key={i} className="text-sm">
-                                            {option.optionName} - <span className="font-medium text-green-600">{option.status}</span>
+                                            {option.optionName} - <span className="font-medium text-green-600">{option.status}<span className="font-bold text-xl text-blue-600">   :Price will be here</span></span>
                                         </li>
                                     ))}
                                 </ul>
                             </div>
-                            <p className="font-semibold text-indigo-600">Rs. {item.price}</p>
+                            <p className="font-semibold text-indigo-600">Total Amount: Rs. {item.price}</p>
                         </div>
                     ))}
                 </div>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
 import { notifySuccess, notifyError } from '../../utils/toastNotify';
-import { publicApi, protectedApi } from '../../utils/axiosInstance';
+import { publicApi, protectedApi } from "../../services/axiosInstance";
 
 const UserLogin = () => {
     const [identifier, setIdentifier] = useState("");

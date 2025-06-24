@@ -2,9 +2,9 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaFolderOpen, FaSearch, FaPlus } from 'react-icons/fa';
 import { Grid, List, Loader, AlertCircle, X, Check } from 'lucide-react';
-import ProjectCard from '../../components/ProjectCard';
+import ProjectCard from "../../components/project/ProjectCard";
 import AddProjectModal from '../../modals/AddProjectModal';
-import { publicApi, protectedApi } from '../../utils/axiosInstance';
+import { publicApi, protectedApi } from "../../services/axiosInstance";
 
 const SellerProjects = () => {
     const navigate = useNavigate();

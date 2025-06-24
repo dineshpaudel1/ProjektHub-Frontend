@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { publicApi } from "../utils/axiosInstance";  // ✅ updated import
+import { publicApi } from "../../services/axiosInstance";  // ✅ updated import
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 

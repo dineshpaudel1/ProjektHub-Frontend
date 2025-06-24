@@ -1,5 +1,5 @@
 // src/apis/ProjectApi.jsx
-import { protectedApi } from "../utils/axiosInstance";  // ✅ updated
+import { protectedApi } from "../../services/axiosInstance";  // ✅ updated
 
 // Add new project (simplified ✅)
 export const addProject = async ({ title, description, categoryId }) => {

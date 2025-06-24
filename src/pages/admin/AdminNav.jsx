@@ -3,7 +3,7 @@ import { Bell, Menu, Search, User, ChevronDown } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import user from "../../assets/images/user.png";
 import logo from "../../assets/images/logoblack.png";
-import { publicApi, protectedApi } from "../../utils/axiosInstance";  // 👈 updated here
+import { publicApi, protectedApi } from "../../services/axiosInstance";  // 👈 updated here
 
 const AdminNav = ({ toggleSidebar }) => {
     const [showMenu, setShowMenu] = useState(false);
