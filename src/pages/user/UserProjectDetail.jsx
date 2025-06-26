@@ -1,21 +1,16 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { protectedApi, publicApi } from "../../services/axiosInstance";
-import { Loader, MessageCircle } from "lucide-react";
-import UserQuestionAnswerList from "../../components/user/UserHelper/QuestionAnswerList";
+import { Loader } from "lucide-react";
 import UserProjectDetailHelper from "../../components/user/UserHelper/UserProjectDetailHelper";
-import UserGallerySection from "../../components/user/UserHelper/UserGallerySection";
-import { useProjectContext } from "../../context/ProjectContext";
+import UserQuestionAnswerList from "../../components/user/UserHelper/QuestionAnswerList";   // ⬅️ new
 import OrderModal from "../../modals/OrderModal";
-import { notifySuccess, notifyError } from "../../utils/toastNotify";
+import { useProjectContext } from "../../context/ProjectContext";
+import { notifyError } from "../../utils/toastNotify";
 
 const getEmbedUrl = (url) => {
     try {
         const match = url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=)([^&]+)/);
-        if (match && match[1]) {
-            return `https://www.youtube.com/embed/${match[1]}`;
-        }
-        return null;
+        return match?.[1] ? `https://www.youtube.com/embed/${match[1]}` : null;
     } catch {
         return null;
     }
@@ -24,110 +19,71 @@ const getEmbedUrl = (url) => {
 const UserProjectDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-
     const {
         projectDetail: project,
         loadingDetail: loading,
         fetchProjectDetail,
-        fetchQuestions,
-        loadingQuestions,
-        questions,
         setSelectedProject,
     } = useProjectContext();
 
-    const [questionText, setQuestionText] = useState("");
     const [isExpanded, setIsExpanded] = useState(false);
     const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
 
-    const handleAskQuestion = async (e) => {
-        e.preventDefault();
-        if (!questionText.trim()) return;
+    /* ───────── Fetch once ───────── */
+    useEffect(() => { fetchProjectDetail(id); }, [id]);
 
-        const token = localStorage.getItem("token");
-        if (!token) {
-            notifyError("Please login to ask a question.");
-            localStorage.setItem("redirectAfterLogin", `/project/${id}`);
-            navigate("/login");
-            return;
-        }
+    if (loading) return (
+        <div className="flex items-center justify-center h-screen">
+            <Loader className="animate-spin h-12 w-12 text-[var(--button-primary)]" />
+        </div>
+    );
 
-        try {
-            await protectedApi.post("/user/interactions/question", {
-                projectId: id, questionText
-            });
-
-            setQuestionText("");
-            fetchQuestions(id);
-            notifySuccess("Question submitted successfully!");
-        } catch (err) {
-            console.error("Error submitting question:", err);
-            notifyError("Failed to submit question");
-        }
-    };
-
-    useEffect(() => {
-        fetchProjectDetail(id);
-        fetchQuestions(id);
-    }, [id]);
-
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center h-screen">
-                <Loader className="animate-spin h-12 w-12 text-[var(--button-primary)]" />
+    if (!project) return (
+        <div className="flex items-center justify-center h-screen">
+            <div className="p-6 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded-lg shadow-lg">
+                Failed to load project details.
             </div>
-        );
-    }
-
-    if (!loading && !project) {
-        return (
-            <div className="flex items-center justify-center h-screen">
-                <div className="p-6 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded-lg max-w-md text-center shadow-lg">
-                    Failed to load project details.
-                </div>
-            </div>
-        );
-    }
+        </div>
+    );
 
     const embedUrl = getEmbedUrl(project.previewVideoUrl);
 
     return (
         <>
-            <div className="min-h-screen py-[100px] px-4 sm:px-6 lg:px-8 bg-[var(--bg-color)] text-[var(--text-color)] transition-all duration-300 ease-in-out">
+            <div className="min-h-screen py-[100px] px-4 sm:px-6 lg:px-8 bg-[var(--bg-color)] text-[var(--text-color)]">
                 <div className="max-w-6xl mx-auto">
                     <div className="rounded-2xl shadow-lg overflow-hidden bg-[var(--menu-bg)] border border-[var(--border-color)]">
-                        {/* Video Preview */}
+
+                        {/* Video preview */}
                         <div className="relative w-full h-[400px] bg-black">
                             {embedUrl ? (
                                 <iframe
                                     src={embedUrl}
-                                    className="absolute top-0 left-0 w-full h-full"
+                                    className="absolute inset-0 w-full h-full"
                                     frameBorder="0"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                     allowFullScreen
                                     title="Project preview"
-                                ></iframe>
+                                />
                             ) : (
                                 <div className="flex items-center justify-center h-full text-gray-400">
                                     <span>Video preview not available</span>
                                 </div>
                             )}
-                            <div className="absolute top-4 left-4 flex gap-2">
-                                <span className="bg-yellow-500 text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide shadow-md">
-                                    Featured
-                                </span>
-                            </div>
+                            <span className="absolute top-4 left-4 bg-yellow-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">
+                                Featured
+                            </span>
                         </div>
 
                         <div className="p-4 sm:p-6 lg:p-8">
-                            {/* Project Info */}
+                            {/* Main project info */}
                             <UserProjectDetailHelper
                                 project={project}
                                 isExpanded={isExpanded}
                                 setIsExpanded={setIsExpanded}
                                 setSelectedProject={setSelectedProject}
                                 onRequestBuy={() => {
-                                    const token = localStorage.getItem("token");
-                                    if (!token) {
+                                    if (!localStorage.getItem("token")) {
                                         notifyError("Please login before placing an order.");
                                         navigate("/login");
                                         return;
@@ -136,40 +92,18 @@ const UserProjectDetail = () => {
                                     setIsOrderModalOpen(true);
                                 }}
                             />
-                            {/* Ask a Question */}
-                            <div className="mt-10 pt-8 border-t border-[var(--border-color)]">
-                                <h2 className="flex items-center text-xl font-semibold mb-4">
-                                    <MessageCircle className="h-5 w-5 mr-2" />
-                                    Ask a Question
-                                </h2>
 
-                                <form onSubmit={handleAskQuestion} className="mb-6">
-                                    <textarea
-                                        value={questionText}
-                                        onChange={(e) => setQuestionText(e.target.value)}
-                                        placeholder="Type your question..."
-                                        className="px-3 py-2 sm:px-4 sm:py-3 w-full border border-[var(--border-color)] rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-[var(--button-primary)] bg-transparent resize-none min-h-[120px]"
-                                    />
-                                    <button
-                                        type="submit"
-                                        className="bg-[var(--button-primary)] hover:bg-[var(--button-primary-hover)] text-white px-6 py-2.5 rounded-lg font-medium transition-colors duration-200 shadow-sm"
-                                    >
-                                        Submit Question
-                                    </button>
-                                </form>
-
-                                {loadingQuestions ? (
-                                    <p className="text-sm text-gray-500">Loading questions...</p>
-                                ) : (
-                                    <UserQuestionAnswerList questions={questions} />
-                                )}
-                            </div>
+                            {/* Q & A – extracted into its own component */}
+                            <UserQuestionAnswerList projectId={id} />
                         </div>
                     </div>
                 </div>
             </div>
 
-            <OrderModal isOpen={isOrderModalOpen} onClose={() => setIsOrderModalOpen(false)} />
+            <OrderModal
+                isOpen={isOrderModalOpen}
+                onClose={() => setIsOrderModalOpen(false)}
+            />
         </>
     );
 };

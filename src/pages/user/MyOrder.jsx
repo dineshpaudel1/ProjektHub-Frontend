@@ -39,9 +39,7 @@ const MyOrder = () => {
               className="cursor-pointer border border-gray-300 rounded-lg p-4 shadow-sm hover:shadow-md transition"
             >
               <div className="flex justify-between items-center mb-2">
-                <h2 className="text-lg font-semibold">
-                  Recent Order
-                </h2>
+
                 <span
                   className={`text-sm font-medium px-3 py-1 rounded-full ${order.status === "PLACED"
                     ? "bg-yellow-100 text-yellow-800"
@@ -60,7 +58,13 @@ const MyOrder = () => {
               <p className="text-sm">
                 Total Price:{" "}
                 <span className="font-semibold text-indigo-600">
-                  {order.totalPrice > 0 ? `Rs. ${order.totalPrice}` : "Not determine"}
+                  {order.totalPrice > 0 ? `Rs. ${order.totalPrice}` : "Not determined"}
+                </span>
+              </p>
+              <p className="text-sm">
+                Order type:{" "}
+                <span className="font-semibold text-indigo-600">
+                  {order.orderType}
                 </span>
               </p>
             </div>

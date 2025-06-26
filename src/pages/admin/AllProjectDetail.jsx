@@ -108,7 +108,6 @@ const AllProjectDetail = () => {
                         />
 
                         {/* Gallery */}
-                        <UserGallerySection photos={project.photos} />
 
                         {/* Q&A Section */}
                         <div className="mt-10 pt-8 border-t border-[var(--border-color)]">

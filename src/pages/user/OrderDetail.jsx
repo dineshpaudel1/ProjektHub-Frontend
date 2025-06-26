@@ -67,7 +67,7 @@ const OrderDetail = () => {
                                 <ul className="list-disc list-inside">
                                     {item.selectedOptions.map((option, i) => (
                                         <li key={i} className="text-sm">
-                                            {option.optionName} - <span className="font-medium text-green-600">{option.status}<span className="font-bold text-xl text-blue-600">   :Price will be here</span></span>
+                                            {option.optionName} - <span className="font-medium text-green-600">{option.status}<span className="font-bold text-xl text-blue-600">   Amount:{option.price}</span></span>
                                         </li>
                                     ))}
                                 </ul>

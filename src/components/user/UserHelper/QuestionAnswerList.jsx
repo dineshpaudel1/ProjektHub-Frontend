@@ -1,69 +1,114 @@
-import React, { useState } from "react";
-import { MessageCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { protectedApi } from "../../../services/axiosInstance";
+import { useProjectContext } from "../../../context/ProjectContext";
+import { notifySuccess, notifyError } from "../../../utils/toastNotify";
 
-const UserQuestionAnswerList = ({ questions }) => {
+const UserQuestionAnswerList = ({ projectId }) => {
+    const {
+        questions,
+        loadingQuestions,
+        fetchQuestions,
+    } = useProjectContext();
+
+    const [questionText, setQuestionText] = useState("");
     const [visibleCount, setVisibleCount] = useState(5);
+    const navigate = useNavigate();
 
-    if (!questions || questions.length === 0) return null;
+    useEffect(() => {
+        fetchQuestions(projectId);
+    }, [projectId]);
 
-    const handleLoadMore = () => {
-        setVisibleCount((prev) => prev + 5);
+    const handleAskQuestion = async (e) => {
+        e.preventDefault();
+        if (!questionText.trim()) return;
+
+        const token = localStorage.getItem("token");
+        if (!token) {
+            notifyError("Please login to ask a question.");
+            localStorage.setItem("redirectAfterLogin", `/project/${projectId}`);
+            navigate("/login");
+            return;
+        }
+
+        try {
+            await protectedApi.post("/user/interactions/question", {
+                projectId,
+                questionText,
+            });
+            setQuestionText("");
+            fetchQuestions(projectId);
+            notifySuccess("Question submitted successfully!");
+        } catch (err) {
+            console.error("Error submitting question:", err);
+            notifyError("Failed to submit question");
+        }
     };
 
+    const handleLoadMore = () => setVisibleCount((prev) => prev + 5);
     const visibleQuestions = questions.slice(0, visibleCount);
 
     return (
-        <div>
-            <h2 className="flex items-center text-xl font-semibold mb-4">
-                <MessageCircle className="h-5 w-5 mr-2" />
-                Questions & Answers
-            </h2>
-            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                {visibleQuestions.map((q, idx) => {
-                    const askedDate = new Date(q.createdAt).toLocaleString("en-US", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                    });
-
-                    return (
-                        <li
-                            key={idx}
-                            className="bg-[var(--hover-bg)] border border-[var(--border-color)] p-4 rounded-lg text-sm shadow-md space-y-2"
-                        >
-                            <div>
-                                <p className="font-medium text-[var(--text-color)]">Q: {q.questionText}</p>
-                                <p className="text-xs text-gray-500">
-                                    Asked by: {q.askedBy} on {askedDate}
-                                </p>
-                            </div>
-                            {q.answerText ? (
-                                <div className="mt-2 border-t pt-2 border-gray-300 dark:border-gray-600">
-                                    <p className="font-medium text-[var(--button-primary-hover)]">
-                                        A: {q.answerText}
-                                    </p>
-                                    <p className="text-xs text-gray-500">Answered by: {q.answeredBy}</p>
-                                </div>
-                            ) : (
-                                <p className="italic text-yellow-500 text-xs">Answer pending...</p>
-                            )}
-                        </li>
-                    );
-                })}
-            </ul>
-
-            {visibleCount < questions.length && (
-                <div className="mt-6 text-center">
+        <div className="mt-10 space-y-8">
+            {/* Ask a Question */}
+            <div>
+                <h2 className="text-xl font-semibold mb-3">Ask a Question</h2>
+                <form onSubmit={handleAskQuestion}>
+                    <textarea
+                        value={questionText}
+                        onChange={(e) => setQuestionText(e.target.value)}
+                        placeholder="Type your question..."
+                        className="w-full px-4 py-3 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[100px]"
+                    />
                     <button
-                        onClick={handleLoadMore}
-                        className="px-5 py-2 text-sm font-medium bg-[var(--button-primary)] text-white rounded-md hover:bg-[var(--button-primary-hover)] transition"
+                        type="submit"
+                        className="mt-4 px-6 py-2 font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition"
                     >
-                        Load More
+                        Submit
                     </button>
-                </div>
-            )}
+                </form>
+            </div>
+
+            {/* Questions and Answers */}
+            <div>
+                <h2 className="text-xl font-semibold mb-4">Question and Answers</h2>
+
+                {loadingQuestions ? (
+                    <p className="text-sm text-gray-500">Loading questions...</p>
+                ) : questions.length === 0 ? (
+                    <p className="italic text-gray-500">No questions yet.</p>
+                ) : (
+                    <div className="space-y-6">
+                        {visibleQuestions.map((q, idx) => (
+                            <div key={idx} className="pb-4 border-b border-gray-200">
+                                <p className="font-medium text-[var(--text-color)] mb-1">
+                                    {q.questionText}
+                                </p>
+                                {q.answerText ? (
+                                    <p className="text-sm text-gray-600">
+                                        {q.answerText}
+                                    </p>
+                                ) : (
+                                    <p className="italic text-sm text-yellow-500">
+                                        Answer pending…
+                                    </p>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {visibleCount < questions.length && (
+                    <div className="mt-6 text-center">
+                        <button
+                            onClick={handleLoadMore}
+                            className="px-5 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition"
+                        >
+                            Load More
+                        </button>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

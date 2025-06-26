@@ -19,6 +19,7 @@ export const UserProvider = ({ children }) => {
             try {
                 const res = await protectedApi.get("/user/me");  // ✅ no need to manually set headers
                 setUser(res.data);
+                console.log(res.data)
 
                 // ✅ Decode token and extract roles
                 const decoded = JSON.parse(atob(token.split(".")[1]));
