@@ -181,7 +181,7 @@ const AdminProjects = () => {
                             subtitle="Project Hub"
                             description={project.description}
                             price={project.price}
-                            image={`http://localhost:8080/api/media/photo?file=${project.thumbnail}`}
+                            image={`${import.meta.env.VITE_API_URL}/media/photo?file=${project.thumbnail}`}
                             bg={project.categoryName}
                             status={project.status || 'active'}
                             date={project.createdAt ? new Date(project.createdAt).toLocaleDateString() : undefined}

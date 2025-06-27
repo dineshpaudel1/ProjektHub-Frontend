@@ -176,7 +176,7 @@ const SeeSellerProfile = () => {
                                 {/* ─ Project Image ─ */}
                                 <div className="relative overflow-hidden">
                                     <img
-                                        src={`http://localhost:8080/api/media/photo?file=${project.thumbnail}`}
+                                        src={`${import.meta.env.VITE_API_URL}/media/photo?file=${project.thumbnail}`}
                                         alt={project.title}
                                         className="h-48 w-full object-cover group-hover:scale-105 transition-transform duration-300"
                                     />

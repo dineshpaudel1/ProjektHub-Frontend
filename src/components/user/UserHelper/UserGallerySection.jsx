@@ -42,7 +42,6 @@ const UserGallerySection = ({ photos }) => {
                         <div className="aspect-w-4 aspect-h-3 rounded-xl overflow-hidden shadow-md">
                             <img
                                 src={`${API_URL}/media/photo?file=${photo.path}`}
-
                                 alt={photo.caption || "Project Photo"}
                                 className="w-full h-40 object-cover group-hover:opacity-90 transition-opacity duration-200"
                             />

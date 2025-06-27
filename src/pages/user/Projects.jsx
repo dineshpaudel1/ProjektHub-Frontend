@@ -135,10 +135,11 @@ const Projects = () => {
                                 {/* Image */}
                                 <div className="relative overflow-hidden">
                                     <img
-                                        src={`http://localhost:8080/api/media/photo?file=${project.thumbnail}`}
+                                        src={`${import.meta.env.VITE_API_URL}/media/photo?file=${project.thumbnail}`}
                                         alt={project.title}
                                         className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105"
                                     />
+
                                     <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 text-sm font-semibold rounded-full">
                                         NPR {project.price?.toLocaleString() || "3000"}
                                     </div>

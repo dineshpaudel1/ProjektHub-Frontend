@@ -153,7 +153,7 @@ const AdminOrderDetails = () => {
                                 {orderType === "PREMADE" && order.items.map((item) => (
                                     <div key={item.itemId} className="flex items-center gap-4 p-4 rounded-lg border border-gray-200">
                                         <img
-                                            src={`http://localhost:8080/api/media/photo?file=${item.projectThumbnail}`}
+                                            src={`${import.meta.env.VITE_API_URL}/media/photo?file=${item.projectThumbnail}`}
                                             alt={item.projectTitle}
                                             className="w-20 h-20 object-cover rounded-lg border"
                                         />

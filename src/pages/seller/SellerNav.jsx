@@ -169,7 +169,7 @@ const SellerNav = ({ toggleSidebar }) => {
 
                                         >
                                             <img
-                                                src={`http://localhost:8080/api/media/photo?file=${note.photoUrl}`}
+                                                src={`${import.meta.env.VITE_API_URL}/media/photo?file=${note.photoUrl}`}
                                                 alt="Notification"
                                                 className="w-9 h-9 rounded-full mt-1 object-cover border"
                                             />

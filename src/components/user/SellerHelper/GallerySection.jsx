@@ -84,7 +84,7 @@ const GallerySection = ({ id, photos, refreshProject }) => {
                     <div key={photo.id} className="rounded-xl overflow-hidden shadow-md">
                         <div className="relative group">
                             <img
-                                src={`http://localhost:8080/api/media/photo?file=${photo.path}`}
+                                src={`${import.meta.env.VITE_API_URL}/media/photo?file=${photo.path}`}
                                 alt={photo.caption || "Project Photo"}
                                 className="w-full h-30 object-contain bg-white transition duration-300"
                             />

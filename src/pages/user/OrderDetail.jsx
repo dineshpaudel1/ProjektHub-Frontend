@@ -232,7 +232,7 @@ const PremadeItem = ({
 }) => (
     <div className="flex flex-col sm:flex-row border border-[var(--border-color)] rounded-lg p-4">
         <img
-            src={`http://localhost:8080/api/media/photo?file=${projectThumbnail}`}
+            src={`${import.meta.env.VITE_API_URL}/media/photo?file=${projectThumbnail}`}
             alt={projectTitle}
             className="w-full sm:w-24 h-24 object-cover rounded mb-4 sm:mb-0 sm:mr-4"
         />

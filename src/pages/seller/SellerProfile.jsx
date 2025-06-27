@@ -69,7 +69,7 @@ const SellerProfile = () => {
           <div className="relative group mb-4">
             {seller.profilePicture ? (
               <img
-                src={`http://localhost:8080/api/media/photo?file=${seller.profilePicture}`}
+                src={`${import.meta.env.VITE_API_URL}/media/photo?file=${seller.profilePicture}`}
                 alt="Profile"
                 className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-md"
               />

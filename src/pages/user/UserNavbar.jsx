@@ -253,7 +253,7 @@ const UserNavbar = () => {
                                                 <img
                                                     src={
                                                         note.photoUrl
-                                                            ? `http://localhost:8080/api/media/photo?file=${note.photoUrl}`
+                                                            ? `${import.meta.env.VITE_API_URL}/media/photo?file=${note.photoUrl}`
                                                             : userphoto
                                                     }
                                                     alt="notif"
@@ -283,7 +283,7 @@ const UserNavbar = () => {
                             >
                                 {user.profilePicture ? (
                                     <img
-                                        src={`http://localhost:8080/api/media/photo?file=${user.profilePicture}`}
+                                        src={`${import.meta.env.VITE_API_URL}/media/photo?file=${user.profilePicture}`}
                                         alt="Profile"
                                         className="w-full h-full object-cover rounded-full"
                                     />

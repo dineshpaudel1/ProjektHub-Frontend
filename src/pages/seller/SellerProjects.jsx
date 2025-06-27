@@ -41,7 +41,7 @@ const SellerProjects = () => {
             title: item.title || 'Untitled Project',
             description: item.description || 'No description available.',
             price: item.price || '0',
-            image: `http://localhost:8080/api/media/photo?file=${item.thumbnail}`,
+            image: `${import.meta.env.VITE_API_URL}/media/photo?file=${item.thumbnail}`,
             category: item.categoryName || 'Uncategorized',
             bg: getBgColorForCategory(item.categoryName),
             createdAt: item.createdAt,

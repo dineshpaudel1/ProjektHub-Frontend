@@ -162,7 +162,7 @@ const ProjectDetailsSection = ({ project, setProject, isExpanded, setIsExpanded 
 
             <div className="rounded-xl shadow-lg p-6 w-full lg:w-80 bg-[var(--hover-bg)] border border-[var(--border-color)]">
                 <div className="mb-4 relative group">
-                    <img src={`http://localhost:8080/api/media/photo?file=${project.thumbnail}`} alt={project.title}
+                    <img src={`${import.meta.env.VITE_API_URL}/media/photo?file=${project.thumbnail}`} alt={project.title}
                         className="w-full h-40 object-cover rounded-lg shadow-md" />
                     <label htmlFor="thumbnailUpload"
                         className="absolute inset-0 bg-black bg-opacity-50 text-white flex items-center justify-center opacity-0 group-hover:opacity-70 transition-opacity rounded-lg cursor-pointer">

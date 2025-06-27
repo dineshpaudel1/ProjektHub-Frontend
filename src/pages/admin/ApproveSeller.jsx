@@ -47,7 +47,7 @@ const ApproveSeller = () => {
             <h2 className="text-xl font-bold mb-4">Approve Seller</h2>
             <div className="flex gap-4">
                 <img
-                    src={`http://localhost:8080/api/media/photo?file=${seller.verificationPhotoPath}`}
+                    src={`${import.meta.env.VITE_API_URL}/media/photo?file=${seller.verificationPhotoPath}`}
                     alt="Verification"
                     className="w-40 h-40 object-cover rounded border"
                 />

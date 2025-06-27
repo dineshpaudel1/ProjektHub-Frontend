@@ -34,14 +34,13 @@ const UserProfile = () => {
                 <div className="space-y-6">
                     <div className="flex flex-col items-center">
                         <img
-                            src={user.profilePicture ? `http://localhost:8080/api/media/photo?file=${user.profilePicture}` : "https://via.placeholder.com/150"}
+                            src={`${import.meta.env.VITE_API_URL}/media/photo?file=${user.profilePicture}`}
                             alt="Profile"
                             onError={(e) => { e.target.src = "https://via.placeholder.com/150" }}
                             className="w-32 h-32 rounded-full border border-green-500 object-cover"
                         />
                         <h2 className="text-xl font-semibold mt-3">{user.fullName}</h2>
                     </div>
-
                     <div>
                         <label className="block text-sm font-medium mb-1">Username</label>
                         <div className="flex items-center gap-2 px-4 py-2 border rounded-md" style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}>

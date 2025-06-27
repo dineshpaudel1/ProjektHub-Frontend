@@ -72,7 +72,7 @@ const SeeAllProject = () => {
                                 >
                                     <div className="w-full md:w-64 h-48 flex-shrink-0">
                                         <img
-                                            src={`http://localhost:8080/api/media/photo?file=${project.thumbnail}`}
+                                            src={`${import.meta.env.VITE_API_URL}/media/photo?file=${project.thumbnail}`}
                                             alt={project.title}
                                             className="w-full h-full object-cover rounded-lg"
                                         />
