@@ -49,7 +49,7 @@ const Projects = () => {
     return (
         <section
             id="projects"
-            className="scroll-mt-24 pt-24 sm:pt-28 px-4 sm:px-6 lg:px-12"
+            className="scroll-mt-14 pt-12 sm:pt-16 px-4 sm:px-6 lg:px-12"
             style={{ backgroundColor: "var(--bg-color)" }}
         >
             <div className="text-center mb-12">

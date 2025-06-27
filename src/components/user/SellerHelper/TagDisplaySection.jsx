@@ -13,18 +13,24 @@ const TagDisplaySection = ({
     const [newTag, setNewTag] = useState("");
     const [pendingTags, setPendingTags] = useState([]);
     const wrapperRef = useRef();
+    const [inputDisabled, setInputDisabled] = useState(false);
+
 
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-                setInputVisible(false);
-                setNewTag("");
-                setPendingTags([]);
+                if (inputDisabled) {
+                    setInputVisible(false);
+                    setInputDisabled(false);  // ✅ Reset for next time
+                    setNewTag("");
+                    setPendingTags([]);
+                }
             }
         };
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
+    }, [inputDisabled]);
+
 
     const handleDeleteTag = async (tagId) => {
         try {
@@ -80,9 +86,7 @@ const TagDisplaySection = ({
             }));
 
             setNotification({ type: "success", message: "Tags added successfully!" });
-            setPendingTags([]);
-            setNewTag("");
-            setInputVisible(false);
+            setInputDisabled(true);  // ✅ Disable input
         } catch (err) {
             console.error("Failed to add tags:", err);
             setNotification({ type: "error", message: "Failed to add tags." });
@@ -91,6 +95,7 @@ const TagDisplaySection = ({
             setTimeout(() => setNotification(null), 3000);
         }
     };
+
 
     return (
         <div className="mt-6">
@@ -119,10 +124,11 @@ const TagDisplaySection = ({
                             <input
                                 type="text"
                                 value={newTag}
+                                disabled={inputDisabled}
                                 onChange={(e) => setNewTag(e.target.value)}
                                 onKeyDown={handleLocalTagAdd}
                                 placeholder="Type and hit space/comma..."
-                                className="px-2 py-1 pr-8 text-sm focus:outline-none bg-transparent text-gray-800"
+                                className="px-2 py-1 pr-8 text-sm focus:outline-none bg-transparent text-gray-800 disabled:opacity-50"
                             />
                             <button onClick={handleSaveTags} disabled={isTagSubmitting} className="absolute right-1 top-1/2 -translate-y-1/2 text-gray-600 hover:text-black">
                                 <Save size={16} />

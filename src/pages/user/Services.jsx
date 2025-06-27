@@ -134,7 +134,7 @@ const Services = () => {
                     }
                     onClick={handleCustomOrderClick}
                 >
-                    Click here to Make Custom Order →
+                    Click here to Make Order →
                 </button>
                 <CustomOrderModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
             </div>

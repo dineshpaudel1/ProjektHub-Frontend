@@ -58,32 +58,34 @@ const UserProfile = () => {
                         </div>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Set New Password</label>
-                        <div className="flex flex-col md:flex-row gap-4">
-                            <input
-                                type="password"
-                                value={newPassword}
-                                onChange={(e) => setNewPassword(e.target.value)}
-                                placeholder="Enter new password"
-                                className="flex-1 px-4 py-2 border rounded-md focus:outline-none"
-                                style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)", borderColor: "var(--border-color)" }}
-                            />
-                            <button
-                                onClick={handleSetPassword}
-                                className="px-6 py-2 rounded-md text-white transition"
-                                style={{ backgroundColor: "var(--button-primary)" }}
-                            >
-                                Save Password
-                            </button>
-                        </div>
-
-                        {notification && (
-                            <div className={`mt-3 px-4 py-2 rounded text-sm ${notification.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-                                {notification.message}
+                    {!user.passwordSet && (
+                        <div>
+                            <label className="block text-sm font-medium mb-1">Set New Password</label>
+                            <div className="flex flex-col md:flex-row gap-4">
+                                <input
+                                    type="password"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    placeholder="Enter new password"
+                                    className="flex-1 px-4 py-2 border rounded-md focus:outline-none"
+                                    style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)", borderColor: "var(--border-color)" }}
+                                />
+                                <button
+                                    onClick={handleSetPassword}
+                                    className="px-6 py-2 rounded-md text-white transition"
+                                    style={{ backgroundColor: "var(--button-primary)" }}
+                                >
+                                    Save Password
+                                </button>
                             </div>
-                        )}
-                    </div>
+
+                            {notification && (
+                                <div className={`mt-3 px-4 py-2 rounded text-sm ${notification.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                                    {notification.message}
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

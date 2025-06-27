@@ -15,6 +15,7 @@ const UserNavbar = () => {
     const location = useLocation();
     const { user, setUser } = useUser();
 
+    const [open, setOpen] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [showSellerModal, setShowSellerModal] = useState(false);
@@ -382,8 +383,7 @@ const UserNavbar = () => {
                 </div>
             )}
 
-            {showSellerModal && <SellerRegisterModal onClose={() => setShowSellerModal(false)} />}
-        </div>
+            {open && <SellerRegisterModal onClose={() => setOpen(false)} />}        </div>
     );
 };
 

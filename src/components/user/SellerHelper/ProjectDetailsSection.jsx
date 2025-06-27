@@ -74,7 +74,7 @@ const ProjectDetailsSection = ({ project, setProject, isExpanded, setIsExpanded 
             toast.success("Thumbnail updated!");
         } catch (err) {
             console.error("Thumbnail update failed:", err);
-            toast.error("Thumbnail update failed");
+            toast.error("your file is upto 2 mb so decrease it");
         }
     };
 

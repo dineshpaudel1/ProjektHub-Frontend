@@ -7,6 +7,8 @@ import ProjectCard from "../../components/project/ProjectCard";
 import AddCategoryModal from '../../modals/AddCategoryModal';
 import { protectedApi } from "../../services/axiosInstance";
 import { useProjectContext } from '../../context/ProjectContext';
+import { toast } from "react-toastify";
+
 
 const AdminProjects = () => {
     const navigate = useNavigate();
@@ -36,11 +38,11 @@ const AdminProjects = () => {
             setShowCategoryModal(false);
             setCategoryName('');
             await fetchCategories();
-            setNotification({ type: 'success', message: 'Category created successfully!' });
+            toast.success("Category created successfully!");
             setTimeout(() => setNotification(null), 3000);
         } catch (error) {
             console.error("❌ Failed to create category:", error);
-            setNotification({ type: 'error', message: 'Failed to create category' });
+            toast.error("Failed to create category.");
             setTimeout(() => setNotification(null), 3000);
         }
     };

@@ -5,6 +5,7 @@ import { Grid, List, Loader, AlertCircle, X, Check } from 'lucide-react';
 import ProjectCard from "../../components/project/ProjectCard";
 import AddProjectModal from '../../modals/AddProjectModal';
 import { publicApi, protectedApi } from "../../services/axiosInstance";
+import { toast } from 'react-toastify';
 
 const SellerProjects = () => {
     const navigate = useNavigate();
@@ -82,7 +83,7 @@ const SellerProjects = () => {
             setShowProjectModal(false);
             setProjectForm({ title: '', description: '', categoryId: '' });
             await fetchAllData();
-            setNotification({ type: 'success', message: 'Project created!' });
+            toast("Project created sucessfully")
         } catch (err) {
             console.error("Error creating project:", err);
             setNotification({ type: 'error', message: 'Failed to create project' });
