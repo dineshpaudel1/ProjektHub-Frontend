@@ -1,9 +1,8 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { publicApi } from "../../services/axiosInstance";
 import { Loader, Calendar, Star, Award } from "lucide-react";
+import UserProjectCard from "../../components/project/UserProjectCard";
 
 const SeeSellerProfile = () => {
     const { id } = useParams();
@@ -12,8 +11,6 @@ const SeeSellerProfile = () => {
     const [loading, setLoading] = useState(true);
 
     const navigate = useNavigate();
-
-    /* ───────────── Fetch Seller + Projects ───────────── */
     useEffect(() => {
         const fetchSellerData = async () => {
             try {
@@ -47,7 +44,6 @@ const SeeSellerProfile = () => {
         );
     }
 
-    /* ───────────── Not Found ───────────── */
     if (!seller) {
         return (
             <div
@@ -59,7 +55,6 @@ const SeeSellerProfile = () => {
         );
     }
 
-    /* ───────────── Main Content ───────────── */
     return (
         <div
             className="min-h-screen px-5 py-10 mt-10 transition-colors duration-300"
@@ -78,7 +73,7 @@ const SeeSellerProfile = () => {
                         {/* ── Profile Image ── */}
                         <div className="relative">
                             <img
-                                src={`http://localhost:8080/api/media/photo?file=${seller.profilePicture}`}
+                                src={`${import.meta.env.VITE_API_URL}/media/photo?file=${seller.profilePicture}`}
                                 alt={seller.sellerName}
                                 className="w-32 h-32 lg:w-40 lg:h-40 rounded-full object-cover border-4 border-white shadow-xl"
                             />
@@ -163,65 +158,7 @@ const SeeSellerProfile = () => {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {projects.map((project) => (
-                            <div
-                                key={project.id}
-                                onClick={() => navigate(`/project/${project.id}`)}
-                                className="group cursor-pointer rounded-xl overflow-hidden transition-all duration-300"
-                                style={{
-                                    backgroundColor: "var(--bg-color)",
-                                    border: `1px solid var(--border-color)`,
-                                    boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-                                }}
-                            >
-                                {/* ─ Project Image ─ */}
-                                <div className="relative overflow-hidden">
-                                    <img
-                                        src={`${import.meta.env.VITE_API_URL}/media/photo?file=${project.thumbnail}`}
-                                        alt={project.title}
-                                        className="h-48 w-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                    />
-                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-                                </div>
-
-                                {/* ─ Project Info ─ */}
-                                <div className="p-6">
-                                    <div className="mb-3">
-                                        <span
-                                            className="inline-block px-3 py-1 text-xs font-semibold rounded-full"
-                                            style={{
-                                                backgroundColor: "var(--hover-bg)",
-                                                color: "var(--text-color)",
-                                            }}
-                                        >
-                                            {project.categoryName}
-                                        </span>
-                                    </div>
-
-                                    <h3 className="text-xl font-bold mb-2 line-clamp-2 group-hover:text-[var(--button-primary)] transition-colors">
-                                        {project.title}
-                                    </h3>
-
-                                    <div className="flex items-center justify-between mt-4">
-                                        {/* Stars */}
-                                        <div className="flex items-center gap-1">
-                                            {[1, 2, 3, 4].map((n) => (
-                                                <Star
-                                                    key={n}
-                                                    className="w-4 h-4 text-yellow-400 fill-current"
-                                                />
-                                            ))}
-                                            <Star className="w-4 h-4 text-gray-300" />
-                                            <span className="text-sm text-[var(--text-secondary)] ml-1">
-                                                (4.0)
-                                            </span>
-                                        </div>
-                                        {/* Price */}
-                                        <p className="text-2xl font-bold text-green-600">
-                                            NPR {project.price.toLocaleString()}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
+                            <UserProjectCard key={project.id} project={project} />
                         ))}
                     </div>
                 )}
