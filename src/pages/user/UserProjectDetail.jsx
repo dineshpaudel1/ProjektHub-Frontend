@@ -102,7 +102,7 @@ const UserProjectDetail = () => {
             <OrderModal
                 isOpen={isOrderModalOpen}
                 onClose={() => setIsOrderModalOpen(false)}
-                selectedProject={project}   // ✅ add this!
+                selectedProject={project}
             />
 
         </>
