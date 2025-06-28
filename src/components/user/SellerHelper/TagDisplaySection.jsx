@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Tag, X, Info, Plus, Save } from "lucide-react";
-import { protectedApi } from "../../../services/axiosInstance";  // ✅ updated import
+import { Tag, X, Plus, Save, Trash2 } from "lucide-react";
+import { protectedApi } from "../../../services/axiosInstance";
+import { toast } from "react-toastify";
 
 const TagDisplaySection = ({
     project,
@@ -13,39 +14,50 @@ const TagDisplaySection = ({
     const [newTag, setNewTag] = useState("");
     const [pendingTags, setPendingTags] = useState([]);
     const wrapperRef = useRef();
-    const [inputDisabled, setInputDisabled] = useState(false);
-
 
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-                if (inputDisabled) {
-                    setInputVisible(false);
-                    setInputDisabled(false);  // ✅ Reset for next time
-                    setNewTag("");
-                    setPendingTags([]);
-                }
+                setInputVisible(false);
+                setNewTag("");
+                setPendingTags([]);
             }
         };
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [inputDisabled]);
-
+    }, []);
 
     const handleDeleteTag = async (tagId) => {
         try {
-            await protectedApi.delete(`/seller/project/${project.id}/tag`, {
-                data: { tagId }
-            });
-
+            await protectedApi.delete(
+                `/seller/project/${project.id}/tags/${tagId}`
+            );
             const updatedTags = project.tags.filter((tag) => tag.id !== tagId);
             setProject((prev) => ({ ...prev, tags: updatedTags }));
-            setNotification({ type: "success", message: "Tag deleted successfully!" });
+            toast.success("Tag deleted successfully!");
         } catch (error) {
             console.error("Failed to delete tag:", error);
-            setNotification({ type: "error", message: "Failed to delete tag." });
-        } finally {
-            setTimeout(() => setNotification(null), 3000);
+            toast.error("Failed to delete tag.");
+        }
+    };
+
+    const handleClearAllTags = async () => {
+        if (project.tags.length === 0) {
+            toast.info("No tags to clear.");
+            return;
+        }
+
+        try {
+            for (const tag of project.tags) {
+                await protectedApi.delete(`/seller/project/${project.id}/tag`, {
+                    data: { tagId: tag.id },
+                });
+            }
+            setProject((prev) => ({ ...prev, tags: [] }));
+            toast.success("All tags cleared!");
+        } catch (err) {
+            console.error("Failed to clear all tags:", err);
+            toast.error("Failed to clear tags.");
         }
     };
 
@@ -85,59 +97,78 @@ const TagDisplaySection = ({
                 tags: [...prev.tags, ...newTagObjects],
             }));
 
-            setNotification({ type: "success", message: "Tags added successfully!" });
-            setInputDisabled(true);  // ✅ Disable input
-            setTimeout(() => {
-                setInputVisible(false);
-                setInputDisabled(false); // optional reset for re-adding later
-                setPendingTags([]);
-                setNewTag("");
-            }, 2000); // waits for 2s after success
-
+            toast.success("Tags added successfully!");
         } catch (err) {
             console.error("Failed to add tags:", err);
-            setNotification({ type: "error", message: "Failed to add tags." });
+            toast.error("Failed to add tags.");
         } finally {
             setIsTagSubmitting(false);
-            setTimeout(() => setNotification(null), 3000);
+            setInputVisible(false);
+            setNewTag("");
+            setPendingTags([]);
         }
     };
-
 
     return (
         <div className="mt-6">
             <div className="flex items-center justify-between mb-1">
                 <h2 className="flex items-center text-xl font-bold text-black">Tags</h2>
+                {project.tags.length > 0 && (
+                    <button
+                        onClick={handleClearAllTags}
+                        className="flex items-center gap-1 text-sm text-red-600 hover:text-red-800 transition-all"
+                    >
+                        <Trash2 className="w-4 h-4" />
+                        Clear All
+                    </button>
+                )}
             </div>
 
-            <div ref={wrapperRef} className="flex flex-wrap items-center gap-2 px-3 py-2 rounded-md bg-white dark:bg-[var(--menu-bg)] w-full max-w-xl">
-
+            <div
+                ref={wrapperRef}
+                className="flex flex-wrap items-center gap-2 px-3 py-2 rounded-md bg-white dark:bg-[var(--menu-bg)] w-full max-w-xl"
+            >
                 {project.tags?.map((tag) => (
-                    <span key={tag.id} className="flex items-center gap-1 px-3 py-1 text-sm rounded-full bg-gray-200 text-gray-800">
+                    <span
+                        key={tag.id}
+                        className="flex items-center gap-1 px-3 py-1 text-sm rounded-full bg-gray-200 text-gray-800"
+                    >
                         {tag.tag}
-                        <X className="w-3 h-3 cursor-pointer hover:text-red-500" onClick={() => handleDeleteTag(tag.id)} />
+                        <X
+                            className="w-3 h-3 cursor-pointer hover:text-red-500"
+                            onClick={() => handleDeleteTag(tag.id)}
+                        />
                     </span>
                 ))}
 
-                {inputVisible && !inputDisabled && (
+                {inputVisible && (
                     <div className="flex items-center flex-wrap gap-2 relative max-w-full border border-gray-300 rounded-2xl p-2">
                         {pendingTags.map((tag, i) => (
-                            <span key={i} className="flex items-center gap-1 px-3 py-1 text-sm rounded-full bg-gray-200 text-gray-800">
+                            <span
+                                key={i}
+                                className="flex items-center gap-1 px-3 py-1 text-sm rounded-full bg-gray-200 text-gray-800"
+                            >
                                 {tag}
-                                <X className="w-3 h-3 cursor-pointer hover:text-red-500" onClick={() => handleRemovePendingTag(i)} />
+                                <X
+                                    className="w-3 h-3 cursor-pointer hover:text-red-500"
+                                    onClick={() => handleRemovePendingTag(i)}
+                                />
                             </span>
                         ))}
                         <div className="relative">
                             <input
                                 type="text"
                                 value={newTag}
-                                disabled={inputDisabled}
                                 onChange={(e) => setNewTag(e.target.value)}
                                 onKeyDown={handleLocalTagAdd}
                                 placeholder="Type and hit space/comma..."
-                                className="px-2 py-1 pr-8 text-sm focus:outline-none bg-transparent text-gray-800 disabled:opacity-50"
+                                className="px-2 py-1 pr-8 text-sm focus:outline-none bg-transparent text-gray-800"
                             />
-                            <button onClick={handleSaveTags} disabled={isTagSubmitting} className="absolute right-1 top-1/2 -translate-y-1/2 text-gray-600 hover:text-black">
+                            <button
+                                onClick={handleSaveTags}
+                                disabled={isTagSubmitting}
+                                className="absolute right-1 top-1/2 -translate-y-1/2 text-gray-600 hover:text-black"
+                            >
                                 <Save size={16} />
                             </button>
                         </div>
@@ -145,7 +176,10 @@ const TagDisplaySection = ({
                 )}
 
                 {!inputVisible && (
-                    <button onClick={() => setInputVisible(true)} className="flex items-center gap-1 text-sm text-gray-700 hover:text-black">
+                    <button
+                        onClick={() => setInputVisible(true)}
+                        className="flex items-center gap-1 text-sm text-gray-700 hover:text-black"
+                    >
                         <Plus className="w-4 h-4" /> Add tag
                     </button>
                 )}

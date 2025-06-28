@@ -2,10 +2,9 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Loader, ArrowLeft, MessageCircle } from "lucide-react";
 import { useProjectContext } from "../../context/ProjectContext";
-
 import UserProjectDetailHelper from "../../components/user/UserHelper/UserProjectDetailHelper";
-import UserGallerySection from "../../components/user/UserHelper/UserGallerySection";
 import UserQuestionAnswerList from "../../components/user/UserHelper/QuestionAnswerList";
+import AdminQuestion from "../../components/user/AdminHelper/AdminQuestion";
 
 const getEmbedUrl = (url) => {
     try {
@@ -106,18 +105,9 @@ const AllProjectDetail = () => {
                             setIsExpanded={setIsExpanded}
                             onRequestBuy={null} // Admins don"t need this, pass null or skip
                         />
-
-                        {/* Gallery */}
-
                         {/* Q&A Section */}
                         <div className="mt-10 pt-8 border-t border-[var(--border-color)]">
-
-
-                            {loadingQuestions ? (
-                                <p className="text-sm text-gray-400">Loading questions...</p>
-                            ) : (
-                                <UserQuestionAnswerList questions={questions} />
-                            )}
+                            <AdminQuestion questions={questions} />
                         </div>
                     </div>
                 </div>
