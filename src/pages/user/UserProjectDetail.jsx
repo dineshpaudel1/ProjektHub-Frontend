@@ -99,11 +99,12 @@ const UserProjectDetail = () => {
                     </div>
                 </div>
             </div>
-
             <OrderModal
                 isOpen={isOrderModalOpen}
                 onClose={() => setIsOrderModalOpen(false)}
+                selectedProject={project}   // ✅ add this!
             />
+
         </>
     );
 };

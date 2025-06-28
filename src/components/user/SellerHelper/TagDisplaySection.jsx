@@ -87,6 +87,13 @@ const TagDisplaySection = ({
 
             setNotification({ type: "success", message: "Tags added successfully!" });
             setInputDisabled(true);  // ✅ Disable input
+            setTimeout(() => {
+                setInputVisible(false);
+                setInputDisabled(false); // optional reset for re-adding later
+                setPendingTags([]);
+                setNewTag("");
+            }, 2000); // waits for 2s after success
+
         } catch (err) {
             console.error("Failed to add tags:", err);
             setNotification({ type: "error", message: "Failed to add tags." });
@@ -112,7 +119,7 @@ const TagDisplaySection = ({
                     </span>
                 ))}
 
-                {inputVisible && (
+                {inputVisible && !inputDisabled && (
                     <div className="flex items-center flex-wrap gap-2 relative max-w-full border border-gray-300 rounded-2xl p-2">
                         {pendingTags.map((tag, i) => (
                             <span key={i} className="flex items-center gap-1 px-3 py-1 text-sm rounded-full bg-gray-200 text-gray-800">
