@@ -59,7 +59,7 @@ const UserQuestionAnswerList = ({ projectId }) => {
     };
 
     /* ⬇️ show more */
-    const handleLoadMore = () => setVisibleCount((prev) => prev + 5);
+    const handleLoadMore = () => setVisibleCount((prev) => prev + 3);
     const visibleQuestions = questions.slice(0, visibleCount);
 
     return (
