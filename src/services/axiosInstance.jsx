@@ -59,6 +59,9 @@ protectedApi.interceptors.response.use(
                 return Promise.reject(refreshErr);
             }
         }
+        if (err.response?.status === 401) {
+            handleLogoutAndRedirect();
+        }
 
         return Promise.reject(err);
     }
