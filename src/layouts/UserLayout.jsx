@@ -1,12 +1,14 @@
 import React from "react";
-import UserNavbar from "../pages/user/UserNavbar";
 import { Outlet } from "react-router-dom";
-import Home from "../pages/user/Home";
-;
+import UserNavbar from "../pages/user/UserNavbar";
 import Footer from "../pages/user/Footer";
+import { useTheme } from "next-themes";
+
 const UserLayout = () => {
+    const { theme } = useTheme(); // light or dark
+
     return (
-        <div className="min-h-screen flex flex-col bg-[#19191B] text-white">
+        <div data-theme={theme} className="min-h-screen flex flex-col">
             <UserNavbar />
             <Outlet />
             <Footer />

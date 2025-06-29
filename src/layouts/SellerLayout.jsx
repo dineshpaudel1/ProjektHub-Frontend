@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
-import Navbar from "../pages/admin/AdminNav";
 import SellerSidebar from "../pages/seller/SellerSidebar";
 import SellerNav from "../pages/seller/SellerNav";
 
@@ -10,7 +9,7 @@ const SellerLayout = () => {
     const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
     return (
-        <div>
+        <div data-theme="light" className="bg-gray-50 text-black">
             {/* Fixed Navbar */}
             <SellerNav toggleSidebar={toggleSidebar} />
 
@@ -20,7 +19,7 @@ const SellerLayout = () => {
             {/* Main Content */}
             <div
                 className={`transition-all duration-300 ease-in-out ${isCollapsed ? "ml-20" : "ml-64"
-                    } pt-[60px] h-[calc(100vh-60px)] overflow-y-auto bg-gray-50 p-6`}
+                    } pt-[60px] h-[calc(100vh-60px)] overflow-y-auto p-6`}
             >
                 <Outlet />
             </div>

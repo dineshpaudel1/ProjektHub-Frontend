@@ -6,6 +6,9 @@ import { useNavigate } from "react-router-dom";
 import html2pdf from "html2pdf.js";
 import logo from "../assets/images/logoblack.png";
 
+
+const Api = import.meta.env.VITE_API_URL;
+
 const OrderModal = ({ isOpen, onClose, selectedProject }) => {
     const [step, setStep] = useState(1);
     const [phoneNumber, setPhoneNumber] = useState("");
@@ -106,7 +109,7 @@ const OrderModal = ({ isOpen, onClose, selectedProject }) => {
                 >
                     ×
                 </button>
-        
+
 
                 {step === 1 ? (
                     <>
@@ -160,7 +163,7 @@ const OrderModal = ({ isOpen, onClose, selectedProject }) => {
                             <div className="flex items-start mb-6">
                                 <span className="text-xl font-semibold mr-3">1.</span>
                                 <img
-                                    src={`http://localhost:8080/api/media/photo?file=${selectedProject.thumbnail}`}
+                                    src={`${Api}/media/photo?file=${selectedProject.thumbnail}`}
                                     alt="project"
                                     className="w-20 h-20 object-cover rounded mr-4"
                                 />

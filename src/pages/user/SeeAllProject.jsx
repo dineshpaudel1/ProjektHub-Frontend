@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useProjectContext } from "../../context/ProjectContext";
 import OrderModal from "../../modals/OrderModal";
-import { useNavigate } from "react-router-dom";
+import TotalProjectCard from "../../components/project/TotalProjectCard";
 
 const SkeletonCard = () => (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden animate-pulse">
@@ -25,7 +25,6 @@ const SeeAllProject = () => {
     const { projects, loadingProjects } = useProjectContext();
     const [showModal, setShowModal] = useState(false);
     const [selectedProject, setSelectedProject] = useState(null);
-    const navigate = useNavigate();
 
     const handleLiveView = (url) => {
         window.open(url || "https://dineshpaudel1.com.np", "_blank");
@@ -34,10 +33,6 @@ const SeeAllProject = () => {
     const openModal = (project) => {
         setSelectedProject(project);
         setShowModal(true);
-    };
-
-    const goToProjectDetail = (id) => {
-        navigate(`/project/${id}`);
     };
 
     return (
@@ -62,79 +57,12 @@ const SeeAllProject = () => {
                         [...Array(4)].map((_, index) => <SkeletonCard key={index} />)
                     ) : (
                         projects.map((project) => (
-                            <div
+                            <TotalProjectCard
                                 key={project.id}
-                                className="bg-[var(--menu-bg)] text-[var(--text-color)] rounded-lg shadow-sm border border-[var(--border-color)] overflow-hidden transition-all hover:shadow-md"
-                            >
-                                <div
-                                    className="p-6 flex flex-col md:flex-row gap-6 cursor-pointer"
-                                    onClick={() => goToProjectDetail(project.id)}
-                                >
-                                    <div className="w-full md:w-64 h-48 flex-shrink-0">
-                                        <img
-                                            src={`${import.meta.env.VITE_API_URL}/media/photo?file=${project.thumbnail}`}
-                                            alt={project.title}
-                                            className="w-full h-full object-cover rounded-lg"
-                                        />
-                                    </div>
-
-                                    <div className="flex-1">
-                                        <div className="flex justify-between items-start">
-                                            <h3 className="text-xl font-bold font-serif">
-                                                {project.title}
-                                            </h3>
-                                            <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded dark:bg-blue-800 dark:text-white">
-                                                {project.categoryName}
-                                            </span>
-                                        </div>
-
-                                        <div className="mt-2 flex items-center">
-                                            <div className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center mr-2 overflow-hidden">
-                                                {project.seller.photo ? (
-                                                    <img
-                                                        src={project.seller.photo}
-                                                        alt={project.seller.name}
-                                                        className="w-full h-full rounded-full object-cover"
-                                                    />
-                                                ) : (
-                                                    <span className="text-xs text-gray-600">
-                                                        {project.seller.name.charAt(0)}
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <p className="text-sm text-[var(--text-secondary)]">
-                                                {project.seller.name}
-                                            </p>
-                                        </div>
-
-                                        <p className="mt-3 text-[var(--text-secondary)]">
-                                            {project.description ||
-                                                "Professional project with high-quality implementation."}
-                                        </p>
-
-                                        <div className="mt-4 flex flex-col sm:flex-row gap-3">
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleLiveView(project.demoUrl);
-                                                }}
-                                                className="px-4 py-2 border border-[var(--border-color)] rounded-md hover:bg-[var(--hover-bg)] transition-colors"
-                                            >
-                                                Live Preview
-                                            </button>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    openModal(project);
-                                                }}
-                                                className="px-4 py-2 bg-[var(--button-primary)] text-white rounded-md hover:bg-[var(--button-primary-hover)] transition-colors"
-                                            >
-                                                Purchase (Rs. {project.price})
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                                project={project}
+                                onLiveView={handleLiveView}
+                                onPurchase={openModal}
+                            />
                         ))
                     )}
                 </div>

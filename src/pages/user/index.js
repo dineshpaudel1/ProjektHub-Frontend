@@ -10,3 +10,4 @@ export { default as SeeAllProject } from "./SeeAllProject";
 export { default as SeeSellerProfile } from "./SeeSellerProfile";
 export { default as MyOrder } from "./MyOrder";
 export { default as OrderDetail } from "./OrderDetail";
+export { default as Search } from "./Search";

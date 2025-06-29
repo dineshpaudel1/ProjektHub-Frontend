@@ -30,6 +30,14 @@ const UserNavbar = () => {
     const [loadingNotifications, setLoadingNotifications] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [searchKeyword, setSearchKeyword] = useState("");
+
+    const handleSearch = async (e) => {
+        if (e.key === "Enter" && searchKeyword.trim()) {
+            navigate(`/search?keyword=${encodeURIComponent(searchKeyword.trim())}`);
+        }
+    };
+
 
     const oneTapInitialized = useRef(false);
     const { theme, setTheme } = useTheme();
@@ -155,6 +163,9 @@ const UserNavbar = () => {
                     <div className="relative">
                         <input
                             type="text"
+                            value={searchKeyword}
+                            onChange={(e) => setSearchKeyword(e.target.value)}
+                            onKeyDown={handleSearch}
                             placeholder="Search your project name"
                             className="rounded-full px-4 py-2 pl-10 w-[280px] text-sm focus:outline-none transition-all duration-300 border-1 shadow-sm focus:shadow-sm"
                             style={{
@@ -164,6 +175,7 @@ const UserNavbar = () => {
                                 caretColor: "var(--text-secondary)",
                             }}
                         />
+
                         <Search
                             size={16}
                             className="absolute left-3 top-2.5 pointer-events-none"
