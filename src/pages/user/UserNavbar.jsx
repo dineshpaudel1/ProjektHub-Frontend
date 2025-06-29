@@ -1,32 +1,47 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, Moon, Sun, ShoppingCart, Bell } from "lucide-react";
+import {
+    Menu,
+    X,
+    Moon,
+    Sun,
+    Search,
+    Bell,
+    ShoppingCart,
+} from "lucide-react";
+
 import logowhite from "../../assets/images/logowhite.png";
 import logoDark from "../../assets/images/logoblack.png";
 import { useUser } from "../../context/UserContext";
 import SellerRegisterModal from "../../modals/SellerRegisterModal";
 import { protectedApi, publicApi } from "../../services/axiosInstance";
-import userphoto from "../../assets/images/user.png";
 import { useTheme } from "next-themes";
-import { toast } from "react-toastify";
+import NotificationDropdown from "../../components/notification/NotificationDropdown";
+import ProfileDropdown from "../../components/user/ProfileDropdown";
 
 const UserNavbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { user, setUser } = useUser();
 
-    const [open, setOpen] = useState(false);
-    const [isOpen, setIsOpen] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [showSellerModal, setShowSellerModal] = useState(false);
     const [notifications, setNotifications] = useState([]);
     const [loadingNotifications, setLoadingNotifications] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
     const oneTapInitialized = useRef(false);
     const { theme, setTheme } = useTheme();
     const unreadCount = notifications.filter((n) => !n.read).length;
 
     const toggleDarkMode = () => setTheme(theme === "dark" ? "light" : "dark");
+
+    const handleLogout = () => {
+        localStorage.clear();
+        setUser(null);
+        navigate("/login");
+    };
 
     const handleSectionClick = (sectionId) => {
         if (location.pathname !== "/") {
@@ -45,12 +60,8 @@ const UserNavbar = () => {
         const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
         if (!CLIENT_ID || !window.google?.accounts?.id) return;
 
-        // ✅ Store current path before triggering One Tap
         localStorage.setItem("redirectAfterLogin", location.pathname);
-
         oneTapInitialized.current = true;
-        document.cookie = "g_state=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        window.google.accounts.id.cancel();
 
         window.google.accounts.id.initialize({
             client_id: CLIENT_ID,
@@ -66,12 +77,12 @@ const UserNavbar = () => {
                     const userRes = await protectedApi.get("/user/me");
                     setUser(userRes.data);
 
-                    // ✅ Redirect back to stored page
-                    const redirectPath = location.state?.from || localStorage.getItem("redirectAfterLogin") || "/";
+                    const redirectPath =
+                        location.state?.from || localStorage.getItem("redirectAfterLogin") || "/";
                     localStorage.removeItem("redirectAfterLogin");
                     navigate(redirectPath);
                 } catch (err) {
-                    console.error("❌ Google One Tap Login Failed:", err);
+                    console.error("Google One Tap login failed:", err);
                 }
             },
             auto_select: true,
@@ -79,21 +90,8 @@ const UserNavbar = () => {
             context: "signin",
         });
 
-        window.google.accounts.id.prompt((notification) => {
-            console.log("📢 One Tap status:", notification);
-        });
+        window.google.accounts.id.prompt();
     }, [user, location.pathname]);
-
-
-
-    useEffect(() => {
-        const handleClickOutside = (e) => {
-            if (!e.target.closest(".profile-dropdown")) setDropdownOpen(false);
-            if (!e.target.closest(".notification-dropdown")) setShowNotifications(false);
-        };
-        document.addEventListener("click", handleClickOutside);
-        return () => document.removeEventListener("click", handleClickOutside);
-    }, []);
 
     useEffect(() => {
         const fetchNotifications = async () => {
@@ -111,11 +109,14 @@ const UserNavbar = () => {
         fetchNotifications();
     }, [user]);
 
-    const handleLogout = () => {
-        localStorage.clear();
-        setUser(null);
-        navigate("/login");
-    };
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (!e.target.closest(".profile-dropdown")) setDropdownOpen(false);
+            if (!e.target.closest(".notification-dropdown")) setShowNotifications(false);
+        };
+        document.addEventListener("click", handleClickOutside);
+        return () => document.removeEventListener("click", handleClickOutside);
+    }, []);
 
     useEffect(() => {
         document.body.style.overflow = showSellerModal ? "hidden" : "auto";
@@ -133,23 +134,24 @@ const UserNavbar = () => {
             >
                 {/* Logo */}
                 <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
-                    <img src={theme === "dark" ? logowhite : logoDark} alt="Logo" className="h-8 w-auto" />
+                    <img
+                        src={theme === "dark" ? logowhite : logoDark}
+                        alt="Logo"
+                        className="h-8 w-auto"
+                    />
                 </div>
 
                 {/* Links */}
-                <div className="hidden md:flex items-center gap-8">
-                    <div className="hidden md:flex items-center gap-8 ml-[250px]">
-                        <a onClick={() => handleSectionClick("home")} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">Home</a>
-                        <a onClick={() => navigate("/", { state: { scrollTo: "projects" } })} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">Project</a>
-                        <a onClick={() => navigate("/", { state: { scrollTo: "services" } })} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">Services</a>
-                        <a onClick={() => navigate("/", { state: { scrollTo: "about" } })} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">About Us</a>
-                    </div>
-
+                <div className="hidden md:flex items-center gap-8 ml-[250px]">
+                    <a onClick={() => handleSectionClick("home")} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">Home</a>
+                    <a onClick={() => navigate("/", { state: { scrollTo: "projects" } })} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">Project</a>
+                    <a onClick={() => navigate("/", { state: { scrollTo: "services" } })} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">Services</a>
+                    <a onClick={() => navigate("/", { state: { scrollTo: "about" } })} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">About Us</a>
                 </div>
 
-
-                {/* Right */}
+                {/* Right Side */}
                 <div className="hidden md:flex items-center gap-4">
+                    {/* Search */}
                     <div className="relative">
                         <input
                             type="text"
@@ -162,21 +164,13 @@ const UserNavbar = () => {
                                 caretColor: "var(--text-secondary)",
                             }}
                         />
-                        <svg
-                            className="absolute left-3 top-2.5 h-4 w-4 pointer-events-none"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth={2}
-                            viewBox="0 0 24 24"
+                        <Search
+                            size={16}
+                            className="absolute left-3 top-2.5 pointer-events-none"
                             style={{ color: "var(--text-secondary)" }}
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1110.5 3a7.5 7.5 0 016.15 13.65z"
-                            />
-                        </svg>
+                        />
                     </div>
+
                     {/* Theme Toggle */}
                     <button
                         onClick={toggleDarkMode}
@@ -199,127 +193,24 @@ const UserNavbar = () => {
 
                     {/* Notifications */}
                     {user && (
-                        <div className="relative notification-dropdown">
-                            <button
-                                onClick={() => setShowNotifications(!showNotifications)}
-                                className="p-2 rounded-md transition-all duration-300"
-                                style={{
-                                    backgroundColor: "var(--bg-color)",
-                                    color: "var(--text-secondary)",
-                                    borderColor: "var(--border-color)",
-                                }}
-                            >
-                                <Bell size={18} />
-                            </button>
-                            {unreadCount > 0 && (
-                                <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full px-1.5 h-4 min-w-[1rem] flex items-center justify-center">
-                                    {unreadCount > 9 ? "9+" : unreadCount}
-                                </span>
-                            )}
-                            {showNotifications && (
-                                <div
-                                    className="absolute right-0 mt-2 w-72 max-h-[400px] overflow-y-auto rounded-md shadow-lg py-2 z-50 border"
-                                    style={{
-                                        backgroundColor: "var(--bg-color)",
-                                        color: "var(--text-color)",
-                                        borderColor: "var(--border-color)",
-                                    }}
-                                >
-                                    {loadingNotifications ? (
-                                        <div className="px-4 py-2 text-sm text-gray-500">Loading...</div>
-                                    ) : notifications.length > 0 ? (
-                                        notifications.map((note) => (
-                                            <div
-                                                key={note.id}
-                                                className="px-4 py-2 text-sm border-b flex items-start gap-2 cursor-pointer hover:brightness-95 transition-all duration-200"
-                                                style={{ borderColor: "var(--border-color)" }}
-                                                onClick={async () => {
-                                                    try {
-                                                        await protectedApi.put(`/notifications/${note.id}/read`);
-                                                        setNotifications(prev =>
-                                                            prev.map(n => (n.id === note.id ? { ...n, read: true } : n))
-                                                        );
-                                                        if (note.targetType === "ORDER")
-                                                            navigate(`/my-order/${note.targetId}`);
-                                                        else if (note.targetType === "PROJECT")
-                                                            navigate(`/project/${note.targetId}`);
-                                                    } catch (err) {
-                                                        console.error("Failed to mark notification as read", err);
-                                                    } finally {
-                                                        setShowNotifications(false);
-                                                    }
-                                                }}
-                                            >
-                                                <img
-                                                    src={
-                                                        note.photoUrl
-                                                            ? `${import.meta.env.VITE_API_URL}/media/photo?file=${note.photoUrl}`
-                                                            : userphoto
-                                                    }
-                                                    alt="notif"
-                                                    className="w-8 h-8 object-cover rounded"
-                                                />
-                                                <div className="flex-1">
-                                                    <p className="font-medium">{note.message}</p>
-                                                    <p className="text-xs text-gray-500">{new Date(note.timeStamp).toLocaleString()}</p>
-                                                </div>
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <div className="px-4 py-2 text-sm text-gray-500">No notifications</div>
-                                    )}
-                                </div>
-                            )}
-                        </div>
+                        <NotificationDropdown
+                            notifications={notifications}
+                            setNotifications={setNotifications}
+                            unreadCount={unreadCount}
+                            loadingNotifications={loadingNotifications}
+                            showNotifications={showNotifications}
+                            setShowNotifications={setShowNotifications}
+                        />
                     )}
 
                     {/* Profile or Login */}
                     {user ? (
-                        <div className="relative profile-dropdown">
-                            <div
-                                onClick={() => setDropdownOpen(!dropdownOpen)}
-                                className="w-9 h-9 rounded-full flex items-center justify-center overflow-hidden cursor-pointer border"
-                                style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
-                            >
-                                {user.profilePicture ? (
-                                    <img
-                                        src={`${import.meta.env.VITE_API_URL}/media/photo?file=${user.profilePicture}`}
-                                        alt="Profile"
-                                        className="w-full h-full object-cover rounded-full"
-                                    />
-                                ) : (
-                                    <span className="text-sm font-semibold text-white bg-indigo-600 w-full h-full flex items-center justify-center rounded-full">
-                                        {user.username?.charAt(0).toUpperCase()}
-                                    </span>
-                                )}
-                            </div>
-                            {dropdownOpen && (
-                                <div
-                                    className="absolute right-0 mt-2 w-40 rounded-md shadow-lg py-2 z-50 border"
-                                    style={{
-                                        backgroundColor: "var(--bg-color)",
-                                        color: "var(--text-color)",
-                                        borderColor: "var(--border-color)",
-                                    }}
-                                >
-                                    <button
-                                        onClick={() => {
-                                            setDropdownOpen(false);
-                                            navigate("/userprofile");
-                                        }}
-                                        className="w-full px-4 py-2 text-sm text-left hover:brightness-95 transition"
-                                    >
-                                        Profile
-                                    </button>
-                                    <button
-                                        onClick={handleLogout}
-                                        className="w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-100 dark:hover:bg-red-700"
-                                    >
-                                        Logout
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+                        <ProfileDropdown
+                            user={user}
+                            dropdownOpen={dropdownOpen}
+                            setDropdownOpen={setDropdownOpen}
+                            handleLogout={handleLogout}
+                        />
                     ) : (
                         <button
                             onClick={() => navigate("/login")}
@@ -333,29 +224,28 @@ const UserNavbar = () => {
                         </button>
                     )}
                 </div>
-                {/* Mobile Menu Toggle */}
+
+                {/* Mobile Toggle */}
                 <div className="md:hidden z-30">
-                    <button onClick={() => setIsOpen(!isOpen)} style={{ color: "var(--text-color)" }}>
-                        {isOpen ? <X /> : <Menu />}
+                    <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} style={{ color: "var(--text-color)" }}>
+                        {mobileMenuOpen ? <X /> : <Menu />}
                     </button>
                 </div>
             </nav>
 
             {/* Mobile Menu */}
-            {isOpen && (
+            {mobileMenuOpen && (
                 <div className="md:hidden fixed inset-0 z-40 overflow-y-auto" style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}>
                     <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: "var(--border-color)" }}>
-                        <div className="flex items-center gap-3">
-                            <img src={theme === "dark" ? logowhite : logoDark} alt="Logo" className="h-6 sm:h-7" />
-                        </div>
-                        <button onClick={() => setIsOpen(false)} className="text-xl"><X size={24} /></button>
+                        <img src={theme === "dark" ? logowhite : logoDark} alt="Logo" className="h-6 sm:h-7" />
+                        <button onClick={() => setMobileMenuOpen(false)} className="text-xl"><X size={24} /></button>
                     </div>
 
                     <ul className="px-6 py-6 space-y-6 text-lg font-medium">
-                        <li><a onClick={() => { setIsOpen(false); handleSectionClick("home"); }} className="block hover:text-indigo-500">Home</a></li>
-                        <li><a onClick={() => { setIsOpen(false); handleSectionClick("projects"); }} className="block hover:text-indigo-500">Projects</a></li>
-                        <li><a onClick={() => { setIsOpen(false); handleSectionClick("services"); }} className="block hover:text-indigo-500">Our Services</a></li>
-                        <li><a onClick={() => { setIsOpen(false); handleSectionClick("about"); }} className="block hover:text-indigo-500">About Us</a></li>
+                        <li><a onClick={() => { setMobileMenuOpen(false); handleSectionClick("home"); }} className="block hover:text-indigo-500">Home</a></li>
+                        <li><a onClick={() => { setMobileMenuOpen(false); handleSectionClick("projects"); }} className="block hover:text-indigo-500">Projects</a></li>
+                        <li><a onClick={() => { setMobileMenuOpen(false); handleSectionClick("services"); }} className="block hover:text-indigo-500">Our Services</a></li>
+                        <li><a onClick={() => { setMobileMenuOpen(false); handleSectionClick("about"); }} className="block hover:text-indigo-500">About Us</a></li>
                     </ul>
 
                     <div className="px-6 py-4 space-y-4">
@@ -367,7 +257,7 @@ const UserNavbar = () => {
 
                         {user ? (
                             <>
-                                <button onClick={() => { setIsOpen(false); navigate("/userprofile"); }} className="w-full bg-gray-500 text-white py-2 rounded-full font-medium">
+                                <button onClick={() => { setMobileMenuOpen(false); navigate("/userprofile"); }} className="w-full bg-gray-500 text-white py-2 rounded-full font-medium">
                                     Profile
                                 </button>
                                 <button onClick={handleLogout} className="w-full bg-red-600 text-white py-2 rounded-full font-medium">
@@ -375,7 +265,7 @@ const UserNavbar = () => {
                                 </button>
                             </>
                         ) : (
-                            <button onClick={() => { setIsOpen(false); navigate("/login"); }} className="w-full bg-indigo-600 text-white py-2 rounded-full font-medium">
+                            <button onClick={() => { setMobileMenuOpen(false); navigate("/login"); }} className="w-full bg-indigo-600 text-white py-2 rounded-full font-medium">
                                 Login
                             </button>
                         )}
@@ -383,7 +273,8 @@ const UserNavbar = () => {
                 </div>
             )}
 
-            {open && <SellerRegisterModal onClose={() => setOpen(false)} />}        </div>
+            {showSellerModal && <SellerRegisterModal onClose={() => setShowSellerModal(false)} />}
+        </div>
     );
 };
 

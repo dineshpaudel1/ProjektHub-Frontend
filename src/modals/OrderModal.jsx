@@ -97,16 +97,19 @@ const OrderModal = ({ isOpen, onClose, selectedProject }) => {
         <div className="fixed inset-0 flex items-center justify-center z-50 px-4 backdrop-blur-sm bg-black/10 font-[var(--font-primary)]">
             <div
                 ref={modalRef}
-                className="bg-[var(--bg-color)] text-[var(--text-color)] border border-[var(--border-color)] rounded-lg w-full max-w-3xl shadow-xl px-8 py-6 max-h-[90vh] overflow-y-auto"
+                className="relative bg-[var(--bg-color)] text-[var(--text-color)] border border-[var(--border-color)] rounded-lg w-full max-w-3xl shadow-xl px-8 py-6 max-h-[90vh] overflow-y-auto"
             >
+                {/* ❌ Close button */}
+                <button
+                    onClick={onClose}
+                    className="absolute top-4 right-4 text-2xl font-bold text-[var(--text-color)] hover:text-[var(--button-primary-hover)] transition-colors"
+                >
+                    ×
+                </button>
+        
+
                 {step === 1 ? (
                     <>
-                        <button
-                            onClick={onClose}
-                            className="absolute top-4 right-5 text-2xl font-bold"
-                        >
-                            ×
-                        </button>
                         <h2 className="text-2xl font-semibold text-center mb-6">
                             Contact Info
                         </h2>
@@ -117,7 +120,9 @@ const OrderModal = ({ isOpen, onClose, selectedProject }) => {
                             type="number"
                             placeholder="Enter WhatsApp or Viber number"
                             value={phoneNumber}
-                            onChange={(e) => setPhoneNumber(e.target.value.slice(0, 10))}
+                            onChange={(e) =>
+                                setPhoneNumber(e.target.value.slice(0, 10))
+                            }
                             className="w-full border border-[var(--border-color)] px-4 py-3 rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-[var(--button-primary)] bg-transparent"
                         />
                         {!isPhoneValid && phoneNumber && (
@@ -163,7 +168,9 @@ const OrderModal = ({ isOpen, onClose, selectedProject }) => {
                                     <p className="text-lg font-bold">
                                         Title: {selectedProject.title}
                                     </p>
-                                    <p className="text-base">By: {selectedProject.seller.name}</p>
+                                    <p className="text-base">
+                                        By: {selectedProject.seller.name}
+                                    </p>
                                 </div>
                                 <div className="text-right text-sm">
                                     <p>Price: NPR {selectedProject.price}</p>
