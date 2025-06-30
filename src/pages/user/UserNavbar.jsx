@@ -48,7 +48,7 @@ const UserNavbar = () => {
     const handleLogout = () => {
         localStorage.clear();
         setUser(null);
-        navigate("/login");
+        navigate("/");
     };
 
     const handleSectionClick = (sectionId) => {
@@ -95,7 +95,7 @@ const UserNavbar = () => {
             },
             auto_select: true,
             cancel_on_tap_outside: false,
-            context: "signin",
+            // context: "signin",
         });
 
         window.google.accounts.id.prompt();
