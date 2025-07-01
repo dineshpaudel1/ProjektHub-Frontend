@@ -1,49 +1,58 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import {
-    Menu,
-    X,
-    Moon,
-    Sun,
-    Search,
-    Bell,
-    ShoppingCart,
-} from "lucide-react";
+import { Menu, X, Moon, Sun, Search, ShoppingCart, ChevronRight, ChevronDown } from "lucide-react";
+
 
 import logowhite from "../../assets/images/logowhite.png";
 import logoDark from "../../assets/images/logoblack.png";
+
 import { useUser } from "../../context/UserContext";
-import SellerRegisterModal from "../../modals/SellerRegisterModal";
 import { protectedApi, publicApi } from "../../services/axiosInstance";
 import { useTheme } from "next-themes";
+
 import NotificationDropdown from "../../components/notification/NotificationDropdown";
 import ProfileDropdown from "../../components/user/ProfileDropdown";
 
 const UserNavbar = () => {
+    /* ───────────────────── state / refs ───────────────────── */
     const navigate = useNavigate();
     const location = useLocation();
     const { user, setUser } = useUser();
+    const { theme, resolvedTheme, setTheme } = useTheme();
 
+    const [mounted, setMounted] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [showSellerModal, setShowSellerModal] = useState(false);
     const [notifications, setNotifications] = useState([]);
-    const [loadingNotifications, setLoadingNotifications] = useState(false);
-    const [showNotifications, setShowNotifications] = useState(false);
+    const [loadingNotifications, setLoading] = useState(false);
+    const [showNotifications, setShowNotif] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [searchKeyword, setSearchKeyword] = useState("");
+    const [showMobileSearch, setShowMobileSearch] = useState(false);
 
-    const handleSearch = async (e) => {
-        if (e.key === "Enter" && searchKeyword.trim()) {
-            navigate(`/search?keyword=${encodeURIComponent(searchKeyword.trim())}`);
+    const unreadCount = notifications.filter(n => !n.read).length;
+    const oneTapInit = useRef(false);
+    const mobileSearchRef = useRef(null);
+    const [openSections, setOpenSections] = useState({
+        goal: false,
+        popular: false,
+    });
+
+    const handleSectionClick = id => {
+        if (location.pathname !== "/") {
+            navigate("/", { state: { scrollTo: id } });
+        } else {
+            document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
         }
     };
 
+    /* avoid hydration mismatch for `next-themes` */
+    useEffect(() => setMounted(true), []);
+    const currentTheme = theme === "system" ? resolvedTheme : theme;
 
-    const oneTapInitialized = useRef(false);
-    const { theme, setTheme } = useTheme();
-    const unreadCount = notifications.filter((n) => !n.read).length;
-
-    const toggleDarkMode = () => setTheme(theme === "dark" ? "light" : "dark");
+    /* ───────────────────── helpers ───────────────────── */
+    const toggleDarkMode = () =>
+        setTheme(currentTheme === "dark" ? "light" : "dark");
 
     const handleLogout = () => {
         localStorage.clear();
@@ -51,33 +60,37 @@ const UserNavbar = () => {
         navigate("/");
     };
 
-    const handleSectionClick = (sectionId) => {
-        if (location.pathname !== "/") {
-            navigate(`/#${sectionId}`);
-        } else {
-            const el = document.getElementById(sectionId);
-            if (el) el.scrollIntoView({ behavior: "smooth" });
+    const handleSearchKey = e => {
+        if (e.key === "Enter" && searchKeyword.trim()) {
+            navigate(`/search?keyword=${encodeURIComponent(searchKeyword.trim())}`);
+            setMobileMenuOpen(false);
+            setShowMobileSearch(false);
+        } else if (e.key === "Escape") {
+            setShowMobileSearch(false);
         }
     };
 
-    useEffect(() => {
-        const accessToken = localStorage.getItem("token");
 
-        if (user || accessToken || oneTapInitialized.current || location.pathname === "/login") return;
+    /* ───────────────────── effects ───────────────────── */
+
+    /* Google One-Tap login */
+    useEffect(() => {
+        const access = localStorage.getItem("token");
+        if (user || access || oneTapInit.current || location.pathname === "/login") return;
 
         const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
         if (!CLIENT_ID || !window.google?.accounts?.id) return;
 
         localStorage.setItem("redirectAfterLogin", location.pathname);
-        oneTapInitialized.current = true;
+        oneTapInit.current = true;
 
         window.google.accounts.id.initialize({
             client_id: CLIENT_ID,
-            callback: async (response) => {
+            callback: async res => {
                 try {
-                    const idToken = response.credential;
-                    const res = await publicApi.post("/auth/login/google", { token: idToken });
-                    const { accessToken, refreshToken } = res.data.data;
+                    const idToken = res.credential;
+                    const loginRes = await publicApi.post("/auth/login/google", { token: idToken });
+                    const { accessToken, refreshToken } = loginRes.data.data;
 
                     localStorage.setItem("token", accessToken);
                     localStorage.setItem("refreshToken", refreshToken);
@@ -85,89 +98,125 @@ const UserNavbar = () => {
                     const userRes = await protectedApi.get("/user/me");
                     setUser(userRes.data);
 
-                    const redirectPath =
-                        location.state?.from || localStorage.getItem("redirectAfterLogin") || "/";
+                    const redirect =
+                        location.state?.from ||
+                        localStorage.getItem("redirectAfterLogin") || "/";
                     localStorage.removeItem("redirectAfterLogin");
-                    navigate(redirectPath);
+                    navigate(redirect);
                 } catch (err) {
-                    console.error("Google One Tap login failed:", err);
+                    console.error("Google One-Tap login failed:", err);
                 }
             },
             auto_select: true,
             cancel_on_tap_outside: false,
-            // context: "signin",
         });
 
         window.google.accounts.id.prompt();
-    }, [user, location.pathname]);
+    }, [user, location.pathname, navigate]);
 
+    /* fetch notifications each login */
     useEffect(() => {
-        const fetchNotifications = async () => {
-            if (!user) return;
-            setLoadingNotifications(true);
+        if (!user) return;
+        const getNotif = async () => {
+            setLoading(true);
             try {
                 const res = await protectedApi.get("/notifications?role=USER");
                 setNotifications(res.data.data || []);
-            } catch (err) {
-                console.error("Failed to fetch notifications:", err);
+            } catch (e) {
+                console.error("Fetch notifications failed:", e);
             } finally {
-                setLoadingNotifications(false);
+                setLoading(false);
             }
         };
-        fetchNotifications();
+        getNotif();
     }, [user]);
 
+    /* close dropdown / search on click-outside */
     useEffect(() => {
-        const handleClickOutside = (e) => {
+        const handler = e => {
             if (!e.target.closest(".profile-dropdown")) setDropdownOpen(false);
-            if (!e.target.closest(".notification-dropdown")) setShowNotifications(false);
+            if (!e.target.closest(".notification-dropdown")) setShowNotif(false);
+
+            if (
+                showMobileSearch &&
+                !e.target.closest("#mobile-search-bar") &&
+                !e.target.closest("#mobile-search-toggle")
+            ) {
+                setShowMobileSearch(false);
+            }
         };
-        document.addEventListener("click", handleClickOutside);
-        return () => document.removeEventListener("click", handleClickOutside);
-    }, []);
+        document.addEventListener("click", handler);
+        return () => document.removeEventListener("click", handler);
+    }, [showMobileSearch]);
 
+    /* focus mobile search */
     useEffect(() => {
-        document.body.style.overflow = showSellerModal ? "hidden" : "auto";
-    }, [showSellerModal]);
+        if (showMobileSearch) mobileSearchRef.current?.focus();
+    }, [showMobileSearch]);
 
+    /* lock scroll when drawer open */
+    useEffect(() => {
+        document.body.style.overflow = mobileMenuOpen ? "hidden" : "auto";
+    }, [mobileMenuOpen]);
+
+
+    /* ───────────────────── JSX ───────────────────── */
     return (
         <div className="fixed top-0 left-0 w-full z-50">
             <nav
-                className="px-6 py-4 flex justify-between items-center backdrop-blur-md border-b"
+                className="px-4 sm:px-6 py-4 flex items-center justify-between backdrop-blur-md border-b"
                 style={{
                     backgroundColor: "var(--navbar-bg)",
                     color: "var(--text-color)",
                     borderColor: "var(--border-color)",
                 }}
             >
-                {/* Logo */}
-                <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
+                {/* LEFT : burger + logo */}
+                <div className="flex items-center gap-3">
+                    <button
+                        className="md:hidden -ml-1"
+                        onClick={() => setMobileMenuOpen(true)}
+                        style={{ color: "var(--text-color)" }}
+                        aria-label="Open menu"
+                    >
+                        <Menu size={22} />
+                    </button>
+
                     <img
-                        src={theme === "dark" ? logowhite : logoDark}
+                        src={currentTheme === "dark" ? logowhite : logoDark}
                         alt="Logo"
-                        className="h-8 w-auto"
+                        className="h-7 sm:h-8 w-auto cursor-pointer"
+                        onClick={() => navigate("/")}
                     />
                 </div>
 
-                {/* Links */}
-                <div className="hidden md:flex items-center gap-8 ml-[250px]">
-                    <a onClick={() => handleSectionClick("home")} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">Home</a>
-                    <a onClick={() => navigate("/", { state: { scrollTo: "projects" } })} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">Project</a>
-                    <a onClick={() => navigate("/", { state: { scrollTo: "services" } })} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">Services</a>
-                    <a onClick={() => navigate("/", { state: { scrollTo: "about" } })} className="text-sm hover:text-blue-600 transition font-medium cursor-pointer">About Us</a>
-                </div>
+                {/* CENTER : links */}
+                <ul className="hidden md:flex items-center gap-8 text-sm font-medium ml-[200px]">
+                    {[
+                        ["Home", "home"],
+                        ["Projects", "projects"],
+                        ["Services", "services"],
+                        ["About Us", "about"],
+                    ].map(([label, id]) => (
+                        <li key={id}>
+                            <a
+                                className="whitespace-nowrap hover:text-blue-600 transition cursor-pointer"
+                                onClick={() => handleSectionClick(id)}
+                            >{label}</a>
+                        </li>
+                    ))}
+                </ul>
 
-                {/* Right Side */}
+                {/* RIGHT : desktop controls */}
                 <div className="hidden md:flex items-center gap-4">
-                    {/* Search */}
                     <div className="relative">
                         <input
                             type="text"
                             value={searchKeyword}
-                            onChange={(e) => setSearchKeyword(e.target.value)}
-                            onKeyDown={handleSearch}
+                            onChange={e => setSearchKeyword(e.target.value)}
+                            onKeyDown={handleSearchKey}
                             placeholder="Search your project name"
-                            className="rounded-full px-4 py-2 pl-10 w-[280px] text-sm focus:outline-none transition-all duration-300 border-1 shadow-sm focus:shadow-sm"
+                            className="rounded-full px-4 py-2 pl-10 w-[280px] text-sm focus:outline-none border shadow-sm"
                             style={{
                                 backgroundColor: "var(--bg-color)",
                                 color: "var(--text-secondary)",
@@ -175,7 +224,6 @@ const UserNavbar = () => {
                                 caretColor: "var(--text-secondary)",
                             }}
                         />
-
                         <Search
                             size={16}
                             className="absolute left-3 top-2.5 pointer-events-none"
@@ -183,27 +231,28 @@ const UserNavbar = () => {
                         />
                     </div>
 
-                    {/* Theme Toggle */}
                     <button
                         onClick={toggleDarkMode}
-                        className="p-2 rounded-md border hover:shadow-sm transition-all duration-300"
+                        className="p-2 rounded-md border hover:shadow-sm transition"
                         style={{
                             backgroundColor: "var(--bg-color)",
                             color: "var(--text-secondary)",
                             borderColor: "var(--border-color)",
                         }}
+                        aria-label="Toggle theme"
                     >
-                        {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+                        {currentTheme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
                     </button>
 
-                    {/* Orders */}
                     {user && (
-                        <Link to="/my-orders" className="transition hover:text-blue-600" style={{ color: "var(--text-secondary)" }}>
-                            <ShoppingCart size={18} />
-                        </Link>
+                        <Link
+                            to="/my-orders"
+                            className="transition hover:text-blue-600"
+                            style={{ color: "var(--text-secondary)" }}
+                            aria-label="My orders"
+                        ><ShoppingCart size={18} /></Link>
                     )}
 
-                    {/* Notifications */}
                     {user && (
                         <NotificationDropdown
                             notifications={notifications}
@@ -211,11 +260,10 @@ const UserNavbar = () => {
                             unreadCount={unreadCount}
                             loadingNotifications={loadingNotifications}
                             showNotifications={showNotifications}
-                            setShowNotifications={setShowNotifications}
+                            setShowNotifications={setShowNotif}
                         />
                     )}
 
-                    {/* Profile or Login */}
                     {user ? (
                         <ProfileDropdown
                             user={user}
@@ -228,64 +276,199 @@ const UserNavbar = () => {
                             onClick={() => navigate("/login")}
                             className="font-medium rounded px-6 py-2 hover:shadow transition"
                             style={{
-                                backgroundColor: "var(--button-primary, #2563eb)",
+                                backgroundColor: "var(--button-primary,#2563eb)",
                                 color: "#fff",
                             }}
-                        >
-                            Login
-                        </button>
+                        >Login</button>
                     )}
                 </div>
 
-                {/* Mobile Toggle */}
-                <div className="md:hidden z-30">
-                    <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} style={{ color: "var(--text-color)" }}>
-                        {mobileMenuOpen ? <X /> : <Menu />}
-                    </button>
+                {/* mobile bell + search */}
+                <div className="flex md:hidden items-center gap-4">
+                    {user && (
+                        <NotificationDropdown
+                            notifications={notifications}
+                            setNotifications={setNotifications}
+                            unreadCount={unreadCount}
+                            loadingNotifications={loadingNotifications}
+                            showNotifications={showNotifications}
+                            setShowNotifications={setShowNotif}
+                        />
+                    )}
+
+                    <button
+                        id="mobile-search-toggle"
+                        onClick={() => setShowMobileSearch(s => !s)}
+                        style={{ color: "var(--text-color)" }}
+                        aria-label="Search"
+                    ><Search size={20} /></button>
                 </div>
             </nav>
 
-            {/* Mobile Menu */}
-            {mobileMenuOpen && (
-                <div className="md:hidden fixed inset-0 z-40 overflow-y-auto" style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}>
-                    <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: "var(--border-color)" }}>
-                        <img src={theme === "dark" ? logowhite : logoDark} alt="Logo" className="h-6 sm:h-7" />
-                        <button onClick={() => setMobileMenuOpen(false)} className="text-xl"><X size={24} /></button>
-                    </div>
-
-                    <ul className="px-6 py-6 space-y-6 text-lg font-medium">
-                        <li><a onClick={() => { setMobileMenuOpen(false); handleSectionClick("home"); }} className="block hover:text-indigo-500">Home</a></li>
-                        <li><a onClick={() => { setMobileMenuOpen(false); handleSectionClick("projects"); }} className="block hover:text-indigo-500">Projects</a></li>
-                        <li><a onClick={() => { setMobileMenuOpen(false); handleSectionClick("services"); }} className="block hover:text-indigo-500">Our Services</a></li>
-                        <li><a onClick={() => { setMobileMenuOpen(false); handleSectionClick("about"); }} className="block hover:text-indigo-500">About Us</a></li>
-                    </ul>
-
-                    <div className="px-6 py-4 space-y-4">
-                        <button onClick={toggleDarkMode} className="w-full flex items-center justify-center gap-2 border py-2 rounded-full font-medium"
-                            style={{ borderColor: "var(--border-color)", backgroundColor: "var(--hover-bg)" }}>
-                            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-                            {theme === "dark" ? "Light Mode" : "Dark Mode"}
-                        </button>
-
-                        {user ? (
-                            <>
-                                <button onClick={() => { setMobileMenuOpen(false); navigate("/userprofile"); }} className="w-full bg-gray-500 text-white py-2 rounded-full font-medium">
-                                    Profile
-                                </button>
-                                <button onClick={handleLogout} className="w-full bg-red-600 text-white py-2 rounded-full font-medium">
-                                    Logout
-                                </button>
-                            </>
-                        ) : (
-                            <button onClick={() => { setMobileMenuOpen(false); navigate("/login"); }} className="w-full bg-indigo-600 text-white py-2 rounded-full font-medium">
-                                Login
-                            </button>
-                        )}
+            {/* mobile inline search */}
+            {showMobileSearch && (
+                <div
+                    id="mobile-search-bar"
+                    className="md:hidden px-4 py-3 border-b"
+                    style={{
+                        backgroundColor: "var(--bg-color)",
+                        borderColor: "var(--border-color)",
+                    }}
+                >
+                    <div className="relative">
+                        <input
+                            ref={mobileSearchRef}
+                            type="text"
+                            value={searchKeyword}
+                            onChange={e => setSearchKeyword(e.target.value)}
+                            onKeyDown={handleSearchKey}
+                            placeholder="Search projects..."
+                            className="rounded-full px-4 py-2 pl-10 w-full text-sm focus:outline-none border shadow-sm"
+                            style={{
+                                backgroundColor: "var(--bg-color)",
+                                color: "var(--text-secondary)",
+                                borderColor: "var(--border-color)",
+                                caretColor: "var(--text-secondary)",
+                            }}
+                        />
+                        <Search size={16}
+                            className="absolute left-3 top-2.5 pointer-events-none"
+                            style={{ color: "var(--text-secondary)" }} />
                     </div>
                 </div>
             )}
 
-            {showSellerModal && <SellerRegisterModal onClose={() => setShowSellerModal(false)} />}
+            {mobileMenuOpen && (
+                <div
+                    className="md:hidden fixed inset-0 z-40 flex"
+                    style={{ backgroundColor: "rgba(0,0,0,0.35)" }}
+                >
+                    {/* sheet */}
+                    <aside
+                        className="w-[85%] max-w-xs h-full overflow-y-auto"
+                        style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
+                    >
+                        {/* header with avatar + close */}
+                        {/* HEADER inside the mobile drawer */}
+                        <div
+                            className="relative px-6 pr-14 py-5 border-b flex items-center justify-between"
+                            /*            ^^^^^^^  ← add “relative” so the absolute-positioned X can anchor */
+                            style={{ borderColor: "var(--border-color)" }}>
+
+                            {/* left: avatar + greeting */}
+                            <div className="flex items-center gap-4">
+                                <div
+                                    className="cursor-pointer w-11 h-11 rounded-full bg-gray-400 flex items-center justify-center overflow-hidden">
+                                    <img
+                                        src={
+                                            user?.profilePicture
+                                                ? `${import.meta.env.VITE_API_URL}/media/photo?file=${user.profilePicture}`
+                                                : "https://via.placeholder.com/100"
+                                        }
+                                        onError={(e) => {
+                                            e.currentTarget.src = "https://via.placeholder.com/100";
+                                        }}
+                                        alt="Profile"
+                                        className="w-full h-full object-cover rounded-full"
+                                    />
+                                </div>
+
+                                <div
+                                    onClick={() => {
+                                        setMobileMenuOpen(false);
+                                        navigate(user ? "/userprofile" : "/login");
+                                    }}
+                                    className="flex flex-col text-sm leading-tight">
+                                    <span className="font-medium">
+                                        {user ? `Hi, ${user.fullName?.split(" ")[0]}` : "Welcome"}
+                                    </span>
+                                    <span
+                                        className="text-[12px]"
+                                        style={{ color: "var(--text-secondary)" }}>
+                                        {user ? "Welcome back" : "Nice to see you"}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* right: close button */}
+                            <button
+                                className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-[var(--hover-bg)]"
+                                onClick={() => setMobileMenuOpen(false)}
+                                style={{ color: "var(--text-color)" }}  /* ensure visible in both themes */
+                                aria-label="Close menu">
+                                <X size={20} />
+                            </button>
+                        </div>
+
+
+                        {/* MAIN LIST */}
+                        <nav className="pt-4">
+                            <ul className="flex flex-col gap-3 px-6">
+                                {[
+                                    ["Home", "home"],
+                                    ["Projects", "projects"],
+                                    ["Services", "services"],
+                                    ["About Us", "about"],
+                                ].map(([label, id]) => (
+                                    <li key={id}>
+                                        <button
+                                            onClick={() => {
+                                                handleSectionClick(id);
+                                                setMobileMenuOpen(false);
+                                            }}
+                                            className="block w-full text-left py-2 px-3 rounded
+                                 font-medium whitespace-nowrap
+                                 hover:bg-[var(--hover-bg)] transition">
+                                            {label}
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                            <hr
+                                className="my-5 mx-6 border-[var(--border-color)]"
+                            />
+                        </nav>
+                        {/* footer */}
+                        <div
+                            className="px-6 py-6 space-y-4 border-t"
+                            style={{ borderColor: "var(--border-color)" }}
+                        >
+                            <button
+                                onClick={toggleDarkMode}
+                                className="w-full flex items-center justify-center gap-2 border py-2 rounded-full font-medium"
+                                style={{
+                                    borderColor: "var(--border-color)",
+                                    backgroundColor: "var(--hover-bg)",
+                                }}
+                            >
+                                {currentTheme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+                                {currentTheme === "dark" ? "Light Mode" : "Dark Mode"}
+                            </button>
+
+                            {user ? (
+                                <button
+                                    onClick={handleLogout}
+                                    className="w-full bg-blue-600 text-white py-2 rounded-full font-medium"
+                                >
+                                    Logout
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={() => {
+                                        setMobileMenuOpen(false);
+                                        navigate("/login");
+                                    }}
+                                    className="w-full bg-indigo-600 text-white py-2 rounded-full font-medium"
+                                >
+                                    Login
+                                </button>
+                            )}
+                        </div>
+                    </aside>
+                    {/* translucent backdrop click to close */}
+                    <div className="flex-1" onClick={() => setMobileMenuOpen(false)} />
+                </div>
+            )}
         </div>
     );
 };

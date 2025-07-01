@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { publicApi } from "../../services/axiosInstance";
 import TotalProjectCard from "../../components/project/TotalProjectCard";
 import OrderModal from "../../modals/OrderModal";
-import noFoundPhoto from "../../assets/images/nofound.jpg";
+import noFoundPhoto from "../../assets/images/nofound.png";
 
 const NoResultCard = ({ onGoBack }) => (
     <div className="flex flex-col items-center justify-center py-16">

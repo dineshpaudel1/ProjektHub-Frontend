@@ -22,6 +22,12 @@ const testimonials = [
         text: "I received excellent service from Project Hub during my project development career.",
         rating: 5,
     },
+    {
+        name: "Aakash Pun",
+        role: "CLIENTS",
+        text: "I received excellent service from Project Hub during my project development career.",
+        rating: 5,
+    },
 ];
 
 const Testimonials = () => {
@@ -47,7 +53,7 @@ const Testimonials = () => {
                 </div>
 
                 {/* Testimonials Grid */}
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                     {testimonials.map((testimonial, idx) => (
                         <div
                             key={idx}

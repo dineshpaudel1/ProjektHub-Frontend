@@ -63,11 +63,6 @@ const Services = () => {
             navigate("/login", { state: { from: "/" } });
         }
     };
-
-
-
-
-
     return (
         <section id="services"
             className="py-30 px-4 sm:px-6 lg:px-16 transition-all"
