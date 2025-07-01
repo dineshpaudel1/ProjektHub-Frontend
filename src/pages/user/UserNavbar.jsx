@@ -1,8 +1,6 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, Moon, Sun, Search, ShoppingCart, ChevronRight, ChevronDown } from "lucide-react";
-
+import { Menu, X, Moon, Sun, Search, ShoppingCart } from "lucide-react";
 
 import logowhite from "../../assets/images/logowhite.png";
 import logoDark from "../../assets/images/logoblack.png";
@@ -13,9 +11,9 @@ import { useTheme } from "next-themes";
 
 import NotificationDropdown from "../../components/notification/NotificationDropdown";
 import ProfileDropdown from "../../components/user/ProfileDropdown";
+import MobileMenu from "../../components/navbar/MobileMenu";
 
 const UserNavbar = () => {
-    /* ───────────────────── state / refs ───────────────────── */
     const navigate = useNavigate();
     const location = useLocation();
     const { user, setUser } = useUser();
@@ -33,10 +31,7 @@ const UserNavbar = () => {
     const unreadCount = notifications.filter(n => !n.read).length;
     const oneTapInit = useRef(false);
     const mobileSearchRef = useRef(null);
-    const [openSections, setOpenSections] = useState({
-        goal: false,
-        popular: false,
-    });
+    const currentTheme = theme === "system" ? resolvedTheme : theme;
 
     const handleSectionClick = id => {
         if (location.pathname !== "/") {
@@ -46,13 +41,9 @@ const UserNavbar = () => {
         }
     };
 
-    /* avoid hydration mismatch for `next-themes` */
-    useEffect(() => setMounted(true), []);
-    const currentTheme = theme === "system" ? resolvedTheme : theme;
-
-    /* ───────────────────── helpers ───────────────────── */
-    const toggleDarkMode = () =>
+    const toggleDarkMode = () => {
         setTheme(currentTheme === "dark" ? "light" : "dark");
+    };
 
     const handleLogout = () => {
         localStorage.clear();
@@ -70,26 +61,23 @@ const UserNavbar = () => {
         }
     };
 
+    useEffect(() => setMounted(true), []);
 
-    /* ───────────────────── effects ───────────────────── */
-
-    /* Google One-Tap login */
     useEffect(() => {
-        const access = localStorage.getItem("token");
-        if (user || access || oneTapInit.current || location.pathname === "/login") return;
+        const token = localStorage.getItem("token");
+        if (user || token || oneTapInit.current || location.pathname === "/login") return;
 
         const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
         if (!CLIENT_ID || !window.google?.accounts?.id) return;
 
-        localStorage.setItem("redirectAfterLogin", location.pathname);
         oneTapInit.current = true;
+        localStorage.setItem("redirectAfterLogin", location.pathname);
 
         window.google.accounts.id.initialize({
             client_id: CLIENT_ID,
             callback: async res => {
                 try {
-                    const idToken = res.credential;
-                    const loginRes = await publicApi.post("/auth/login/google", { token: idToken });
+                    const loginRes = await publicApi.post("/auth/login/google", { token: res.credential });
                     const { accessToken, refreshToken } = loginRes.data.data;
 
                     localStorage.setItem("token", accessToken);
@@ -98,9 +86,7 @@ const UserNavbar = () => {
                     const userRes = await protectedApi.get("/user/me");
                     setUser(userRes.data);
 
-                    const redirect =
-                        location.state?.from ||
-                        localStorage.getItem("redirectAfterLogin") || "/";
+                    const redirect = location.state?.from || localStorage.getItem("redirectAfterLogin") || "/";
                     localStorage.removeItem("redirectAfterLogin");
                     navigate(redirect);
                 } catch (err) {
@@ -114,29 +100,26 @@ const UserNavbar = () => {
         window.google.accounts.id.prompt();
     }, [user, location.pathname, navigate]);
 
-    /* fetch notifications each login */
     useEffect(() => {
         if (!user) return;
-        const getNotif = async () => {
+        const fetchNotifications = async () => {
             setLoading(true);
             try {
                 const res = await protectedApi.get("/notifications?role=USER");
                 setNotifications(res.data.data || []);
-            } catch (e) {
-                console.error("Fetch notifications failed:", e);
+            } catch (err) {
+                console.error("Notification fetch failed:", err);
             } finally {
                 setLoading(false);
             }
         };
-        getNotif();
+        fetchNotifications();
     }, [user]);
 
-    /* close dropdown / search on click-outside */
     useEffect(() => {
-        const handler = e => {
+        const closeOnOutsideClick = e => {
             if (!e.target.closest(".profile-dropdown")) setDropdownOpen(false);
             if (!e.target.closest(".notification-dropdown")) setShowNotif(false);
-
             if (
                 showMobileSearch &&
                 !e.target.closest("#mobile-search-bar") &&
@@ -145,22 +128,18 @@ const UserNavbar = () => {
                 setShowMobileSearch(false);
             }
         };
-        document.addEventListener("click", handler);
-        return () => document.removeEventListener("click", handler);
+        document.addEventListener("click", closeOnOutsideClick);
+        return () => document.removeEventListener("click", closeOnOutsideClick);
     }, [showMobileSearch]);
 
-    /* focus mobile search */
     useEffect(() => {
         if (showMobileSearch) mobileSearchRef.current?.focus();
     }, [showMobileSearch]);
 
-    /* lock scroll when drawer open */
     useEffect(() => {
         document.body.style.overflow = mobileMenuOpen ? "hidden" : "auto";
     }, [mobileMenuOpen]);
 
-
-    /* ───────────────────── JSX ───────────────────── */
     return (
         <div className="fixed top-0 left-0 w-full z-50">
             <nav
@@ -171,17 +150,16 @@ const UserNavbar = () => {
                     borderColor: "var(--border-color)",
                 }}
             >
-                {/* LEFT : burger + logo */}
+                {/* Left: Logo and Menu */}
                 <div className="flex items-center gap-3">
                     <button
                         className="md:hidden -ml-1"
                         onClick={() => setMobileMenuOpen(true)}
-                        style={{ color: "var(--text-color)" }}
                         aria-label="Open menu"
+                        style={{ color: "var(--text-color)" }}
                     >
                         <Menu size={22} />
                     </button>
-
                     <img
                         src={currentTheme === "dark" ? logowhite : logoDark}
                         alt="Logo"
@@ -190,7 +168,7 @@ const UserNavbar = () => {
                     />
                 </div>
 
-                {/* CENTER : links */}
+                {/* Center: Navigation Links */}
                 <ul className="hidden md:flex items-center gap-8 text-sm font-medium ml-[200px]">
                     {[
                         ["Home", "home"],
@@ -202,12 +180,14 @@ const UserNavbar = () => {
                             <a
                                 className="whitespace-nowrap hover:text-blue-600 transition cursor-pointer"
                                 onClick={() => handleSectionClick(id)}
-                            >{label}</a>
+                            >
+                                {label}
+                            </a>
                         </li>
                     ))}
                 </ul>
 
-                {/* RIGHT : desktop controls */}
+                {/* Right: Controls */}
                 <div className="hidden md:flex items-center gap-4">
                     <div className="relative">
                         <input
@@ -221,7 +201,6 @@ const UserNavbar = () => {
                                 backgroundColor: "var(--bg-color)",
                                 color: "var(--text-secondary)",
                                 borderColor: "var(--border-color)",
-                                caretColor: "var(--text-secondary)",
                             }}
                         />
                         <Search
@@ -247,10 +226,12 @@ const UserNavbar = () => {
                     {user && (
                         <Link
                             to="/my-orders"
-                            className="transition hover:text-blue-600"
+                            className="hover:text-blue-600 transition"
                             style={{ color: "var(--text-secondary)" }}
                             aria-label="My orders"
-                        ><ShoppingCart size={18} /></Link>
+                        >
+                            <ShoppingCart size={18} />
+                        </Link>
                     )}
 
                     {user && (
@@ -279,11 +260,13 @@ const UserNavbar = () => {
                                 backgroundColor: "var(--button-primary,#2563eb)",
                                 color: "#fff",
                             }}
-                        >Login</button>
+                        >
+                            Login
+                        </button>
                     )}
                 </div>
 
-                {/* mobile bell + search */}
+                {/* Mobile: Bell + Search */}
                 <div className="flex md:hidden items-center gap-4">
                     {user && (
                         <NotificationDropdown
@@ -295,17 +278,17 @@ const UserNavbar = () => {
                             setShowNotifications={setShowNotif}
                         />
                     )}
-
                     <button
                         id="mobile-search-toggle"
                         onClick={() => setShowMobileSearch(s => !s)}
-                        style={{ color: "var(--text-color)" }}
                         aria-label="Search"
-                    ><Search size={20} /></button>
+                        style={{ color: "var(--text-color)" }}
+                    >
+                        <Search size={20} />
+                    </button>
                 </div>
             </nav>
 
-            {/* mobile inline search */}
             {showMobileSearch && (
                 <div
                     id="mobile-search-bar"
@@ -328,147 +311,25 @@ const UserNavbar = () => {
                                 backgroundColor: "var(--bg-color)",
                                 color: "var(--text-secondary)",
                                 borderColor: "var(--border-color)",
-                                caretColor: "var(--text-secondary)",
                             }}
                         />
-                        <Search size={16}
+                        <Search
+                            size={16}
                             className="absolute left-3 top-2.5 pointer-events-none"
-                            style={{ color: "var(--text-secondary)" }} />
+                            style={{ color: "var(--text-secondary)" }}
+                        />
                     </div>
                 </div>
             )}
-
-            {mobileMenuOpen && (
-                <div
-                    className="md:hidden fixed inset-0 z-40 flex"
-                    style={{ backgroundColor: "rgba(0,0,0,0.35)" }}
-                >
-                    {/* sheet */}
-                    <aside
-                        className="w-[85%] max-w-xs h-full overflow-y-auto"
-                        style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
-                    >
-                        {/* header with avatar + close */}
-                        {/* HEADER inside the mobile drawer */}
-                        <div
-                            className="relative px-6 pr-14 py-5 border-b flex items-center justify-between"
-                            /*            ^^^^^^^  ← add “relative” so the absolute-positioned X can anchor */
-                            style={{ borderColor: "var(--border-color)" }}>
-
-                            {/* left: avatar + greeting */}
-                            <div className="flex items-center gap-4">
-                                <div
-                                    className="cursor-pointer w-11 h-11 rounded-full bg-gray-400 flex items-center justify-center overflow-hidden">
-                                    <img
-                                        src={
-                                            user?.profilePicture
-                                                ? `${import.meta.env.VITE_API_URL}/media/photo?file=${user.profilePicture}`
-                                                : "https://via.placeholder.com/100"
-                                        }
-                                        onError={(e) => {
-                                            e.currentTarget.src = "https://via.placeholder.com/100";
-                                        }}
-                                        alt="Profile"
-                                        className="w-full h-full object-cover rounded-full"
-                                    />
-                                </div>
-
-                                <div
-                                    onClick={() => {
-                                        setMobileMenuOpen(false);
-                                        navigate(user ? "/userprofile" : "/login");
-                                    }}
-                                    className="flex flex-col text-sm leading-tight">
-                                    <span className="font-medium">
-                                        {user ? `Hi, ${user.fullName?.split(" ")[0]}` : "Welcome"}
-                                    </span>
-                                    <span
-                                        className="text-[12px]"
-                                        style={{ color: "var(--text-secondary)" }}>
-                                        {user ? "Welcome back" : "Nice to see you"}
-                                    </span>
-                                </div>
-                            </div>
-
-                            {/* right: close button */}
-                            <button
-                                className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-[var(--hover-bg)]"
-                                onClick={() => setMobileMenuOpen(false)}
-                                style={{ color: "var(--text-color)" }}  /* ensure visible in both themes */
-                                aria-label="Close menu">
-                                <X size={20} />
-                            </button>
-                        </div>
-
-
-                        {/* MAIN LIST */}
-                        <nav className="pt-4">
-                            <ul className="flex flex-col gap-3 px-6">
-                                {[
-                                    ["Home", "home"],
-                                    ["Projects", "projects"],
-                                    ["Services", "services"],
-                                    ["About Us", "about"],
-                                ].map(([label, id]) => (
-                                    <li key={id}>
-                                        <button
-                                            onClick={() => {
-                                                handleSectionClick(id);
-                                                setMobileMenuOpen(false);
-                                            }}
-                                            className="block w-full text-left py-2 px-3 rounded
-                                 font-medium whitespace-nowrap
-                                 hover:bg-[var(--hover-bg)] transition">
-                                            {label}
-                                        </button>
-                                    </li>
-                                ))}
-                            </ul>
-                            <hr
-                                className="my-5 mx-6 border-[var(--border-color)]"
-                            />
-                        </nav>
-                        {/* footer */}
-                        <div
-                            className="px-6 py-6 space-y-4 border-t"
-                            style={{ borderColor: "var(--border-color)" }}
-                        >
-                            <button
-                                onClick={toggleDarkMode}
-                                className="w-full flex items-center justify-center gap-2 border py-2 rounded-full font-medium"
-                                style={{
-                                    borderColor: "var(--border-color)",
-                                    backgroundColor: "var(--hover-bg)",
-                                }}
-                            >
-                                {currentTheme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-                                {currentTheme === "dark" ? "Light Mode" : "Dark Mode"}
-                            </button>
-
-                            {user ? (
-                                <button
-                                    onClick={handleLogout}
-                                    className="w-full bg-blue-600 text-white py-2 rounded-full font-medium"
-                                >
-                                    Logout
-                                </button>
-                            ) : (
-                                <button
-                                    onClick={() => {
-                                        setMobileMenuOpen(false);
-                                        navigate("/login");
-                                    }}
-                                    className="w-full bg-indigo-600 text-white py-2 rounded-full font-medium"
-                                >
-                                    Login
-                                </button>
-                            )}
-                        </div>
-                    </aside>
-                    {/* translucent backdrop click to close */}
-                    <div className="flex-1" onClick={() => setMobileMenuOpen(false)} />
-                </div>
-            )}
+            <MobileMenu
+                isOpen={mobileMenuOpen}
+                onClose={() => setMobileMenuOpen(false)}
+                user={user}
+                currentTheme={currentTheme}
+                toggleDarkMode={toggleDarkMode}
+                handleLogout={handleLogout}
+                handleSectionClick={handleSectionClick}
+            />
         </div>
     );
 };
