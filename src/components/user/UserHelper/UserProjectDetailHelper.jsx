@@ -129,20 +129,30 @@ const UserProjectDetailHelper = ({
                             {/* Arrows */}
                             {canGoPrev && (
                                 <button
-                                    onClick={() => setGalleryIndex((prev) => prev - 1)}
-                                    className="absolute left-0 top-1/2 -translate-y-1/2 bg-white p-2 rounded-full shadow hover:bg-gray-100 transition"
+                                    onClick={() => setGalleryIndex(prev => prev - 1)}
+                                    className="
+      absolute left-0 top-1/2 -translate-y-1/2
+      p-2 rounded-full shadow transition-colors
+      bg-[var(--menu-bg)] hover:bg-[var(--hover-bg)]
+    "
                                 >
-                                    <ChevronLeft className="w-5 h-5" />
+                                    <ChevronLeft className="w-5 h-5 text-[var(--text-color)]" />
                                 </button>
                             )}
+
                             {canGoNext && (
                                 <button
-                                    onClick={() => setGalleryIndex((prev) => prev + 1)}
-                                    className="absolute right-0 top-1/2 -translate-y-1/2 bg-white p-2 rounded-full shadow hover:bg-gray-100 transition"
+                                    onClick={() => setGalleryIndex(prev => prev + 1)}
+                                    className="
+      absolute right-0 top-1/2 -translate-y-1/2
+      p-2 rounded-full shadow transition-colors
+      bg-[var(--menu-bg)] hover:bg-[var(--hover-bg)]
+    "
                                 >
-                                    <ChevronRight className="w-5 h-5" />
+                                    <ChevronRight className="w-5 h-5 text-[var(--text-color)]" />
                                 </button>
                             )}
+
                         </div>
                     </div>
                 )}

@@ -75,27 +75,6 @@ const TotalProjectCard = ({ project, onLiveView, onPurchase }) => {
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
-                                onLiveView(project.demoUrl);
-                            }}
-                            className="px-4 py-2 border rounded-md transition-colors"
-                            style={{
-                                borderColor: "var(--border-color)",
-                                backgroundColor: "transparent",
-                                color: "var(--text-color)",
-                            }}
-                            onMouseOver={(e) =>
-                                (e.currentTarget.style.backgroundColor = "var(--hover-bg)")
-                            }
-                            onMouseOut={(e) =>
-                                (e.currentTarget.style.backgroundColor = "transparent")
-                            }
-                        >
-                            Live Preview
-                        </button>
-
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
                                 onPurchase(project);
                             }}
                             className="px-4 py-2 text-white rounded-md transition-colors"

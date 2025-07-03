@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { FaStar, FaQuoteLeft } from "react-icons/fa";
 import myphoto from "../../assets/images/user.png";
 
@@ -5,32 +6,42 @@ const testimonials = [
     {
         name: "Kushal guragain",
         role: "CLIENT",
-        photo: { myphoto },
-        text: "I received excellent service from Project Hub during my project development time.",
+        photo: myphoto,
+        text: "ProjektHub made my project journey super smooth. They understood my requirements clearly and delivered right on time.",
         rating: 5,
     },
     {
         name: "Sandeep Oli",
         role: "CLIENT",
-        photo: { myphoto },
-        text: "I received excellent service from Project Hub during my project development career.",
+        photo: myphoto,
+        text: "From concept to completion, ProjektHub was with me at every step. Very professional and friendly team!",
         rating: 5,
     },
     {
         name: "Aakash Pun",
         role: "CLIENTS",
-        text: "I received excellent service from Project Hub during my project development career.",
+        photo: myphoto,
+        text: "Honestly, I didn’t expect such quality work at this price. ProjektHub exceeded my expectations! literally Outstanding services",
         rating: 5,
     },
     {
-        name: "Aakash Pun",
+        name: "Hritik Jha",
         role: "CLIENTS",
-        text: "I received excellent service from Project Hub during my project development career.",
+        photo: myphoto,
+        text: "I loved how responsive and creative the team at ProjektHub is. My project turned out better than I imagined!",
         rating: 5,
     },
 ];
 
+
+
+
 const Testimonials = () => {
+    const [expanded, setExpanded] = useState({});
+
+    const toggleExpand = (idx) => {
+        setExpanded((prev) => ({ ...prev, [idx]: !prev[idx] }));
+    };
     return (
         <section
             className="py-10 px-4 sm:px-8 lg:px-20 transition-colors duration-300"
@@ -54,53 +65,72 @@ const Testimonials = () => {
 
                 {/* Testimonials Grid */}
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                    {testimonials.map((testimonial, idx) => (
-                        <div
-                            key={idx}
-                            className="group relative rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border"
-                            style={{
-                                backgroundColor: "var(--menu-bg)",
-                                borderColor: "var(--border-color)"
-                            }}
-                        >
-                            {/* Quote Icon */}
-                            <div className="absolute -top-3 left-5">
-                                <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
-                                    <FaQuoteLeft className="text-white text-xs" />
+                    {testimonials.map((testimonial, idx) => {
+                        const isExpanded = expanded[idx];
+
+                        return (
+                            <div
+                                key={idx}
+                                className="group relative rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border"
+                                style={{
+                                    backgroundColor: "var(--menu-bg)",
+                                    borderColor: "var(--border-color)"
+                                }}
+                            >
+                                {/* Quote Icon */}
+                                <div className="absolute -top-3 left-5">
+                                    <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+                                        <FaQuoteLeft className="text-white text-xs" />
+                                    </div>
                                 </div>
-                            </div>
 
-                            {/* Rating */}
-                            <div className="flex items-center mb-4 pt-2">
-                                {[...Array(testimonial.rating)].map((_, i) => (
-                                    <FaStar key={i} className="text-yellow-400 text-sm mr-1" />
-                                ))}
-                            </div>
-
-                            {/* Testimonial Text */}
-                            <blockquote className="text-base leading-relaxed mb-6 line-clamp-2">
-                                "{testimonial.text}"
-                            </blockquote>
-
-                            {/* Author Info */}
-                            <div className="flex items-center">
-                                <div className="relative">
-                                    <img
-                                        src={myphoto}
-                                        alt={testimonial.name}
-                                        className="w-12 h-12 rounded-full object-cover border-2 border-white shadow"
-                                    />
+                                {/* Rating */}
+                                <div className="flex items-center mb-4 pt-2">
+                                    {[...Array(testimonial.rating)].map((_, i) => (
+                                        <FaStar key={i} className="text-yellow-400 text-sm mr-1" />
+                                    ))}
                                 </div>
-                                <div className="ml-3">
-                                    <h4 className="font-semibold text-base">{testimonial.name}</h4>
-                                    <p className="text-sm" style={{ color: "var(--text-secondary)" }}>{testimonial.role}</p>
-                                </div>
-                            </div>
 
-                            {/* Bottom Decorative */}
-                            <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-b-xl transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
-                        </div>
-                    ))}
+                                {/* Testimonial Text */}
+                                <blockquote
+                                    className={`text-base leading-relaxed mb-2 ${isExpanded ? "" : "line-clamp-2"
+                                        }`}
+                                >
+                                    "{testimonial.text}"
+                                </blockquote>
+
+                                {/* Show More / Show Less */}
+                                {testimonial.text.length > 100 && (
+                                    <button
+                                        onClick={() => toggleExpand(idx)}
+                                        className="text-blue-600 text-sm font-medium focus:outline-none mb-4"
+                                    >
+                                        {isExpanded ? "Show less" : "Show more"}
+                                    </button>
+                                )}
+
+                                {/* Author Info */}
+                                <div className="flex items-center">
+                                    <div className="relative">
+                                        <img
+                                            src={testimonial.photo}
+                                            alt={testimonial.name}
+                                            className="w-12 h-12 rounded-full object-cover border-2 border-white shadow"
+                                        />
+                                    </div>
+                                    <div className="ml-3">
+                                        <h4 className="font-semibold text-base">{testimonial.name}</h4>
+                                        <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+                                            {testimonial.role}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Bottom Decorative */}
+                                <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-b-xl transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+                            </div>
+                        );
+                    })}
                 </div>
 
                 {/* Bottom CTA */}

@@ -26,9 +26,7 @@ const SeeAllProject = () => {
     const [showModal, setShowModal] = useState(false);
     const [selectedProject, setSelectedProject] = useState(null);
 
-    const handleLiveView = (url) => {
-        window.open(url || "https://dineshpaudel1.com.np", "_blank");
-    };
+
 
     const openModal = (project) => {
         setSelectedProject(project);
@@ -60,7 +58,6 @@ const SeeAllProject = () => {
                             <TotalProjectCard
                                 key={project.id}
                                 project={project}
-                                onLiveView={handleLiveView}
                                 onPurchase={openModal}
                             />
                         ))
